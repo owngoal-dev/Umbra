@@ -1,12 +1,11 @@
-Package: com.umbra.manager
-Name: Umbra Manager
+Package: wiki.qaq.umbra
+Name: Umbra (RootHide Manager)
 Version: 2.0
 Architecture: iphoneos-arm64e
 Depends: firmware (>= 15.0)
-Description: Manage jailbreak concealment in RootHide environments
-Maintainer: Umbra
-Author: Umbra
-Section: System
-Icon: 
+Description: Manage jailbreak concealment in RootHide environments.
+Maintainer: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Author: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Section: Utilities
 Conflicts: com.roothide.manager
 Replaces: com.roothide.manager
