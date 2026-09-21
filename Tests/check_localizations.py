@@ -47,7 +47,7 @@ assert source_keys('L(flag ? "One" : "Two"); NSLocalizedString(@"A, " @"B", nil)
 }
 
 catalog = json.loads(
-    (ROOT / "RootHide/Localizable.xcstrings").read_text(), object_pairs_hook=unique_object
+    (ROOT / "Umbra/Localizable.xcstrings").read_text(), object_pairs_hook=unique_object
 )
 assert catalog["sourceLanguage"] == "en"
 assert catalog["version"] == "1.0"
@@ -68,10 +68,10 @@ for key, entry in strings.items():
                 assert "Sileo" in value and "Zebra" not in value, f"Outdated uninstall guidance: {language}, {key!r}"
 
 references = set()
-for path in (ROOT / "RootHide").rglob("*"):
+for path in (ROOT / "Umbra").rglob("*"):
     if path.suffix in {".swift", ".m", ".mm", ".h", ".c", ".cpp"}:
         references.update(source_keys(path.read_text()))
 missing = references - strings.keys()
 assert not missing, "Missing localization keys:\n" + "\n".join(sorted(missing))
-assert not list((ROOT / "RootHide").glob("*.lproj/Localizable.strings")), "Legacy .strings files remain"
+assert not list((ROOT / "Umbra").glob("*.lproj/Localizable.strings")), "Legacy .strings files remain"
 print(f"Localization check passed: {len(strings)} strings, {len(LANGUAGES)} languages.")

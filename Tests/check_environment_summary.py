@@ -5,12 +5,12 @@ import tempfile
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
-source = (root / "RootHide/AppUI.swift").read_text()
+source = (root / "Umbra/AppUI.swift").read_text()
 start = source.index("    var summary: String {")
 summary = source[start:source.index("\n    func refresh()", start)].replace(
     'Bundle.main.preferredLocalizations.first ?? "en"', "testLanguage"
 )
-catalog = json.loads((root / "RootHide/Localizable.xcstrings").read_text())["strings"]
+catalog = json.loads((root / "Umbra/Localizable.xcstrings").read_text())["strings"]
 translations = {
     locale: {
         key: unit["value"]
@@ -58,7 +58,7 @@ let arabic = Check(findings: ["SSH Server", "Dropbear", "Frida Server", "VPN or 
 assert(arabic.contains("؛ "))
 print("Arabic 4: \\(arabic)")
 '''
-with tempfile.TemporaryDirectory(prefix="roothide-summary-") as directory:
+with tempfile.TemporaryDirectory(prefix="umbra-summary-") as directory:
     temp = Path(directory)
     (temp / "check.swift").write_text(script)
     (temp / "translations.json").write_text(json.dumps(translations))

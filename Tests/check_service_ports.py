@@ -5,7 +5,7 @@ import tempfile
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
-source = (root / "RootHide/RHServicePorts.m").read_text()
+source = (root / "Umbra/RHServicePorts.m").read_text()
 parsers = source[source.index("static NSNumber *PortNumber("):source.index("static NSMutableDictionary *ReadConfig(")]
 check = r'''
 int main(void) {
@@ -62,7 +62,7 @@ int main(void) {
     }
 }
 '''
-with tempfile.TemporaryDirectory(prefix="roothide-ports-") as directory:
+with tempfile.TemporaryDirectory(prefix="umbra-ports-") as directory:
     temp = Path(directory)
     path = temp / "check.m"
     path.write_text('#import <Foundation/Foundation.h>\n#include <assert.h>\n' + parsers + check)

@@ -1,12 +1,12 @@
-Package: com.roothide.manager
-Name: RootHide Manager
+Package: com.umbra.manager
+Name: Umbra Manager
 Version: 2.0
 Architecture: iphoneos-arm64e
 Depends: firmware (>= 15.0)
-Description: Configuare RootHide's Features
-Maintainer: roothide
-Author: roothide
+Description: Manage jailbreak concealment in RootHide environments
+Maintainer: Umbra
+Author: Umbra
 Section: System
 Icon: 
-Depiction: https://github.com/roothide/RootHideManagerApp
-Support: https://github.com/roothide/RootHideManagerApp
+Conflicts: com.roothide.manager
+Replaces: com.roothide.manager

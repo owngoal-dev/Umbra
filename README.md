@@ -1,4 +1,4 @@
-# RootHide Manager
+# Umbra
 
 iOS 15+。Swift/UIKit 界面，保留 Objective-C 系统接口和清理规则引擎。
 
@@ -12,7 +12,7 @@ iOS 15+。Swift/UIKit 界面，保留 Objective-C 系统接口和清理规则引
 
 ## 构建与检查
 
-建议使用 Xcode 16 或更新版本打开 `RootHide.xcodeproj`。真实功能依赖设备上的 RootHide 环境及原有权限；普通模拟器不具备这些系统接口。
+建议使用 Xcode 16 或更新版本打开 `Umbra.xcodeproj`。真实功能依赖设备上的 RootHide 环境及原有权限；普通模拟器不具备这些系统接口。
 
 ```sh
 # 无需 Theos：格式化、严格检查和非破坏性回归检查
@@ -21,7 +21,7 @@ make format-check
 make check
 
 # 未签名真机构建
-xcodebuild -project RootHide.xcodeproj -scheme RootHide \
+xcodebuild -project Umbra.xcodeproj -scheme Umbra \
   -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
   CODE_SIGNING_ALLOWED=NO ARCHS='arm64 arm64e' build
 
@@ -29,14 +29,22 @@ xcodebuild -project RootHide.xcodeproj -scheme RootHide \
 make THEOS="$HOME/theos-roothide" package
 ```
 
-`make format` 合并 Xcode 自带的 `swift-format` 与 `clang-format`，后者须在 PATH 中（可用 `brew install clang-format` 安装）。可通过 `SWIFT_FORMAT`、`CLANG_FORMAT` 覆盖命令。第三方 JSON 注释解析器及 RootHide 头文件不批量改写。
+`make format` 合并 Xcode 自带的 `swift-format` 与 `clang-format`，后者须在 PATH 中（可用 `brew install clang-format` 安装）。可通过 `SWIFT_FORMAT`、`CLANG_FORMAT` 覆盖命令。第三方 JSON 注释解析器及 roothide 头文件不批量改写。
 
 `make check` 需要 Python 3 和 Xcode 命令行工具，验证八语言翻译覆盖及参数一致性、环境摘要的分组与简写、服务端口配置的读写与校验、清理规则优先级和选择恢复、内置规则 CRC；不执行清理操作。修改 `VarCleanRules.json` 后需同步更新 `VarCleanRules.h`，Theos 的 `before-all` 会自动生成该校验值。
 
-本地化集中于 `RootHide/Localizable.xcstrings`：英语、简体中文、日语、德语、法语、意大利语、阿拉伯语、越南语。旧配置文件路径及格式保持兼容。
+本地化集中于 `Umbra/Localizable.xcstrings`：英语、简体中文、日语、德语、法语、意大利语、阿拉伯语、越南语。旧配置文件路径及格式保持兼容。
+
+Bundle ID 与 deb 包名为 `com.umbra.manager`，可执行文件安装到 `/Applications/Umbra.app/Umbra`；deb 通过 `Conflicts`/`Replaces` 声明取代旧的 `com.roothide.manager`，升级时不会并存两个 App。服务端口备份后缀改为 `.umbra-backup`，旧版本留下的 `.roothide-backup` 文件不再被识别，需要时可手动删除。`RootHideConfig.plist` 等与 roothidehooks 共享的路径和格式不变。
 
 ## 图标
 
-重绘源图为 `RootHide/Assets.xcassets/AppIcon.appiconset/icon-1024.png`，已生成全部 iPhone/iPad 图标尺寸。通过内置 ImageGen 生成，再用系统 `sips` 缩放；设置页使用同源 `BrandIcon`。
+运行 `swift Tools/make-icon.swift` 重新生成全部图标：脚本用 CoreGraphics 矢量绘制，4 倍超采样后逐级缩放，直接写出 `Umbra/Assets.xcassets/AppIcon.appiconset/` 中 `Contents.json` 列出的全部 18 个 iPhone/iPad 尺寸，以及设置页使用的 228×228 `BrandIcon`。输出确定性可重现，不依赖外部素材。之后可选地压一次源图：
 
-生成提示：保留原有深色背景、带叶片的咬痕苹果轮廓、右半白色与左半彩色终端纹理、左下至右上的细斜向棱彩分割线。简化终端字符为稀疏的绿、黄、珊瑚红和紫色横向符号；边缘清晰、缩小后易辨认；不添加文字、边框、圆角或其他图形。
+```sh
+magick Umbra/Assets.xcassets/AppIcon.appiconset/icon-1024.png \
+  -strip -define png:compression-level=9 \
+  Umbra/Assets.xcassets/AppIcon.appiconset/icon-1024.png
+```
+
+设计取 Umbra（本影）之意：近黑深蓝的径向渐变底色上，暖色太阳被略大的深色本影圆盘自左下遮蔽，只在右上留下一弯细亮边与向外扩散的日冕辉光；本影边缘保留一圈极细的冷色高光，缩小到 29 px 时轮廓仍可辨认。纯图形，不含文字、边框或圆角（圆角由 iOS 自动遮罩）。
