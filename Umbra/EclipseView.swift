@@ -25,6 +25,9 @@ final class EclipseView: UIView {
     /// wait off-screen (the two off-screen keyframes hide the jump back to the
     /// entry side), then sweep in and settle again.
     private static let cycle: CFTimeInterval = 14
+    /// Easter egg: the header sits on the icon for this long before the first
+    /// eclipse begins, so only people who linger in Settings ever see it move.
+    private static let dormancy: CFTimeInterval = 30
     private static let keyTimes: [NSNumber] = [0, 0.36, 0.62, 0.71, 0.711, 0.72, 1]
 
     // MARK: Palette
@@ -328,6 +331,7 @@ final class EclipseView: UIView {
         let easeInOut = CAMediaTimingFunction(name: .easeInEaseOut)
         let linear = CAMediaTimingFunction(name: .linear)
         let tot = point(Self.totality)
+        let wake = CACurrentMediaTime() + Self.dormancy
         let step = CGPoint(x: Self.track.x * Self.reach * unit, y: Self.track.y * Self.reach * unit)
         let start = CGPoint(x: tot.x - step.x, y: tot.y - step.y)
         let end = CGPoint(x: tot.x + step.x, y: tot.y + step.y)
@@ -343,6 +347,7 @@ final class EclipseView: UIView {
             animation.duration = Self.cycle
             animation.repeatCount = .infinity
             animation.isRemovedOnCompletion = false
+            animation.beginTime = wake
             return animation
         }
 
@@ -397,6 +402,7 @@ final class EclipseView: UIView {
         breathe.autoreverses = true
         breathe.repeatCount = .infinity
         breathe.timingFunction = easeInOut
+        breathe.beginTime = wake
         corona.add(breathe, forKey: "breathe")
 
         let turn = CABasicAnimation(keyPath: "transform.rotation.z")
@@ -404,6 +410,7 @@ final class EclipseView: UIView {
         turn.toValue = 2 * CGFloat.pi
         turn.duration = 70
         turn.repeatCount = .infinity
+        turn.beginTime = wake
         streamers.add(turn, forKey: "turn")
 
         let drift = CABasicAnimation(keyPath: "transform.rotation.z")
@@ -411,6 +418,7 @@ final class EclipseView: UIView {
         drift.toValue = -2 * CGFloat.pi
         drift.duration = 110
         drift.repeatCount = .infinity
+        drift.beginTime = wake
         wisps.add(drift, forKey: "drift")
     }
 }
