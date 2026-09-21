@@ -25,7 +25,7 @@ NSString *RootUserClearAppData(AppInfo *app);
 
 static BOOL RHFail(NSError **error, NSString *message) {
     if (error) {
-        *error = [NSError errorWithDomain:@"com.umbra.manager"
+        *error = [NSError errorWithDomain:@"wiki.qaq.umbra"
                                      code:1
                                  userInfo:@{NSLocalizedDescriptionKey : message}];
     }

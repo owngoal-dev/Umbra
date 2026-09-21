@@ -33,7 +33,7 @@ xcodebuild -project Umbra.xcodeproj -scheme Umbra \
 make THEOS="$HOME/theos-roothide" package
 ```
 
-The app installs to `/Applications/Umbra.app`. Bundle ID and package name are `com.umbra.manager`.
+The app installs to `/Applications/Umbra.app`. Bundle ID and package name are `wiki.qaq.umbra`.
 
 ### Checks
 
@@ -99,7 +99,7 @@ xcodebuild -project Umbra.xcodeproj -scheme Umbra \
 make THEOS="$HOME/theos-roothide" package
 ```
 
-App 安装到 `/Applications/Umbra.app`，Bundle ID 与包名均为 `com.umbra.manager`。
+App 安装到 `/Applications/Umbra.app`，Bundle ID 与包名均为 `wiki.qaq.umbra`。
 
 ### 检查
 

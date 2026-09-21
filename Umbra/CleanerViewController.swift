@@ -113,7 +113,7 @@ private final class CleanerCheckbox: UIView {
 }
 
 final class CleanerViewController: UITableViewController {
-    private let worker = DispatchQueue(label: "com.umbra.manager.cleanup", qos: .userInitiated)
+    private let worker = DispatchQueue(label: "wiki.qaq.umbra.cleanup", qos: .userInitiated)
     private var groups: [RHCleanGroup] = []
     private var files: [CleanFileID: RHCleanItem] = [:]
     private var failures: [String: String] = [:]

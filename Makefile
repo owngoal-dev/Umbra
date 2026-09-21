@@ -38,7 +38,7 @@ before-package::
 	ldid -M -S./nickchan.entitlements $(THEOS_STAGING_DIR)/Applications/Umbra.app/Umbra
 
 after-install::
-	install.exec 'uiopen -b com.umbra.manager'
+	install.exec 'uiopen -b wiki.qaq.umbra'
 
 endif
 

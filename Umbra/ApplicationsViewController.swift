@@ -6,7 +6,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
     private let check: EnvironmentCheck
     private let search = UISearchController(searchResultsController: nil)
     private let workQueue = DispatchQueue(
-        label: "com.umbra.manager.applications", qos: .userInitiated)
+        label: "wiki.qaq.umbra.applications", qos: .userInitiated)
     private var apps: [AppInfo] = []
     private var filtered: [AppInfo] = []
     private var configuration: [String: Bool] = [:]

@@ -496,7 +496,7 @@
             "com.google.gmp.measurement.plist",
         ],
         "blacklist":[
-            "com.umbra.manager.plist",
+            "wiki.qaq.umbra.plist",
             "com.roothide.manager.plist",
             "com.opa334.Dopamine.roothide.plist",
             "com.opa334.Dopamine.plist",
@@ -547,7 +547,7 @@
 			{"match":"regexp", "name":"^com\\.apple\\."},
 		],
 		"blacklist":[
-			"com.umbra.manager",
+			"wiki.qaq.umbra",
 			"com.roothide.manager",
 			"com.opa334.Dopamine.roothide",
 			"com.opa334.Dopamine",
