@@ -21,8 +21,11 @@ final class EclipseView: UIView {
     /// the loop can restart without a visible jump.
     private static let reach: CGFloat = 1260
 
+    /// One cycle starts and ends on the icon composition: rest there, sweep out,
+    /// wait off-screen (the two off-screen keyframes hide the jump back to the
+    /// entry side), then sweep in and settle again.
     private static let cycle: CFTimeInterval = 14
-    private static let keyTimes: [NSNumber] = [0, 0.28, 0.64, 0.90, 1]
+    private static let keyTimes: [NSNumber] = [0, 0.36, 0.62, 0.71, 0.711, 0.72, 1]
 
     // MARK: Palette
 
@@ -343,10 +346,12 @@ final class EclipseView: UIView {
             return animation
         }
 
-        // Moon: sweep in, settle at totality, rest, sweep out, wait off-screen.
-        let travel = [easeInOut, linear, easeInOut, linear]
+        // Moon: rest at totality, sweep out, wait off-screen, sweep back in.
+        let travel = [linear, easeInOut, linear, linear, linear, easeInOut]
         moon.add(
-            cycle("position", [start, tot, tot, end, end], Self.keyTimes, timing: travel),
+            cycle(
+                "position", [tot, tot, end, end, start, start, tot], Self.keyTimes,
+                timing: travel),
             forKey: "position")
 
         // The limb lighting keeps facing the Sun as the Moon passes it.
@@ -354,34 +359,34 @@ final class EclipseView: UIView {
         let upRight = CGPoint(x: 1, y: 0)
         let upLeft = CGPoint(x: 0, y: 0)
         let downLeft = CGPoint(x: 0, y: 1)
-        let towards = [downRight, upRight, upRight, upLeft, upLeft]
-        let away = [upLeft, downLeft, downLeft, downRight, downRight]
+        let towards = [upRight, upRight, upLeft, upLeft, downRight, downRight, upRight]
+        let away = [downLeft, downLeft, downRight, downRight, upLeft, upLeft, downLeft]
         moonWrapMask.add(cycle("startPoint", towards, Self.keyTimes, timing: travel), forKey: "s")
         moonWrapMask.add(cycle("endPoint", away, Self.keyTimes, timing: travel), forKey: "e")
         moonSheenMask.add(cycle("startPoint", away, Self.keyTimes, timing: travel), forKey: "s")
         moonSheenMask.add(cycle("endPoint", towards, Self.keyTimes, timing: travel), forKey: "e")
 
         // Corona and streamers emerge only around totality; glare does the opposite.
-        let coronaTimes: [NSNumber] = [0, 0.19, 0.28, 0.64, 0.73, 1]
-        let coronaValues: [Float] = [0, 0, 1, 1, 0, 0]
+        let coronaTimes: [NSNumber] = [0, 0.36, 0.45, 0.72, 0.91, 1]
+        let coronaValues: [Float] = [1, 1, 0, 0, 0, 1]
         corona.add(cycle("opacity", coronaValues, coronaTimes), forKey: "opacity")
 
         // Totality begins as the plain icon; the streamers bloom while it rests.
-        let bloomTimes: [NSNumber] = [0, 0.31, 0.43, 0.54, 0.64, 1]
+        let bloomTimes: [NSNumber] = [0, 0.03, 0.15, 0.26, 0.36, 1]
         streamers.add(cycle("opacity", [0, 0, 1, 1, 0, 0], bloomTimes), forKey: "opacity")
         wisps.add(cycle("opacity", [0, 0, 0.8, 0.8, 0, 0], bloomTimes), forKey: "opacity")
         rimGlow.add(
-            cycle("opacity", [0.35, 0.35, 1, 1, 0.35, 0.35], [0, 0.15, 0.28, 0.64, 0.77, 1]),
+            cycle("opacity", [1, 1, 0.35, 0.35, 0.35, 1], [0, 0.36, 0.49, 0.72, 0.87, 1]),
             forKey: "opacity")
         glare.add(
-            cycle("opacity", [1, 0.7, 0, 0, 0.7, 1], [0, 0.14, 0.27, 0.65, 0.78, 1]),
+            cycle("opacity", [0, 0, 0.7, 1, 0.7, 0, 0], [0, 0.37, 0.50, 0.72, 0.86, 0.99, 1]),
             forKey: "opacity")
 
         // Diamond ring flashes as totality begins and ends.
         diamond.add(
             cycle(
-                "opacity", [0, 0, 1, 0, 0, 1, 0, 0],
-                [0, 0.245, 0.27, 0.295, 0.625, 0.65, 0.675, 1]),
+                "opacity", [0, 0, 1, 0, 0, 1, 0],
+                [0, 0.345, 0.37, 0.395, 0.95, 0.975, 1]),
             forKey: "opacity")
 
         // Slow, continuous life: the corona breathes and the streamers turn.
