@@ -38,7 +38,7 @@ let sunWarm: UInt32 = 0xFFD2_7A  // photosphere highlight
 let sunDeep: UInt32 = 0xFF7A_3D  // photosphere shadow
 let coronaWarm: UInt32 = 0xFF9A_4D  // outer glow
 let coronaBright: UInt32 = 0xFFD9_A0  // tight rim glow
-let umbraCore: UInt32 = 0x0A0E_18  // occulting disk centre
+let umbraCore: UInt32 = 0x1016_26  // occulting disk centre
 let umbraEdge: UInt32 = 0x0609_11  // occulting disk edge
 let rimCool: UInt32 = 0x7FB3_FF  // cool limb highlight
 
@@ -115,6 +115,30 @@ func draw(into context: CGContext) {
         startCenter: umbraCentre, startRadius: 0,
         endCenter: umbraCentre, endRadius: umbraRadius,
         options: [.drawsAfterEndLocation])
+
+    // 5a. Limb shading: a band that follows the disk's own edge, transparent
+    //     towards the centre, attenuated by direction so the corona wraps warmly
+    //     onto the limb facing the sun and a faint cool sheen lifts the far side.
+    //     This keeps the disk reading as a sphere instead of a flat cut-out.
+    let diagonal = umbraRadius * 0.7071
+    let towardsSun = CGPoint(x: umbraCentre.x + diagonal, y: umbraCentre.y + diagonal)
+    let awayFromSun = CGPoint(x: umbraCentre.x - diagonal, y: umbraCentre.y - diagonal)
+    func limbBand(_ colour: UInt32, peak: CGFloat, inner: CGFloat, from: CGPoint, to: CGPoint) {
+        context.beginTransparencyLayer(auxiliaryInfo: nil)
+        context.drawRadialGradient(
+            gradient([(colour, 0, 0), (colour, peak * 0.35, 0.72), (colour, peak, 1)]),
+            startCenter: umbraCentre, startRadius: umbraRadius * inner,
+            endCenter: umbraCentre, endRadius: umbraRadius,
+            options: [.drawsAfterEndLocation])
+        context.setBlendMode(.destinationIn)
+        context.drawLinearGradient(
+            gradient([(0xFFFF_FF, 1, 0), (0xFFFF_FF, 0.35, 0.5), (0xFFFF_FF, 0, 1)]),
+            start: from, end: to,
+            options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+        context.endTransparencyLayer()
+    }
+    limbBand(coronaBright, peak: 0.55, inner: 0.70, from: towardsSun, to: awayFromSun)
+    limbBand(rimCool, peak: 0.16, inner: 0.62, from: awayFromSun, to: towardsSun)
     context.restoreGState()
 
     // 6. A hairline cool highlight on the umbral limb, brightest on the shadow
@@ -124,7 +148,6 @@ func draw(into context: CGContext) {
     context.setLineWidth(3)
     context.replacePathWithStrokedPath()
     context.clip()
-    let diagonal = umbraRadius * 0.7071
     context.drawLinearGradient(
         gradient([(rimCool, 0.40, 0), (rimCool, 0.12, 0.55), (rimCool, 0, 1)]),
         start: CGPoint(x: umbraCentre.x - diagonal, y: umbraCentre.y - diagonal),
