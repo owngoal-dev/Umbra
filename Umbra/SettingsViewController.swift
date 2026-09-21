@@ -125,9 +125,9 @@ final class SettingsViewController: UITableViewController {
         let header = UIView()
         header.backgroundColor = .systemGroupedBackground
 
-        let icon = UIImageView(image: UIImage(named: "BrandIcon"))
-        icon.contentMode = .scaleAspectFit
+        let icon = EclipseView()
         icon.layer.cornerRadius = 17
+        icon.layer.cornerCurve = .continuous
         icon.clipsToBounds = true
         let name = UILabel()
         name.text = "Umbra"

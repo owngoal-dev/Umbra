@@ -18,6 +18,7 @@
 		BFA3034C2A47EBA800DC242C /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA3034A2A47EBA800DC242C /* AppInfo.m */; };
 		A9B47589F1C47027677602E0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1F7322E3D6FD9B8F13C6F4 /* AppDelegate.swift */; };
 		427A750B42BCB2821214B1D1 /* AppUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC90D4646905E1C675CD010 /* AppUI.swift */; };
+		7E1C4A9B2D3F4E5A6B7C8D91 /* EclipseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E1C4A9B2D3F4E5A6B7C8D90 /* EclipseView.swift */; };
 		DE3EF99B42548AABDB56B5F8 /* ApplicationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D98F0ECB7381B5EE018586 /* ApplicationsViewController.swift */; };
 		15386168BE3D6F1250F2C642 /* CleanerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1A8B1793CBF40B3F3CC395 /* CleanerViewController.swift */; };
 		A47807C9DBB8B298C437C870 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DF354BA4E12ECD10CD88066 /* SettingsViewController.swift */; };
@@ -53,6 +54,7 @@
 		BFA3034A2A47EBA800DC242C /* AppInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppInfo.m; sourceTree = "<group>"; };
 		1F1F7322E3D6FD9B8F13C6F4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate.swift"; sourceTree = "<group>"; };
 		EFC90D4646905E1C675CD010 /* AppUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppUI.swift"; sourceTree = "<group>"; };
+		7E1C4A9B2D3F4E5A6B7C8D90 /* EclipseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EclipseView.swift"; sourceTree = "<group>"; };
 		48D98F0ECB7381B5EE018586 /* ApplicationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApplicationsViewController.swift"; sourceTree = "<group>"; };
 		DE1A8B1793CBF40B3F3CC395 /* CleanerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CleanerViewController.swift"; sourceTree = "<group>"; };
 		5DF354BA4E12ECD10CD88066 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsViewController.swift"; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 			children = (
 				1F1F7322E3D6FD9B8F13C6F4 /* AppDelegate.swift */,
 				EFC90D4646905E1C675CD010 /* AppUI.swift */,
+				7E1C4A9B2D3F4E5A6B7C8D90 /* EclipseView.swift */,
 				48D98F0ECB7381B5EE018586 /* ApplicationsViewController.swift */,
 				DE1A8B1793CBF40B3F3CC395 /* CleanerViewController.swift */,
 				5DF354BA4E12ECD10CD88066 /* SettingsViewController.swift */,
@@ -239,6 +242,7 @@
 				BFA3034C2A47EBA800DC242C /* AppInfo.m in Sources */,
 				A9B47589F1C47027677602E0 /* AppDelegate.swift in Sources */,
 				427A750B42BCB2821214B1D1 /* AppUI.swift in Sources */,
+				7E1C4A9B2D3F4E5A6B7C8D91 /* EclipseView.swift in Sources */,
 				DE3EF99B42548AABDB56B5F8 /* ApplicationsViewController.swift in Sources */,
 				15386168BE3D6F1250F2C642 /* CleanerViewController.swift in Sources */,
 				A47807C9DBB8B298C437C870 /* SettingsViewController.swift in Sources */,

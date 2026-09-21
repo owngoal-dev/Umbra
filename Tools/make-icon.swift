@@ -5,7 +5,9 @@
 //
 //  Draws the Umbra app icon (a total solar eclipse: a dark umbral disk covering a
 //  warm sun, leaving a thin bright crescent and corona at the upper right) and
-//  writes every size listed in AppIcon.appiconset/Contents.json plus BrandIcon.
+//  writes every size listed in AppIcon.appiconset/Contents.json plus MoonDisk (the
+//  textured Moon alone, transparent outside the disk, used by the animated
+//  eclipse in Settings).
 //
 //  Usage: swift Tools/make-icon.swift
 //
@@ -72,7 +74,7 @@ let root = URL(fileURLWithPath: CommandLine.arguments[0])
     .deletingLastPathComponent()  // Tools
     .deletingLastPathComponent()  // repository root
 let appIcon = root.appendingPathComponent("Umbra/Assets.xcassets/AppIcon.appiconset")
-let brandIcon = root.appendingPathComponent("Umbra/Assets.xcassets/BrandIcon.imageset")
+let moonDiskSet = root.appendingPathComponent("Umbra/Assets.xcassets/MoonDisk.imageset")
 
 // MARK: - Lunar surface
 
@@ -138,8 +140,11 @@ let moonDisk: CGImage = {
             let u = u0 * cos(viewRoll) - v0 * sin(viewRoll)
             let v = u0 * sin(viewRoll) + v0 * cos(viewRoll)
             let rr = u * u + v * v
-            guard rr <= 1 else { continue }
-            let z = (1 - rr).squareRoot()
+            // Anti-aliased edge: fade alpha across the last pixel of the disk.
+            let edge = (1 - rr.squareRoot()) * CGFloat(size) / 2
+            let coverage = max(0, min(1, edge + 0.5))
+            guard coverage > 0 else { continue }
+            let z = (1 - min(rr, 1)).squareRoot()
             // Rotate the view vector by the sub-observer latitude, then longitude.
             let y = v * cosLat + z * sinLat
             let zz = z * cosLat - v * sinLat
@@ -147,17 +152,18 @@ let moonDisk: CGImage = {
             let longitude = atan2(u, zz) + viewLongitude
             let grey = map.sample(longitude: longitude, latitude: latitude)
             let i = (py * size + px) * 4
-            pixels[i] = UInt8(max(0, min(255, grey * moonTint.0 * 255)))
-            pixels[i + 1] = UInt8(max(0, min(255, grey * moonTint.1 * 255)))
-            pixels[i + 2] = UInt8(max(0, min(255, grey * moonTint.2 * 255)))
-            pixels[i + 3] = 255
+            // Premultiplied RGBA.
+            pixels[i] = UInt8(max(0, min(255, grey * moonTint.0 * coverage * 255)))
+            pixels[i + 1] = UInt8(max(0, min(255, grey * moonTint.1 * coverage * 255)))
+            pixels[i + 2] = UInt8(max(0, min(255, grey * moonTint.2 * coverage * 255)))
+            pixels[i + 3] = UInt8(coverage * 255)
         }
     }
     let provider = CGDataProvider(data: Data(pixels) as CFData)!
     return CGImage(
         width: size, height: size, bitsPerComponent: 8, bitsPerPixel: 32,
         bytesPerRow: size * 4, space: sRGB,
-        bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipLast.rawValue),
+        bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
         provider: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent)!
 }()
 
@@ -320,5 +326,11 @@ for (name, pixels) in appIconSizes {
     write(image, to: appIcon.appendingPathComponent(name))
     print("\(name) \(pixels)x\(pixels)")
 }
-write(render(228), to: brandIcon.appendingPathComponent("BrandIcon.png"))
-print("BrandIcon.png 228x228")
+let moonDiskSize = 360
+let moonDiskContext = CGContext(
+    data: nil, width: moonDiskSize, height: moonDiskSize, bitsPerComponent: 8, bytesPerRow: 0,
+    space: sRGB, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+moonDiskContext.interpolationQuality = .high
+moonDiskContext.draw(moonDisk, in: CGRect(x: 0, y: 0, width: moonDiskSize, height: moonDiskSize))
+write(moonDiskContext.makeImage()!, to: moonDiskSet.appendingPathComponent("MoonDisk.png"))
+print("MoonDisk.png \(moonDiskSize)x\(moonDiskSize)")
