@@ -6,9 +6,11 @@
 #import <CFNetwork/CFNetwork.h>
 #import <IOKit/IOKitLib.h>
 #include <arpa/inet.h>
+#include <mach/machine.h>
 #include <spawn.h>
 #include <sys/mount.h>
 #include <sys/socket.h>
+#include <sys/sysctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <zlib.h>
@@ -200,12 +202,14 @@ static BOOL RHPortIsOpen(uint16_t port) {
 }
 
 + (BOOL)requiresCompatibilityWarning {
-#ifdef __arm64e__
-    return [[self configurationForKey:@"spinlockFixApplied"] boolValue] &&
-           NSProcessInfo.processInfo.operatingSystemVersion.majorVersion == 15;
-#else
-    return NO;
-#endif
+    if (![[self configurationForKey:@"spinlockFixApplied"] boolValue] ||
+        NSProcessInfo.processInfo.operatingSystemVersion.majorVersion != 15) {
+        return NO;
+    }
+    cpu_subtype_t subtype = 0;
+    size_t size = sizeof(subtype);
+    return sysctlbyname("hw.cpusubtype", &subtype, &size, NULL, 0) == 0 &&
+           (subtype & ~CPU_SUBTYPE_MASK) == CPU_SUBTYPE_ARM64E;
 }
 
 + (BOOL)setBlacklisted:(BOOL)blacklisted forApp:(AppInfo *)app error:(NSError **)error {

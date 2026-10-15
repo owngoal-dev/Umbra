@@ -27,7 +27,7 @@ Requires Xcode 16 or later. The app depends on a RootHide environment on a real 
 # Unsigned device build
 xcodebuild -project Umbra.xcodeproj -scheme Umbra \
   -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
-  CODE_SIGNING_ALLOWED=NO ARCHS='arm64 arm64e' build
+  CODE_SIGNING_ALLOWED=NO ARCHS=arm64 build
 
 # Package a deb (requires Theos with the roothide package scheme, and ldid)
 make THEOS="$HOME/theos-roothide" package
@@ -93,7 +93,7 @@ Umbra 是 RootHide 自定义固件的管理 App，用于对 App 隐藏自定义�
 # 未签名真机构建
 xcodebuild -project Umbra.xcodeproj -scheme Umbra \
   -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
-  CODE_SIGNING_ALLOWED=NO ARCHS='arm64 arm64e' build
+  CODE_SIGNING_ALLOWED=NO ARCHS=arm64 build
 
 # 打包 deb（需要带 roothide package scheme 的 Theos 与 ldid）
 make THEOS="$HOME/theos-roothide" package

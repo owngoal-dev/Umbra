@@ -1,6 +1,6 @@
 ifneq ($(filter-out format format-check check,$(if $(MAKECMDGOALS),$(MAKECMDGOALS),all)),)
 
-ARCHS = arm64 arm64e
+ARCHS = arm64
 TARGET = iphone:latest:15.0
 DEB_ARCH = iphoneos-arm64e
 IPHONEOS_DEPLOYMENT_TARGET = 15.0
