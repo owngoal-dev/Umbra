@@ -57,7 +57,9 @@
 }
 
 - (UIImage *)icon {
-    if (nil == _icon) {
+    if (nil == _icon &&
+        [UIImage
+            respondsToSelector:@selector(_applicationIconImageForBundleIdentifier:format:scale:)]) {
         _icon = [UIImage _applicationIconImageForBundleIdentifier:self.bundleIdentifier
                                                            format:10
                                                             scale:UIScreen.mainScreen.scale];

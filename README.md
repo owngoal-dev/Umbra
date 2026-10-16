@@ -29,6 +29,9 @@ xcodebuild -project Umbra.xcodeproj -scheme Umbra \
   -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
   CODE_SIGNING_ALLOWED=NO ARCHS=arm64 build
 
+# Unsigned iOS archive and IPA (no Theos required)
+make ipa
+
 # Package a deb (requires Theos with the roothide package scheme, and ldid)
 make THEOS="$HOME/theos-roothide" package
 ```
@@ -57,12 +60,18 @@ printf '#define VARCLEANRULESHASH %s\n' \
 | Path | Description |
 |---|---|
 | `Umbra/` | App sources and resources |
+| `Umbra/Platform/` | Platform-specific UIKit and system API adapters |
 | `Umbra/roothide/` | libroothide headers and link stubs; do not modify |
 | `Umbra/VarCleanRules.json` | Bundled cleanup rules |
 | `Umbra/Localizable.xcstrings` | Localized strings |
 | `Tests/` | Scripts used by `make check` |
+| `Tools/package-ipa.py` | Packs an archived app without macOS metadata |
 | `Tools/make-icon.swift` | Regenerates all app icon sizes: `swift Tools/make-icon.swift` |
 | `layout/`, `control`, `Makefile` | Theos packaging |
+
+### tvOS
+
+Apple TV is an optional platform. See the separate [tvOS build and runtime notes](Docs/tvOS.md).
 
 ### License
 
@@ -95,6 +104,9 @@ xcodebuild -project Umbra.xcodeproj -scheme Umbra \
   -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
   CODE_SIGNING_ALLOWED=NO ARCHS=arm64 build
 
+# 未签名 iOS 归档和 IPA（无需 Theos）
+make ipa
+
 # 打包 deb（需要带 roothide package scheme 的 Theos 与 ldid）
 make THEOS="$HOME/theos-roothide" package
 ```
@@ -123,12 +135,18 @@ printf '#define VARCLEANRULESHASH %s\n' \
 | 路径 | 说明 |
 |---|---|
 | `Umbra/` | App 源码与资源 |
+| `Umbra/Platform/` | UIKit 与系统 API 平台适配 |
 | `Umbra/roothide/` | libroothide 头文件与链接存根，请勿修改 |
 | `Umbra/VarCleanRules.json` | 内置清理规则 |
 | `Umbra/Localizable.xcstrings` | 本地化字符串 |
 | `Tests/` | `make check` 使用的检查脚本 |
+| `Tools/package-ipa.py` | 打包归档 App，排除 macOS 元数据 |
 | `Tools/make-icon.swift` | 重新生成全部尺寸的 App 图标：`swift Tools/make-icon.swift` |
 | `layout/`、`control`、`Makefile` | Theos 打包 |
+
+### tvOS
+
+Apple TV 为可选平台，详见独立的 [tvOS 构建与运行说明](Docs/tvOS.md)。
 
 ### 许可
 

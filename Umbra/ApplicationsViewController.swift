@@ -23,7 +23,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
 
     init(check: EnvironmentCheck) {
         self.check = check
-        super.init(style: .insetGrouped)
+        super.init(style: AppPlatform.tableStyle)
         title = localized("Blacklist")
     }
 
@@ -37,11 +37,16 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         search.delegate = self
         search.obscuresBackgroundDuringPresentation = false
         search.searchBar.placeholder = localized("name or identifier")
-        navigationItem.searchController = search
-        navigationItem.hidesSearchBarWhenScrolling = false
+        #if os(iOS)
+            navigationItem.searchController = search
+            navigationItem.hidesSearchBarWhenScrolling = false
+        #else
+            search.searchBar.delegate = self
+            search.searchBar.sizeToFit()
+            tableView.tableHeaderView = search.searchBar
+        #endif
         definesPresentationContext = true
-        refreshControl = UIRefreshControl()
-        refreshControl?.addTarget(self, action: #selector(manualRefresh), for: .valueChanged)
+        configureRefresh(action: #selector(manualRefresh))
         NotificationCenter.default.addObserver(
             self, selector: #selector(environmentChanged), name: EnvironmentCheck.didChange,
             object: check)
@@ -68,12 +73,12 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
     private func refresh(resort: Bool, synchronously: Bool = false) {
         guard !isLoading, !isWorking, pendingChanges.isEmpty else {
             pendingResort = (pendingResort ?? false) || resort
-            refreshControl?.endRefreshing()
+            endRefreshing()
             return
         }
         isLoading = true
         for cell in tableView.visibleCells {
-            (cell.accessoryView as? UISwitch)?.isEnabled = false
+            (cell.accessoryView as? AppSwitch)?.isEnabled = false
         }
         let load = {
             let apps = RHBackend.installedApps()
@@ -106,7 +111,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                     }
                 }
                 self.isLoading = false
-                self.refreshControl?.endRefreshing()
+                self.endRefreshing()
                 self.updateSearchResults(for: self.search)
                 self.refreshIfNeeded()
             }
@@ -211,8 +216,10 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                 isLoading
                 ? localized("Loading…")
                 : apps.isEmpty ? localized("No apps found") : localized("No search results")
-            content.secondaryText =
-                apps.isEmpty && !isLoading ? localized("Pull to refresh") : nil
+            #if !os(tvOS)
+                content.secondaryText =
+                    apps.isEmpty && !isLoading ? localized("Pull to refresh") : nil
+            #endif
             content.image = UIImage(systemName: "magnifyingglass")
             content.imageProperties.tintColor = .secondaryLabel
         } else {
@@ -227,7 +234,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
             content.imageProperties.maximumSize = CGSize(width: 44, height: 44)
             content.imageProperties.reservedLayoutSize = CGSize(width: 44, height: 44)
             content.imageProperties.cornerRadius = 10
-            let toggle = UISwitch()
+            let toggle = AppSwitch()
             toggle.isOn =
                 unavailableReason == nil && (configuration[identifier] ?? false)
             toggle.isEnabled = !isWorking && !isLoading && !pendingChanges.contains(identifier)
@@ -237,6 +244,9 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                     guard let self, let toggle else { return }
                     self.toggle(app, enabled: toggle.isOn)
                 }, for: .valueChanged)
+            #if os(tvOS)
+                cell.selectionStyle = .default
+            #endif
             cell.accessoryView = toggle
         }
         cell.contentConfiguration = content
@@ -249,6 +259,27 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
             navigationController?.pushViewController(
                 EnvironmentViewController(check: check), animated: true)
         }
+        #if os(tvOS)
+            guard indexPath.section == applicationsSection, !filtered.isEmpty,
+                !isLoading, !isWorking, pendingChanges.isEmpty
+            else { return }
+            let app = filtered[indexPath.row]
+            let enabled = configuration[app.bundleIdentifier ?? ""] ?? false
+            let alert = UIAlertController(
+                title: app.name, message: app.bundleIdentifier, preferredStyle: .alert)
+            alert.addAction(
+                UIAlertAction(title: localized(enabled ? "Disable" : "Enable"), style: .default) {
+                    [weak self] _ in
+                    self?.toggle(app, enabled: !enabled)
+                })
+            alert.addAction(
+                UIAlertAction(title: localized("Clear App Data"), style: .destructive) {
+                    [weak self] _ in
+                    self?.confirmClear(app)
+                })
+            alert.addAction(UIAlertAction(title: localized("Cancel"), style: .cancel))
+            present(alert, animated: true)
+        #endif
     }
 
     private func toggle(_ app: AppInfo, enabled: Bool) {
@@ -315,7 +346,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
     private func updateApp(_ identifier: String) {
         guard let row = filtered.firstIndex(where: { $0.bundleIdentifier == identifier }),
             let cell = tableView.cellForRow(at: IndexPath(row: row, section: applicationsSection)),
-            let toggle = cell.accessoryView as? UISwitch
+            let toggle = cell.accessoryView as? AppSwitch
         else { return }
         toggle.setOn(
             unavailableReason == nil && (configuration[identifier] ?? false),
@@ -331,44 +362,50 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         UIView.performWithoutAnimation { tableView.performBatchUpdates(nil) }
     }
 
-    override func tableView(
-        _ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
-        point: CGPoint
-    ) -> UIContextMenuConfiguration? {
-        guard indexPath.section == applicationsSection, !filtered.isEmpty, !isWorking, !isLoading,
-            pendingChanges.isEmpty
-        else { return nil }
-        let app = filtered[indexPath.row]
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            UIMenu(
-                children: [
-                    UIAction(
-                        title: localized("Clear App Data"), image: UIImage(systemName: "trash"),
-                        attributes: .destructive
-                    ) {
-                        [weak self] _ in self?.confirmClear(app)
-                    }
-                ])
+    #if !os(tvOS)
+        override func tableView(
+            _ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
+            point: CGPoint
+        ) -> UIContextMenuConfiguration? {
+            guard indexPath.section == applicationsSection, !filtered.isEmpty, !isWorking,
+                !isLoading,
+                pendingChanges.isEmpty
+            else { return nil }
+            let app = filtered[indexPath.row]
+            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+                UIMenu(
+                    children: [
+                        UIAction(
+                            title: localized("Clear App Data"), image: UIImage(systemName: "trash"),
+                            attributes: .destructive
+                        ) {
+                            [weak self] _ in self?.confirmClear(app)
+                        }
+                    ])
+            }
         }
-    }
 
-    override func tableView(
-        _ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
-    ) -> UISwipeActionsConfiguration? {
-        guard indexPath.section == applicationsSection, !filtered.isEmpty, !isWorking, !isLoading,
-            pendingChanges.isEmpty
-        else { return nil }
-        let app = filtered[indexPath.row]
-        let action = UIContextualAction(style: .destructive, title: localized("Clear App Data")) {
-            [weak self] _, _, done in
-            done(false)
-            self?.confirmClear(app)
+        override func tableView(
+            _ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+        ) -> UISwipeActionsConfiguration? {
+            guard indexPath.section == applicationsSection, !filtered.isEmpty, !isWorking,
+                !isLoading,
+                pendingChanges.isEmpty
+            else { return nil }
+            let app = filtered[indexPath.row]
+            let action = UIContextualAction(style: .destructive, title: localized("Clear App Data"))
+            {
+                [weak self] _, _, done in
+                done(false)
+                self?.confirmClear(app)
+            }
+            action.image = UIImage(systemName: "trash")
+            let actions = UISwipeActionsConfiguration(actions: [action])
+            actions.performsFirstActionWithFullSwipe = false
+            return actions
         }
-        action.image = UIImage(systemName: "trash")
-        let actions = UISwipeActionsConfiguration(actions: [action])
-        actions.performsFirstActionWithFullSwipe = false
-        return actions
-    }
+
+    #endif
 
     private func confirmClear(_ app: AppInfo) {
         guard !isWorking, !isLoading, pendingChanges.isEmpty else { return }
@@ -413,3 +450,15 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         present(alert, animated: true)
     }
 }
+
+#if os(tvOS)
+    extension ApplicationsViewController: UISearchBarDelegate {
+        func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+            updateSearchResults(for: search)
+        }
+
+        func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+            searchBar.resignFirstResponder()
+        }
+    }
+#endif

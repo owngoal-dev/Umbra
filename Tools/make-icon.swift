@@ -1,4 +1,3 @@
-#!/usr/bin/env swift
 //
 //  make-icon.swift
 //  Umbra
@@ -169,15 +168,18 @@ let moonDisk: CGImage = {
 
 // MARK: - Artwork
 
-func draw(into context: CGContext) {
+func draw(into context: CGContext, includesBackground: Bool = true) {
     let centre = CGPoint(x: canvas / 2, y: canvas / 2)
 
     // 1. Deep space background.
-    context.drawRadialGradient(
-        gradient([(backgroundCore, 1, 0), (backgroundEdge, 1, 1)]),
-        startCenter: centre, startRadius: 0,
-        endCenter: centre, endRadius: canvas * 0.62,
-        options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+    if includesBackground {
+        context.drawRadialGradient(
+            gradient([(backgroundCore, 1, 0), (backgroundEdge, 1, 1)]),
+            startCenter: centre, startRadius: 0,
+            endCenter: centre, endRadius: canvas * 0.62,
+            options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+
+    }
 
     // 2. Wide corona halo, centred on the sun so it survives downscaling.
     context.drawRadialGradient(
@@ -304,6 +306,76 @@ func write(_ image: CGImage, to url: URL) {
     }
     CGImageDestinationAddImage(destination, image, nil)
     guard CGImageDestinationFinalize(destination) else { fatalError("Cannot encode \(url.path)") }
+}
+
+// MARK: - tvOS output
+
+if CommandLine.arguments.contains("--tvos") {
+    let assets = root.appendingPathComponent("Umbra/Assets.xcassets/AppIconTV.brandassets")
+    func metadata(_ value: [String: Any], at url: URL) {
+        try! FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        let data = try! JSONSerialization.data(
+            withJSONObject: value, options: [.prettyPrinted, .sortedKeys])
+        try! data.write(to: url.appendingPathComponent("Contents.json"))
+    }
+    let info: [String: Any] = ["author": "xcode", "version": 1]
+    let specifications = [("AppIcon", 400, 240), ("AppIconLarge", 1280, 768)]
+    metadata(
+        [
+            "info": info,
+            "assets": specifications.map { name, width, height in
+                [
+                    "filename": "\(name).imagestack", "idiom": "tv", "role": "primary-app-icon",
+                    "size": "\(width)x\(height)",
+                ]
+            },
+        ], at: assets)
+    for (name, width, height) in specifications {
+        let stack = assets.appendingPathComponent("\(name).imagestack")
+        metadata(
+            [
+                "info": info,
+                "layers": [
+                    ["filename": "Artwork.imagestacklayer"],
+                    ["filename": "Background.imagestacklayer"],
+                ],
+            ], at: stack)
+        let layer = stack.appendingPathComponent("Artwork.imagestacklayer")
+        metadata(["info": info], at: layer)
+        let content = layer.appendingPathComponent("Content.imageset")
+        metadata(
+            [
+                "info": info,
+                "images": [
+                    ["filename": "artwork.png", "idiom": "tv", "scale": "1x"]
+                ],
+            ], at: content)
+        let context = CGContext(
+            data: nil, width: width, height: height, bitsPerComponent: 8,
+            bytesPerRow: 0, space: sRGB,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        context.translateBy(x: CGFloat(width - height) / 2, y: 0)
+        context.scaleBy(x: CGFloat(height) / canvas, y: CGFloat(height) / canvas)
+        draw(into: context, includesBackground: false)
+        write(context.makeImage()!, to: content.appendingPathComponent("artwork.png"))
+        let backgroundLayer = stack.appendingPathComponent("Background.imagestacklayer")
+        metadata(["info": info], at: backgroundLayer)
+        let backgroundContent = backgroundLayer.appendingPathComponent("Content.imageset")
+        metadata(
+            [
+                "info": info,
+                "images": [["filename": "background.png", "idiom": "tv", "scale": "1x"]],
+            ], at: backgroundContent)
+        let background = CGContext(
+            data: nil, width: width, height: height, bitsPerComponent: 8,
+            bytesPerRow: 0, space: sRGB,
+            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)!
+        background.setFillColor(rgba(backgroundEdge))
+        background.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        write(
+            background.makeImage()!, to: backgroundContent.appendingPathComponent("background.png"))
+    }
+    exit(0)
 }
 
 // MARK: - Outputs

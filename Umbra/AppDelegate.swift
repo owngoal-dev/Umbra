@@ -33,7 +33,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             let tabs = UITabBarController()
             tabs.viewControllers = controllers.enumerated().map { index, item in
                 let navigation = UINavigationController(rootViewController: item.0)
-                navigation.navigationBar.prefersLargeTitles = true
+                #if !os(tvOS)
+                    navigation.navigationBar.prefersLargeTitles = true
+                #endif
                 navigation.tabBarItem = UITabBarItem(
                     title: item.1, image: UIImage(systemName: item.2), tag: index)
                 return navigation
@@ -79,7 +81,7 @@ private final class StartupErrorViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemGroupedBackground
+        view.backgroundColor = AppTheme.background
         let message = UILabel()
         message.text = localized("Startup failed") + "\n\n" + error.localizedDescription
         message.numberOfLines = 0

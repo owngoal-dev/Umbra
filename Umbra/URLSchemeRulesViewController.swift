@@ -5,7 +5,7 @@ final class URLSchemeRulesViewController: UITableViewController {
     private var loadError: String?
 
     init() {
-        super.init(style: .insetGrouped)
+        super.init(style: AppPlatform.tableStyle)
         title = localized("URL Scheme Replacements")
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .add, target: self, action: #selector(addRule))
@@ -77,7 +77,7 @@ final class URLSchemeRulesViewController: UITableViewController {
             let rule = rules[indexPath.row]
             content.text = rule.title
             cell.selectionStyle = .default
-            let toggle = UISwitch()
+            let toggle = AppSwitch()
             toggle.isOn = rule.enabled
             toggle.accessibilityLabel = rule.title
             toggle.addAction(
@@ -108,13 +108,45 @@ final class URLSchemeRulesViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard loadError == nil, !rules.isEmpty else { return }
-        edit(rules[indexPath.row])
+        #if os(iOS)
+            edit(rules[indexPath.row])
+        #else
+            let rule = rules[indexPath.row]
+            let alert = UIAlertController(title: rule.title, message: nil, preferredStyle: .alert)
+            alert.addAction(
+                UIAlertAction(
+                    title: localized(rule.enabled ? "Disable" : "Enable"), style: .default
+                ) { [weak self] _ in
+                    guard let self else { return }
+                    var updated = rule
+                    updated.enabled.toggle()
+                    do {
+                        try URLSchemeRules.save(updated, replacing: rule.source)
+                        self.refreshRules()
+                    } catch {
+                        showMessage(
+                            error.localizedDescription, title: localized("Could not save changes"),
+                            from: self)
+                    }
+                })
+            alert.addAction(
+                UIAlertAction(title: localized("Edit Replacement Rule"), style: .default) {
+                    [weak self] _ in
+                    self?.edit(rule)
+                })
+            alert.addAction(
+                UIAlertAction(title: localized("Remove"), style: .destructive) { [weak self] _ in
+                    self?.tableView(tableView, commit: .delete, forRowAt: indexPath)
+                })
+            alert.addAction(UIAlertAction(title: localized("Cancel"), style: .cancel))
+            present(alert, animated: true)
+        #endif
     }
 
     private func edit(_ rule: URLSchemeRule?) {
         let form = URLSchemeRuleForm(rule: rule) { [weak self] in self?.refreshRules() }
         let navigation = UINavigationController(rootViewController: form)
-        navigation.modalPresentationStyle = .formSheet
+        navigation.modalPresentationStyle = AppPlatform.formPresentation
         present(navigation, animated: true) { form.focusSource() }
     }
 
@@ -151,7 +183,7 @@ private final class URLSchemeRuleForm: UITableViewController {
     init(rule: URLSchemeRule?, onSave: @escaping () -> Void) {
         original = rule
         self.onSave = onSave
-        super.init(style: .insetGrouped)
+        super.init(style: AppPlatform.tableStyle)
         title = localized(rule == nil ? "Add Replacement Rule" : "Edit Replacement Rule")
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: localized("Cancel"), style: .plain, target: self, action: #selector(cancel))
@@ -222,6 +254,13 @@ private final class URLSchemeRuleForm: UITableViewController {
         cell.contentConfiguration = content
         return cell
     }
+
+    #if os(tvOS)
+        override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+            tableView.deselectRow(at: indexPath, animated: true)
+            (indexPath.row == 0 ? source : target).becomeFirstResponder()
+        }
+    #endif
 
     @objc private func cancel() { dismiss(animated: true) }
 

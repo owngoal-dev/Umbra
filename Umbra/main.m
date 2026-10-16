@@ -1,5 +1,5 @@
 #import <dlfcn.h>
-#import <spawn.h>
+#import "Platform/RHSpawn.h"
 #import <objc/message.h>
 #import <UIKit/UIKit.h>
 #import "AppInfo.h"

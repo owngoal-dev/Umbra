@@ -129,7 +129,7 @@ final class CleanerViewController: UITableViewController {
     private var progressButton: UIBarButtonItem!
     private var informationError: String?
 
-    init() { super.init(style: .insetGrouped) }
+    init() { super.init(style: AppPlatform.tableStyle) }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     override func viewDidLoad() {
@@ -161,8 +161,7 @@ final class CleanerViewController: UITableViewController {
             }
             return cell
         }
-        refreshControl = UIRefreshControl()
-        refreshControl?.addTarget(self, action: #selector(manualRefresh), for: .valueChanged)
+        configureRefresh(action: #selector(manualRefresh))
 
         NotificationCenter.default.addObserver(
             self, selector: #selector(autoRefresh),
@@ -181,7 +180,7 @@ final class CleanerViewController: UITableViewController {
     private func refresh(keepingSelection: Bool, afterCleanup: Bool = false) {
         guard operation == nil, !isConfirmingCleanup, !isUpdatingList else {
             pendingRefresh = (pendingRefresh ?? true) && keepingSelection
-            refreshControl?.endRefreshing()
+            endRefreshing()
             return
         }
         let keepSelection = keepingSelection && (pendingRefresh ?? true)
@@ -199,7 +198,7 @@ final class CleanerViewController: UITableViewController {
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.operation = nil
-                self.refreshControl?.endRefreshing()
+                self.endRefreshing()
                 let wasLoaded = self.hasLoaded
                 self.hasLoaded = true
                 switch result {
@@ -352,7 +351,7 @@ final class CleanerViewController: UITableViewController {
         navigationItem.leftBarButtonItem?.isEnabled =
             canEdit && (!allEligibleSelected || !selectedItems.isEmpty)
         removeButton.isEnabled = canEdit && !selectedItems.isEmpty
-        refreshControl?.isEnabled = operation == nil && !isUpdatingList
+        setRefreshEnabled(operation == nil && !isUpdatingList)
     }
 
     private func configureInformation(_ cell: UITableViewCell, state: Bool) {
@@ -382,9 +381,13 @@ final class CleanerViewController: UITableViewController {
         } else {
             content.text =
                 scanError == nil ? localized("No Matching Items") : localized("Unable to Scan")
-            content.secondaryText =
-                scanError
-                ?? localized("No files match the current rules. Pull down to check again.")
+            #if os(iOS)
+                content.secondaryText =
+                    scanError
+                    ?? localized("No files match the current rules. Pull down to check again.")
+            #else
+                content.secondaryText = scanError
+            #endif
             content.image = UIImage(
                 systemName: scanError == nil ? "checkmark.circle" : "exclamationmark.triangle")
             content.imageProperties.tintColor = scanError == nil ? AppTheme.tint : .systemOrange
@@ -438,35 +441,66 @@ final class CleanerViewController: UITableViewController {
             case .file(let identifier) = dataSource.itemIdentifier(for: indexPath),
             let item = files[identifier]
         else { return }
-        item.checked.toggle()
-        if let cell = tableView.cellForRow(at: indexPath) {
-            configure(cell, item: item, animated: true)
-        }
-        updateInterface()
+        #if os(iOS)
+            item.checked.toggle()
+            if let cell = tableView.cellForRow(at: indexPath) {
+                configure(cell, item: item, animated: true)
+            }
+            updateInterface()
+        #else
+            let alert = UIAlertController(
+                title: item.name, message: item.path, preferredStyle: .alert)
+            alert.addAction(
+                UIAlertAction(
+                    title: localized(item.checked ? "Deselect" : "Select"), style: .default
+                ) { [weak self] _ in
+                    guard let self, self.operation == nil, !self.isUpdatingList else { return }
+                    item.checked.toggle()
+                    if let cell = self.tableView.cellForRow(at: indexPath) {
+                        self.configure(cell, item: item, animated: true)
+                    }
+                    self.updateInterface()
+                })
+            alert.addAction(
+                UIAlertAction(title: localized("Open in File Manager"), style: .default) {
+                    [weak self] _ in
+                    guard let self else { return }
+                    openInFileManager(path: item.path, from: self)
+                })
+            alert.addAction(UIAlertAction(title: localized("Cancel"), style: .cancel))
+            present(alert, animated: true)
+        #endif
     }
 
-    override func tableView(
-        _ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
-        point: CGPoint
-    ) -> UIContextMenuConfiguration? {
-        guard operation == nil, !isUpdatingList,
-            case .file(let identifier) = dataSource.itemIdentifier(for: indexPath),
-            let path = files[identifier]?.path
-        else { return nil }
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
-            UIMenu(children: [
-                UIAction(
-                    title: localized("Open in File Manager"), image: UIImage(systemName: "folder")
-                ) {
-                    _ in
-                    guard let self else { return }
-                    openInFileManager(path: path, from: self)
-                },
-                UIAction(title: localized("Copy Path"), image: UIImage(systemName: "doc.on.doc")) {
-                    _ in
-                    UIPasteboard.general.string = path
-                },
-            ])
+    #if !os(tvOS)
+        override func tableView(
+            _ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
+            point: CGPoint
+        ) -> UIContextMenuConfiguration? {
+            guard operation == nil, !isUpdatingList,
+                case .file(let identifier) = dataSource.itemIdentifier(for: indexPath),
+                let path = files[identifier]?.path
+            else { return nil }
+            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) {
+                [weak self] _ in
+                UIMenu(children: [
+                    UIAction(
+                        title: localized("Open in File Manager"),
+                        image: UIImage(systemName: "folder")
+                    ) {
+                        _ in
+                        guard let self else { return }
+                        openInFileManager(path: path, from: self)
+                    },
+                    UIAction(
+                        title: localized("Copy Path"), image: UIImage(systemName: "doc.on.doc")
+                    ) {
+                        _ in
+                        UIPasteboard.general.string = path
+                    },
+                ])
+            }
         }
-    }
+    #endif
+
 }

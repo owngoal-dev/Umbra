@@ -8,7 +8,7 @@ final class SettingsViewController: UITableViewController {
 
     init(check: EnvironmentCheck) {
         self.check = check
-        super.init(style: .insetGrouped)
+        super.init(style: AppPlatform.tableStyle)
         title = localized("Settings")
     }
 
@@ -81,7 +81,7 @@ final class SettingsViewController: UITableViewController {
             content.directionalLayoutMargins = NSDirectionalEdgeInsets(
                 top: 16, leading: 20, bottom: 16, trailing: 20)
             cell.contentConfiguration = content
-            let toggle = UISwitch()
+            let toggle = AppSwitch()
             toggle.isEnabled = false
             toggle.accessibilityLabel = localized("Whitelist Mode")
             cell.accessoryView = toggle
@@ -116,14 +116,14 @@ final class SettingsViewController: UITableViewController {
         content.directionalLayoutMargins = NSDirectionalEdgeInsets(
             top: 16, leading: 20, bottom: 16, trailing: 20)
         cell.contentConfiguration = content
-        cell.accessoryType = isRule ? .disclosureIndicator : .detailButton
+        cell.accessoryType = isRule ? .disclosureIndicator : AppPlatform.detailAccessory
         cell.selectionStyle = isRule ? .default : .none
         return cell
     }
 
     private func brandHeader() -> UIView {
         let header = UIView()
-        header.backgroundColor = .systemGroupedBackground
+        header.backgroundColor = AppTheme.background
 
         let icon = EclipseView()
         icon.layer.cornerRadius = 17
@@ -172,6 +172,12 @@ final class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        #if os(tvOS)
+            if indexPath.section == 1, !services.isEmpty {
+                self.tableView(tableView, accessoryButtonTappedForRowWith: indexPath)
+                return
+            }
+        #endif
         if indexPath.section == rulesSection {
             if showsURLSchemeReplacements && indexPath.row == 0 {
                 navigationController?.pushViewController(
