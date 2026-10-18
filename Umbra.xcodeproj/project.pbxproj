@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		840A948D2C6C9F3C00180FFA /* libroothide.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 840A94892C6C9F3C00180FFA /* libroothide.tbd */; };
+		BE0000000000000000000003 /* AppPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0000000000000000000004; };
+		840A948D2C6C9F3C00180FFA /* libroothide.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 840A94892C6C9F3C00180FFA /* libroothide.tbd */; platformFilter = ios; };
 		8477B5E22A7526AB000632D0 /* NSJSONSerialization+Comments.m in Sources */ = {isa = PBXBuildFile; fileRef = 8477B5E02A7526AB000632D0 /* NSJSONSerialization+Comments.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		847EBF812D9B01DB0052E18F /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847EBF802D9B01DB0052E18F /* MobileCoreServices.framework */; };
 		848148292D131A2800CB9FA9 /* AppDataCleaner.m in Sources */ = {isa = PBXBuildFile; fileRef = 848148282D131A2800CB9FA9 /* AppDataCleaner.m */; };
-		848D86672DBC606D003C680F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 848D86662DBC606D003C680F /* IOKit.framework */; };
+		848D86672DBC606D003C680F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 848D86662DBC606D003C680F /* IOKit.framework */; platformFilter = ios; };
 		84BBFAC92A7420100054A68E /* VarCleanRules.json in Resources */ = {isa = PBXBuildFile; fileRef = 84BBFAC72A741C800054A68E /* VarCleanRules.json */; };
 		A672ABBF27F748E100878787 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A672ABBE27F748E100878787 /* Assets.xcassets */; };
 		A672ABC527F748E100878787 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A672ABC427F748E100878787 /* main.m */; };
@@ -32,6 +33,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE0000000000000000000004 /* AppPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPlatform.swift; sourceTree = "<group>"; };
+		BE0000000000000000000005 /* RHSpawn.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RHSpawn.h; sourceTree = "<group>"; };
+		BE0000000000000000000002 /* libroothide-tvos.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = "libroothide-tvos.tbd"; sourceTree = "<group>"; };
 		840A94882C6C9F3C00180FFA /* roothide.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = roothide.h; sourceTree = "<group>"; };
 		840A94892C6C9F3C00180FFA /* libroothide.tbd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libroothide.tbd; sourceTree = "<group>"; };
 		840A948A2C6C9F3C00180FFA /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
@@ -86,6 +90,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE0000000000000000000006 /* Platform */ = {
+			isa = PBXGroup;
+			children = (
+				BE0000000000000000000004 /* AppPlatform.swift */,
+				BE0000000000000000000005 /* RHSpawn.h */,
+				BE0000000000000000000002 /* libroothide-tvos.tbd */,
+			);
+			path = Platform;
+			sourceTree = "<group>";
+		};
 		840A94872C6C9F3C00180FFA /* roothide */ = {
 			isa = PBXGroup;
 			children = (
@@ -139,6 +153,7 @@
 				1D0D1BEDF1A3D6E5DD573FEF /* Localizable.xcstrings */,
 				28E6D18ED1F42CD12BC54B07 /* VarCleanRules.h */,
 				840A94872C6C9F3C00180FFA /* roothide */,
+				BE0000000000000000000006 /* Platform */,
 				840A948C2C6C9F3C00180FFA /* roothide.h */,
 				BFA303472A47EBA800DC242C /* AppInfo.h */,
 				BFA3034A2A47EBA800DC242C /* AppInfo.m */,
@@ -240,6 +255,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BFA3034C2A47EBA800DC242C /* AppInfo.m in Sources */,
+				BE0000000000000000000003 /* AppPlatform.swift in Sources */,
 				A9B47589F1C47027677602E0 /* AppDelegate.swift in Sources */,
 				427A750B42BCB2821214B1D1 /* AppUI.swift in Sources */,
 				7E1C4A9B2D3F4E5A6B7C8D91 /* EclipseView.swift in Sources */,
@@ -401,6 +417,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Umbra",
+					"$(PROJECT_DIR)/Umbra/Platform",
 					"$(PROJECT_DIR)/Umbra/roothide",
 				);
 				MARKETING_VERSION = 2.0;
@@ -412,7 +429,12 @@
 				SWIFT_VERSION = 5.0;
 				SWIFT_OBJC_BRIDGING_HEADER = "Umbra/Umbra-Bridging-Header.h";
 				OTHER_LDFLAGS = ("$(inherited)", "-lz");
+				"OTHER_LDFLAGS[sdk=appletv*]" = ("$(inherited)", "-lroothide-tvos");
 				TARGETED_DEVICE_FAMILY = "1,2";
+				"TARGETED_DEVICE_FAMILY[sdk=appletv*]" = 3;
+				SUPPORTED_PLATFORMS = "iphoneos appletvos";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletv*]" = AppIconTV;
 				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)";
 			};
 			name = Debug;
@@ -444,6 +466,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Umbra",
+					"$(PROJECT_DIR)/Umbra/Platform",
 					"$(PROJECT_DIR)/Umbra/roothide",
 				);
 				MARKETING_VERSION = 2.0;
@@ -455,7 +478,12 @@
 				SWIFT_VERSION = 5.0;
 				SWIFT_OBJC_BRIDGING_HEADER = "Umbra/Umbra-Bridging-Header.h";
 				OTHER_LDFLAGS = ("$(inherited)", "-lz");
+				"OTHER_LDFLAGS[sdk=appletv*]" = ("$(inherited)", "-lroothide-tvos");
 				TARGETED_DEVICE_FAMILY = "1,2";
+				"TARGETED_DEVICE_FAMILY[sdk=appletv*]" = 3;
+				SUPPORTED_PLATFORMS = "iphoneos appletvos";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletv*]" = AppIconTV;
 				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)";
 			};
 			name = Release;

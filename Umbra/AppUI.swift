@@ -6,6 +6,11 @@ func localized(_ key: String) -> String {
 
 enum AppTheme {
     static let tint = UIColor.systemIndigo
+    #if os(iOS)
+        static let background = UIColor.systemGroupedBackground
+    #else
+        static let background = UIColor.black
+    #endif
 }
 
 func showMessage(_ message: String, title: String, from controller: UIViewController) {
@@ -15,7 +20,9 @@ func showMessage(_ message: String, title: String, from controller: UIViewContro
 }
 
 func openInFileManager(path: String, from controller: UIViewController) {
-    UIPasteboard.general.string = path
+    #if os(iOS)
+        UIPasteboard.general.string = path
+    #endif
     var components = URLComponents()
     components.scheme = "fila"
     components.host = "view"
@@ -27,8 +34,14 @@ func openInFileManager(path: String, from controller: UIViewController) {
         guard !opened else { return }
         UIApplication.shared.open(filza) { opened in
             guard !opened else { return }
+            #if os(iOS)
+                let message = localized(
+                    "Neither Fila nor Filza could be opened. The path has been copied.")
+            #else
+                let message = path
+            #endif
             showMessage(
-                localized("Neither Fila nor Filza could be opened. The path has been copied."),
+                message,
                 title: localized("Open in File Manager"), from: controller)
         }
     }
@@ -100,6 +113,7 @@ final class EnvironmentCheck {
     }
 
     func configure(_ cell: UITableViewCell) {
+        let hasFindings = !findings.isEmpty
         var content = cell.defaultContentConfiguration()
         content.text = localized("Environment Check")
         content.textProperties.numberOfLines = 0
@@ -114,18 +128,26 @@ final class EnvironmentCheck {
                 ? "clock"
                 : findings.isEmpty
                     ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
-        content.imageProperties.maximumSize = CGSize(width: 26, height: 26)
-        content.imageProperties.reservedLayoutSize = CGSize(width: 32, height: 26)
+        content.imageProperties.maximumSize = CGSize(
+            width: AppPlatform.listSymbolPointSize, height: AppPlatform.listSymbolPointSize)
+        content.imageProperties.reservedLayoutSize = AppPlatform.listSymbolReservedSize
         content.imageProperties.preferredSymbolConfiguration = UIImage.SymbolConfiguration(
-            pointSize: 26)
+            pointSize: AppPlatform.listSymbolPointSize)
         content.imageProperties.tintColor =
             isChecking && findings.isEmpty
             ? .secondaryLabel : findings.isEmpty ? AppTheme.tint : .systemOrange
         cell.contentConfiguration = content
-        cell.accessoryType = .disclosureIndicator
+        #if os(iOS)
+            cell.accessoryType = .disclosureIndicator
+        #else
+            cell.accessoryType = hasFindings ? .disclosureIndicator : .none
+            cell.selectionStyle = hasFindings ? .default : .none
+            cell.isUserInteractionEnabled = hasFindings
+            cell.accessibilityTraits = hasFindings ? .button : .staticText
+        #endif
         cell.accessoryView = nil
         cell.accessibilityValue = nil
-        if !findings.isEmpty {
+        if hasFindings {
             let badge = UILabel()
             badge.text = findings.count.formatted()
             badge.font = .preferredFont(forTextStyle: .subheadline)
@@ -157,7 +179,11 @@ final class EnvironmentCheck {
             cell.accessoryView = accessory
             cell.accessibilityValue = badge.text
         }
-        cell.accessibilityHint = localized("Show Details")
+        #if os(iOS)
+            cell.accessibilityHint = localized("Show Details")
+        #else
+            cell.accessibilityHint = hasFindings ? localized("Show Details") : nil
+        #endif
     }
 }
 
@@ -166,19 +192,27 @@ final class EnvironmentViewController: UITableViewController {
 
     init(check: EnvironmentCheck) {
         self.check = check
-        super.init(style: .insetGrouped)
+        super.init(style: AppPlatform.tableStyle)
         title = localized("Environment Check")
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
+    #if os(tvOS)
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            navigationController?.setNavigationBarHidden(false, animated: animated)
+        }
+    #endif
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.allowsSelection = false
+        #if os(iOS)
+            tableView.allowsSelection = false
+        #endif
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 110
-        refreshControl = UIRefreshControl()
-        refreshControl?.addTarget(self, action: #selector(refreshCheck), for: .valueChanged)
+        configureRefresh(action: #selector(refreshCheck))
         NotificationCenter.default.addObserver(
             self, selector: #selector(update), name: EnvironmentCheck.didChange, object: check)
         update()
@@ -188,7 +222,7 @@ final class EnvironmentViewController: UITableViewController {
 
     @objc private func update() {
         if check.isChecking && !check.findings.isEmpty { return }
-        if !check.isChecking { refreshControl?.endRefreshing() }
+        if !check.isChecking { endRefreshing() }
         tableView.reloadData()
     }
 
@@ -224,7 +258,7 @@ final class EnvironmentViewController: UITableViewController {
                 localized("VPN or Proxy"): "network",
             ]
             if let identifier = finding["service"], ManagedService(rawValue: identifier) != nil {
-                cell.accessoryType = .detailButton
+                cell.accessoryType = AppPlatform.detailAccessory
             }
             content.text = finding["title"]
             content.secondaryText = finding["message"]
@@ -234,10 +268,11 @@ final class EnvironmentViewController: UITableViewController {
             content.secondaryTextProperties.numberOfLines = 0
             content.secondaryTextProperties.color = .secondaryLabel
         }
-        content.imageProperties.maximumSize = CGSize(width: 26, height: 26)
-        content.imageProperties.reservedLayoutSize = CGSize(width: 32, height: 26)
+        content.imageProperties.maximumSize = CGSize(
+            width: AppPlatform.listSymbolPointSize, height: AppPlatform.listSymbolPointSize)
+        content.imageProperties.reservedLayoutSize = AppPlatform.listSymbolReservedSize
         content.imageProperties.preferredSymbolConfiguration = UIImage.SymbolConfiguration(
-            pointSize: 26)
+            pointSize: AppPlatform.listSymbolPointSize)
         content.textProperties.numberOfLines = 0
         content.textToSecondaryTextVerticalPadding = 8
         content.directionalLayoutMargins = NSDirectionalEdgeInsets(
@@ -245,6 +280,13 @@ final class EnvironmentViewController: UITableViewController {
         cell.contentConfiguration = content
         return cell
     }
+
+    #if os(tvOS)
+        override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+            tableView.deselectRow(at: indexPath, animated: true)
+            self.tableView(tableView, accessoryButtonTappedForRowWith: indexPath)
+        }
+    #endif
 
     override func tableView(
         _ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath

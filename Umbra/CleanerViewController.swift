@@ -45,7 +45,8 @@ private final class CleanerCheckbox: UIView {
     private var checked = false
 
     init() {
-        super.init(frame: CGRect(x: 0, y: 0, width: 26, height: 26))
+        let size = AppPlatform.selectionIndicatorSize
+        super.init(frame: CGRect(x: 0, y: 0, width: size, height: size))
         isUserInteractionEnabled = false
         isAccessibilityElement = false
         for shape in [ring, checkmark] {
@@ -54,8 +55,8 @@ private final class CleanerCheckbox: UIView {
             shape.lineJoin = .round
             layer.addSublayer(shape)
         }
-        ring.lineWidth = 1.5
-        checkmark.lineWidth = 2.2
+        ring.lineWidth = 1.5 * size / 26
+        checkmark.lineWidth = 2.2 * size / 26
         checkmark.strokeEnd = 0
     }
 
@@ -65,11 +66,12 @@ private final class CleanerCheckbox: UIView {
         super.layoutSubviews()
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        ring.path = UIBezierPath(ovalIn: bounds.insetBy(dx: 2, dy: 2)).cgPath
+        let scale = bounds.width / 26
+        ring.path = UIBezierPath(ovalIn: bounds.insetBy(dx: 2 * scale, dy: 2 * scale)).cgPath
         let path = UIBezierPath()
-        path.move(to: CGPoint(x: 6, y: 13))
-        path.addLine(to: CGPoint(x: 11, y: 18))
-        path.addLine(to: CGPoint(x: 21, y: 7))
+        path.move(to: CGPoint(x: 6 * scale, y: 13 * scale))
+        path.addLine(to: CGPoint(x: 11 * scale, y: 18 * scale))
+        path.addLine(to: CGPoint(x: 21 * scale, y: 7 * scale))
         checkmark.path = path.cgPath
         ring.strokeColor = (checked ? tintColor : UIColor.tertiaryLabel).cgColor
         checkmark.strokeColor = tintColor.cgColor
@@ -129,12 +131,14 @@ final class CleanerViewController: UITableViewController {
     private var progressButton: UIBarButtonItem!
     private var informationError: String?
 
-    init() { super.init(style: .insetGrouped) }
+    init() { super.init(style: AppPlatform.tableStyle) }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = localized("var Cleanup")
+        #if os(iOS)
+            title = localized("var Cleanup")
+        #endif
         view.tintColor = AppTheme.tint
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: localized("Select All"), style: .plain, target: self,
@@ -161,8 +165,7 @@ final class CleanerViewController: UITableViewController {
             }
             return cell
         }
-        refreshControl = UIRefreshControl()
-        refreshControl?.addTarget(self, action: #selector(manualRefresh), for: .valueChanged)
+        configureRefresh(action: #selector(manualRefresh))
 
         NotificationCenter.default.addObserver(
             self, selector: #selector(autoRefresh),
@@ -181,7 +184,7 @@ final class CleanerViewController: UITableViewController {
     private func refresh(keepingSelection: Bool, afterCleanup: Bool = false) {
         guard operation == nil, !isConfirmingCleanup, !isUpdatingList else {
             pendingRefresh = (pendingRefresh ?? true) && keepingSelection
-            refreshControl?.endRefreshing()
+            endRefreshing()
             return
         }
         let keepSelection = keepingSelection && (pendingRefresh ?? true)
@@ -199,7 +202,7 @@ final class CleanerViewController: UITableViewController {
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.operation = nil
-                self.refreshControl?.endRefreshing()
+                self.endRefreshing()
                 let wasLoaded = self.hasLoaded
                 self.hasLoaded = true
                 switch result {
@@ -352,7 +355,7 @@ final class CleanerViewController: UITableViewController {
         navigationItem.leftBarButtonItem?.isEnabled =
             canEdit && (!allEligibleSelected || !selectedItems.isEmpty)
         removeButton.isEnabled = canEdit && !selectedItems.isEmpty
-        refreshControl?.isEnabled = operation == nil && !isUpdatingList
+        setRefreshEnabled(operation == nil && !isUpdatingList)
     }
 
     private func configureInformation(_ cell: UITableViewCell, state: Bool) {
@@ -382,9 +385,13 @@ final class CleanerViewController: UITableViewController {
         } else {
             content.text =
                 scanError == nil ? localized("No Matching Items") : localized("Unable to Scan")
-            content.secondaryText =
-                scanError
-                ?? localized("No files match the current rules. Pull down to check again.")
+            #if os(iOS)
+                content.secondaryText =
+                    scanError
+                    ?? localized("No files match the current rules. Pull down to check again.")
+            #else
+                content.secondaryText = scanError
+            #endif
             content.image = UIImage(
                 systemName: scanError == nil ? "checkmark.circle" : "exclamationmark.triangle")
             content.imageProperties.tintColor = scanError == nil ? AppTheme.tint : .systemOrange
@@ -438,6 +445,12 @@ final class CleanerViewController: UITableViewController {
             case .file(let identifier) = dataSource.itemIdentifier(for: indexPath),
             let item = files[identifier]
         else { return }
+        #if os(tvOS)
+            if #unavailable(tvOS 17.0) {
+                presentActions(for: item, at: indexPath)
+                return
+            }
+        #endif
         item.checked.toggle()
         if let cell = tableView.cellForRow(at: indexPath) {
             configure(cell, item: item, animated: true)
@@ -445,6 +458,33 @@ final class CleanerViewController: UITableViewController {
         updateInterface()
     }
 
+    #if os(tvOS)
+        private func presentActions(for item: RHCleanItem, at indexPath: IndexPath) {
+            let alert = UIAlertController(
+                title: item.name, message: item.path, preferredStyle: .alert)
+            alert.addAction(
+                UIAlertAction(
+                    title: localized(item.checked ? "Deselect" : "Select"), style: .default
+                ) { [weak self] _ in
+                    guard let self, self.operation == nil, !self.isUpdatingList else { return }
+                    item.checked.toggle()
+                    if let cell = self.tableView.cellForRow(at: indexPath) {
+                        self.configure(cell, item: item, animated: true)
+                    }
+                    self.updateInterface()
+                })
+            alert.addAction(
+                UIAlertAction(title: localized("Open in File Manager"), style: .default) {
+                    [weak self] _ in
+                    guard let self else { return }
+                    openInFileManager(path: item.path, from: self)
+                })
+            alert.addAction(UIAlertAction(title: localized("Cancel"), style: .cancel))
+            present(alert, animated: true)
+        }
+    #endif
+
+    @available(tvOS 17.0, *)
     override func tableView(
         _ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
         point: CGPoint
@@ -454,19 +494,25 @@ final class CleanerViewController: UITableViewController {
             let path = files[identifier]?.path
         else { return nil }
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
-            UIMenu(children: [
+            var actions = [
                 UIAction(
                     title: localized("Open in File Manager"), image: UIImage(systemName: "folder")
                 ) {
                     _ in
                     guard let self else { return }
                     openInFileManager(path: path, from: self)
-                },
-                UIAction(title: localized("Copy Path"), image: UIImage(systemName: "doc.on.doc")) {
-                    _ in
-                    UIPasteboard.general.string = path
-                },
-            ])
+                }
+            ]
+            #if os(iOS)
+                actions.append(
+                    UIAction(
+                        title: localized("Copy Path"), image: UIImage(systemName: "doc.on.doc")
+                    ) { _ in
+                        UIPasteboard.general.string = path
+                    })
+            #endif
+            return UIMenu(children: actions)
         }
     }
+
 }

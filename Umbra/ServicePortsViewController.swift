@@ -49,14 +49,14 @@ func presentServicePorts(
     guard controller.presentedViewController == nil else { return }
     let form = ServicePortsViewController(service: service, onSave: onSave)
     let navigation = UINavigationController(rootViewController: form)
-    navigation.modalPresentationStyle = .formSheet
+    navigation.modalPresentationStyle = AppPlatform.formPresentation
     controller.present(navigation, animated: true) { form.focusFirstPort() }
 }
 
 final class ServicePortsViewController: UITableViewController {
     private let service: ManagedService
     private let onSave: () -> Void
-    private let backupSwitch = UISwitch()
+    private let backupSwitch = AppSwitch()
     private var fields: [UITextField] = []
     private var originalPorts: [Int] = []
     private var loadError: String?
@@ -66,7 +66,7 @@ final class ServicePortsViewController: UITableViewController {
     init(service: ManagedService, onSave: @escaping () -> Void) {
         self.service = service
         self.onSave = onSave
-        super.init(style: .insetGrouped)
+        super.init(style: AppPlatform.tableStyle)
         title = service.title
         do {
             originalPorts = try RHServicePorts.ports(for: service.rawValue).map(\.intValue)
@@ -165,6 +165,19 @@ final class ServicePortsViewController: UITableViewController {
         cell.contentConfiguration = content
         return cell
     }
+
+    #if os(tvOS)
+        override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+            tableView.deselectRow(at: indexPath, animated: true)
+            guard loadError == nil, !isSaving else { return }
+            if indexPath.section == 1 && indexPath.row == 0 {
+                backupSwitch.isOn.toggle()
+                toggleBackup()
+            } else {
+                fields[indexPath.section].becomeFirstResponder()
+            }
+        }
+    #endif
 
     private var requestedPorts: [Int]? {
         let activeFields =
