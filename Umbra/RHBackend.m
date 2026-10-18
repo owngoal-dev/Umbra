@@ -4,10 +4,18 @@
 #import "VarCleanRules.h"
 #import "roothide.h"
 #import <CFNetwork/CFNetwork.h>
+#import <TargetConditionals.h>
+#if TARGET_OS_IOS
 #import <IOKit/IOKitLib.h>
+#else
+#import <dlfcn.h>
+#import <mach/mach.h>
+typedef mach_port_t io_registry_entry_t;
+#define kIOMainPortDefault MACH_PORT_NULL
+#endif
 #include <arpa/inet.h>
 #include <mach/machine.h>
-#include <spawn.h>
+#include "Platform/RHSpawn.h"
 #include <sys/mount.h>
 #include <sys/socket.h>
 #include <sys/sysctl.h>
@@ -248,7 +256,23 @@ static BOOL RHPortIsOpen(uint16_t port) {
     NSMutableArray<NSDictionary<NSString *, NSString *> *> *warnings = [NSMutableArray new];
     NSFileManager *manager = NSFileManager.defaultManager;
     NSMutableString *bootHash = [NSMutableString new];
+#if TARGET_OS_IOS
     io_registry_entry_t entry = IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen");
+#else
+    // IOKit is private on tvOS and absent from its SDK. Resolve the exact API
+    // needed for the optional preboot inspection without linking an iOS binary.
+    void *ioKit = dlopen("/System/Library/Frameworks/IOKit.framework/IOKit", RTLD_LAZY);
+    io_registry_entry_t (*IORegistryEntryFromPath)(mach_port_t, const char *) =
+        ioKit ? dlsym(ioKit, "IORegistryEntryFromPath") : NULL;
+    CFTypeRef (*IORegistryEntryCreateCFProperty)(io_registry_entry_t, CFStringRef, CFAllocatorRef,
+                                                 uint32_t) =
+        ioKit ? dlsym(ioKit, "IORegistryEntryCreateCFProperty") : NULL;
+    kern_return_t (*IOObjectRelease)(mach_port_t) = ioKit ? dlsym(ioKit, "IOObjectRelease") : NULL;
+    io_registry_entry_t entry =
+        IORegistryEntryFromPath && IORegistryEntryCreateCFProperty && IOObjectRelease
+            ? IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen")
+            : 0;
+#endif
     if (entry) {
         CFTypeRef hash =
             IORegistryEntryCreateCFProperty(entry, CFSTR("boot-manifest-hash"), NULL, 0);
@@ -263,6 +287,11 @@ static BOOL RHPortIsOpen(uint16_t port) {
         }
         IOObjectRelease(entry);
     }
+#if TARGET_OS_TV
+    if (ioKit) {
+        dlclose(ioKit);
+    }
+#endif
     NSString *bootPath =
         bootHash.length ? [@"/private/preboot" stringByAppendingPathComponent:bootHash] : nil;
     if (bootPath && [manager fileExistsAtPath:bootPath]) {

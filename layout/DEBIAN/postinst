@@ -1,5 +1,9 @@
 #!/bin/sh
 
-uicache -p /Applications/Umbra.app
+case "$(dpkg --print-architecture)" in
+	iphoneos-*) uicache -p /Applications/Umbra.app ;;
+	appletvos-*) uicache -a ;;
+	*) uicache -p /Applications/Umbra.app ;;
+esac
 chown 0:0 /Applications/Umbra.app/Umbra
 chmod +s /Applications/Umbra.app/Umbra

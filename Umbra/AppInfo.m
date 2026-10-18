@@ -2,6 +2,7 @@
 // modified by Shadow-
 
 #import "AppInfo.h"
+#import <TargetConditionals.h>
 
 @interface UIImage ()
 + (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)identifier
@@ -57,7 +58,13 @@
 }
 
 - (UIImage *)icon {
+#if TARGET_OS_IOS
     if (nil == _icon) {
+#else
+    if (nil == _icon &&
+        [UIImage
+            respondsToSelector:@selector(_applicationIconImageForBundleIdentifier:format:scale:)]) {
+#endif
         _icon = [UIImage _applicationIconImageForBundleIdentifier:self.bundleIdentifier
                                                            format:10
                                                             scale:UIScreen.mainScreen.scale];
