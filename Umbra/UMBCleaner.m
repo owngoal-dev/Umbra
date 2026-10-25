@@ -1,5 +1,7 @@
 #import "UMBCleaner.h"
+
 #import "roothide.h"
+
 #include <unistd.h>
 
 extern BOOL UMBRootUserGetDirectoryContents(NSString *path, NSString *cacheFile);
@@ -16,17 +18,14 @@ static BOOL Matches(NSString *name, NSArray *list) {
         if ([entry isKindOfClass:NSString.class]) {
             if ([name isEqualToString:entry])
                 return YES;
-        } else if ([entry isKindOfClass:NSDictionary.class] &&
-                   [entry[@"name"] isKindOfClass:NSString.class]) {
+        } else if ([entry isKindOfClass:NSDictionary.class] && [entry[@"name"] isKindOfClass:NSString.class]) {
             NSString *pattern = entry[@"name"];
             if ([entry[@"match"] isEqual:@"include"] && [name containsString:pattern])
                 return YES;
             if ([entry[@"match"] isEqual:@"regexp"]) {
-                NSRegularExpression *expression =
-                    [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil];
-                if ([expression numberOfMatchesInString:name
-                                                options:0
-                                                  range:NSMakeRange(0, name.length)])
+                NSRegularExpression *expression = [NSRegularExpression regularExpressionWithPattern:pattern options:0
+                                                                                              error:nil];
+                if ([expression numberOfMatchesInString:name options:0 range:NSMakeRange(0, name.length)])
                     return YES;
             }
         }
@@ -34,17 +33,18 @@ static BOOL Matches(NSString *name, NSArray *list) {
     return NO;
 }
 
-NSArray<UMBCleanItem *> *
-UMBCleanerItemsForDirectory(NSString *path, NSArray<NSDictionary *> *contents, NSDictionary *rule,
-                            NSDictionary *custom, NSDictionary<NSString *, NSNumber *> *selection) {
+NSArray<UMBCleanItem *> *UMBCleanerItemsForDirectory(NSString *path,
+                                                     NSArray<NSDictionary *> *contents,
+                                                     NSDictionary *rule,
+                                                     NSDictionary *custom,
+                                                     NSDictionary<NSString *, NSNumber *> *selection) {
     NSMutableArray<UMBCleanItem *> *items = [NSMutableArray new];
     for (id entry in contents) {
         if (![entry isKindOfClass:NSDictionary.class])
             continue;
         NSString *name = entry[@"name"];
-        if (![name isKindOfClass:NSString.class] || name.length == 0 ||
-            [name containsString:@"/"] || [name isEqualToString:@"."] ||
-            [name isEqualToString:@".."])
+        if (![name isKindOfClass:NSString.class] || name.length == 0 || [name containsString:@"/"] ||
+            [name isEqualToString:@"."] || [name isEqualToString:@".."])
             continue;
 
         BOOL checked = NO;
@@ -57,8 +57,7 @@ UMBCleanerItemsForDirectory(NSString *path, NSArray<NSDictionary *> *contents, N
         } else if (Matches(name, rule[@"whitelist"])) {
             continue;
         } else if ([rule[@"default"] isEqual:@"blacklist"]) {
-            ignored =
-                Matches(name, custom[@"whitelist"]) || [custom[@"default"] isEqual:@"whitelist"];
+            ignored = Matches(name, custom[@"whitelist"]) || [custom[@"default"] isEqual:@"whitelist"];
             checked = !ignored;
         } else if ([rule[@"default"] isEqual:@"whitelist"]) {
             if ([custom[@"default"] isEqual:@"blacklist"])
@@ -66,8 +65,7 @@ UMBCleanerItemsForDirectory(NSString *path, NSArray<NSDictionary *> *contents, N
             else
                 continue;
         } else {
-            ignored =
-                Matches(name, custom[@"whitelist"]) || [custom[@"default"] isEqual:@"whitelist"];
+            ignored = Matches(name, custom[@"whitelist"]) || [custom[@"default"] isEqual:@"whitelist"];
             checked = !ignored && [custom[@"default"] isEqual:@"blacklist"];
         }
 
@@ -95,8 +93,7 @@ NSArray<NSDictionary *> *UMBGetDirectoryContents(NSString *path) {
     NSMutableArray *result = [NSMutableArray new];
     for (NSString *name in contents) {
         BOOL directory = NO;
-        BOOL exists = [manager fileExistsAtPath:[path stringByAppendingPathComponent:name]
-                                    isDirectory:&directory];
+        BOOL exists = [manager fileExistsAtPath:[path stringByAppendingPathComponent:name] isDirectory:&directory];
         [result addObject:@{@"name" : name, @"isDirectory" : @(exists && directory)}];
     }
     return result;
@@ -140,9 +137,7 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
     NSData *data = [NSData dataWithContentsOfFile:path options:0 error:error];
     if (!data)
         return nil;
-    id rules = [NSPropertyListSerialization propertyListWithData:data
-                                                         options:NSPropertyListImmutable
-                                                          format:nil
+    id rules = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:nil
                                                            error:error];
     if (!rules)
         return nil;
@@ -150,11 +145,10 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
     if (valid) {
         for (NSString *directory in rules) {
             NSDictionary *rule = rules[directory];
-            if (![directory isKindOfClass:NSString.class] || !directory.isAbsolutePath ||
-                ![rule isKindOfClass:NSDictionary.class] ||
-                (validateEntries && !ValidateRuleEntry(rule)) ||
-                (rule[@"whitelist"] && ![rule[@"whitelist"] isKindOfClass:NSArray.class]) ||
-                (rule[@"blacklist"] && ![rule[@"blacklist"] isKindOfClass:NSArray.class])) {
+            if (![directory isKindOfClass:NSString.class] || !directory.isAbsolutePath
+                || ![rule isKindOfClass:NSDictionary.class] || (validateEntries && !ValidateRuleEntry(rule))
+                || (rule[@"whitelist"] && ![rule[@"whitelist"] isKindOfClass:NSArray.class])
+                || (rule[@"blacklist"] && ![rule[@"blacklist"] isKindOfClass:NSArray.class])) {
                 valid = NO;
                 break;
             }
@@ -162,14 +156,10 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
     }
     if (!valid) {
         if (error)
-            *error = [NSError
-                errorWithDomain:NSCocoaErrorDomain
-                           code:NSPropertyListReadCorruptError
-                       userInfo:@{
-                           NSLocalizedDescriptionKey :
-                               NSLocalizedString(@"The cleaning rules file is invalid.", nil),
-                           NSFilePathErrorKey : path
-                       }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSPropertyListReadCorruptError userInfo:@{
+                NSLocalizedDescriptionKey : NSLocalizedString(@"The cleaning rules file is invalid.", nil),
+                NSFilePathErrorKey : path
+            }];
         return nil;
     }
     return rules;
@@ -179,8 +169,7 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
 
 + (NSArray<UMBCleanGroup *> *)scanKeepingSelection:(NSDictionary<NSString *, NSNumber *> *)selection
                                              error:(NSError **)error {
-    NSDictionary *rules =
-        ReadRules(jbroot(@"/var/mobile/Library/RootHide/varCleanRules.plist"), NO, error);
+    NSDictionary *rules = ReadRules(jbroot(@"/var/mobile/Library/RootHide/varCleanRules.plist"), NO, error);
     if (!rules)
         return nil;
     NSString *customPath = jbroot(@"/var/mobile/Library/RootHide/varCleanRules-custom.plist");
@@ -208,8 +197,11 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
 
         UMBCleanGroup *group = [UMBCleanGroup new];
         group.path = path;
-        group.items = UMBCleanerItemsForDirectory(path, contents, rules[path] ?: customRules[path],
-                                                  rules[path] ? customRules[path] : nil, selection);
+        group.items = UMBCleanerItemsForDirectory(path,
+                                                  contents,
+                                                  rules[path] ?: customRules[path],
+                                                  rules[path] ? customRules[path] : nil,
+                                                  selection);
         if (!contents && [manager fileExistsAtPath:path]) {
             group.errorMessage = NSLocalizedString(@"The folder could not be read.", nil);
         }
@@ -229,13 +221,11 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
         NSError *error = nil;
         if ([NSFileManager.defaultManager removeItemAtPath:path error:&error])
             continue;
-        if ([error.domain isEqualToString:NSCocoaErrorDomain] &&
-            error.code == NSFileNoSuchFileError)
+        if ([error.domain isEqualToString:NSCocoaErrorDomain] && error.code == NSFileNoSuchFileError)
             continue;
         if ((geteuid() != 0 || getegid() != 0) && UMBRootUserRemoveItemAtPath(path))
             continue;
-        failures[path] =
-            error.localizedDescription ?: NSLocalizedString(@"The file could not be removed.", nil);
+        failures[path] = error.localizedDescription ?: NSLocalizedString(@"The file could not be removed.", nil);
     }
     return failures;
 }

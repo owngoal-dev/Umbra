@@ -1,8 +1,11 @@
 #import "UMBBackend.h"
-#import "UMBServicePorts.h"
+
 #import "NSJSONSerialization+UMBComments.h"
+#import "Platform/UMBSpawn.h"
+#import "UMBServicePorts.h"
 #import "VarCleanRules.h"
 #import "roothide.h"
+
 #import <CFNetwork/CFNetwork.h>
 #import <TargetConditionals.h>
 #if TARGET_OS_IOS
@@ -13,9 +16,9 @@
 typedef mach_port_t io_registry_entry_t;
 #define kIOMainPortDefault MACH_PORT_NULL
 #endif
+
 #include <arpa/inet.h>
 #include <mach/machine.h>
-#include "Platform/UMBSpawn.h"
 #include <sys/mount.h>
 #include <sys/socket.h>
 #include <sys/sysctl.h>
@@ -35,16 +38,13 @@ BOOL UMBRootUserRemountPreboot(void);
 
 static BOOL RHFail(NSError **error, NSString *message) {
     if (error) {
-        *error = [NSError errorWithDomain:@"wiki.qaq.umbra"
-                                     code:1
-                                 userInfo:@{NSLocalizedDescriptionKey : message}];
+        *error = [NSError errorWithDomain:@"wiki.qaq.umbra" code:1 userInfo:@{NSLocalizedDescriptionKey : message}];
     }
     return NO;
 }
 
 static BOOL RHWriteDictionary(NSDictionary *dictionary, NSString *path, NSError **error) {
-    NSData *data = [NSPropertyListSerialization dataWithPropertyList:dictionary
-                                                              format:NSPropertyListXMLFormat_v1_0
+    NSData *data = [NSPropertyListSerialization dataWithPropertyList:dictionary format:NSPropertyListXMLFormat_v1_0
                                                              options:0
                                                                error:error];
     return data && [data writeToFile:path options:NSDataWritingAtomic error:error];
@@ -87,8 +87,14 @@ static BOOL RHPortIsOpen(uint16_t port) {
     uid_t svuid = (uid_t)-1;
     gid_t svgid = (gid_t)-1;
     UMBGetSVUGID(&svuid, &svgid);
-    NSLog(@"%@: uid=%d euid=%d svuid=%d gid=%d egid=%d svgid=%d issetugid=%d", context,
-          (int)getuid(), (int)geteuid(), (int)svuid, (int)getgid(), (int)getegid(), (int)svgid,
+    NSLog(@"%@: uid=%d euid=%d svuid=%d gid=%d egid=%d svgid=%d issetugid=%d",
+          context,
+          (int)getuid(),
+          (int)geteuid(),
+          (int)svuid,
+          (int)getgid(),
+          (int)getegid(),
+          (int)svgid,
           issetugid());
 }
 
@@ -101,9 +107,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
             NSFileOwnerAccountID : @501,
             NSFileGroupOwnerAccountID : @501
         };
-        if (![manager createDirectoryAtPath:directory
-                withIntermediateDirectories:YES
-                                 attributes:attributes
+        if (![manager createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:attributes
                                       error:error]) {
             return NO;
         }
@@ -111,27 +115,23 @@ static BOOL RHPortIsOpen(uint16_t port) {
 
     NSString *path = [NSBundle.mainBundle pathForResource:@"VarCleanRules" ofType:@"json"];
     if (!path) {
-        return RHFail(error,
-                      NSLocalizedString(@"The bundled cleaning rules could not be found.", nil));
+        return RHFail(error, NSLocalizedString(@"The bundled cleaning rules could not be found.", nil));
     }
     NSData *data = [NSData dataWithContentsOfFile:path options:0 error:error];
     if (!data) {
         return NO;
     }
     if (crc32(0, data.bytes, (uInt)data.length) != VARCLEANRULESHASH) {
-        return RHFail(error,
-                      NSLocalizedString(@"The bundled cleaning rules failed verification.", nil));
+        return RHFail(error, NSLocalizedString(@"The bundled cleaning rules failed verification.", nil));
     }
     id rules = [NSJSONSerialization umb_JSONObjectWithCommentedData:data options:0 error:error];
     if (!rules) {
         return NO;
     }
     if (![rules isKindOfClass:NSDictionary.class]) {
-        return RHFail(error,
-                      NSLocalizedString(@"The cleaning rules are not a valid dictionary.", nil));
+        return RHFail(error, NSLocalizedString(@"The cleaning rules are not a valid dictionary.", nil));
     }
-    if (!RHWriteDictionary(rules, [directory stringByAppendingPathComponent:@"varCleanRules.plist"],
-                           error)) {
+    if (!RHWriteDictionary(rules, [directory stringByAppendingPathComponent:@"varCleanRules.plist"], error)) {
         return NO;
     }
     NSString *customPath = self.customRulesPath;
@@ -149,8 +149,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
 + (id)configurationForKey:(NSString *)key {
     @synchronized(self) {
         NSDictionary *configuration = [NSDictionary
-            dictionaryWithContentsOfFile:jbroot(
-                                             @"/var/mobile/Library/RootHide/RootHideConfig.plist")];
+            dictionaryWithContentsOfFile:jbroot(@"/var/mobile/Library/RootHide/RootHideConfig.plist")];
         return configuration[key];
     }
 }
@@ -158,11 +157,9 @@ static BOOL RHPortIsOpen(uint16_t port) {
 + (BOOL)setConfiguration:(id)value forKey:(NSString *)key error:(NSError **)error {
     @synchronized(self) {
         NSString *path = jbroot(@"/var/mobile/Library/RootHide/RootHideConfig.plist");
-        NSMutableDictionary *configuration =
-            [NSMutableDictionary dictionaryWithContentsOfFile:path];
+        NSMutableDictionary *configuration = [NSMutableDictionary dictionaryWithContentsOfFile:path];
         if (!configuration && [NSFileManager.defaultManager fileExistsAtPath:path]) {
-            return RHFail(error, NSLocalizedString(
-                                     @"The saved configuration is not a valid dictionary.", nil));
+            return RHFail(error, NSLocalizedString(@"The saved configuration is not a valid dictionary.", nil));
         }
         configuration = configuration ?: [NSMutableDictionary new];
         configuration[key] = value;
@@ -174,8 +171,8 @@ static BOOL RHPortIsOpen(uint16_t port) {
     NSMutableArray<UMBInstalledAppInfo *> *applications = [NSMutableArray new];
     for (id proxy in LSApplicationWorkspace.defaultWorkspace.allInstalledApplications) {
         UMBInstalledAppInfo *app = [UMBInstalledAppInfo appWithPrivateProxy:proxy];
-        if (!app.isHiddenApp && ![app.bundleIdentifier hasPrefix:@"com.apple."] &&
-            UMBIsUUIDPathOf(app.bundleURL.path, @"/private/var/containers/Bundle/Application/")) {
+        if (!app.isHiddenApp && ![app.bundleIdentifier hasPrefix:@"com.apple."]
+            && UMBIsUUIDPathOf(app.bundleURL.path, @"/private/var/containers/Bundle/Application/")) {
             [applications addObject:app];
         }
     }
@@ -186,8 +183,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
     NSString *identifier = [NSString stringWithContentsOfFile:jbroot(@"/basebin/.AppIdentifier")
                                                      encoding:NSUTF8StringEncoding
                                                         error:nil];
-    identifier = [identifier
-        stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    identifier = [identifier stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
     if (!identifier.length) {
         return nil;
     }
@@ -212,38 +208,35 @@ static BOOL RHPortIsOpen(uint16_t port) {
     NSFileManager *manager = NSFileManager.defaultManager;
     if ([manager fileExistsAtPath:jbroot(@"/.bootstrapped")] ||
         [manager fileExistsAtPath:jbroot(@"/.thebootstrapped")]) {
-        return NSLocalizedString(@"Apps are blacklisted by default in current environment, just "
-                                 @"disable tweaks for this app in the AppList of Bootstrap.",
-                                 nil);
+        return NSLocalizedString(
+            @"Apps are blacklisted by default in current environment, just " @"disable tweaks for this app in the AppList of Bootstrap.",
+            nil);
     }
     return NSLocalizedString(@"Blacklist is not supported in current environment.", nil);
 }
 
 + (NSString *)blacklistRejectionForApp:(UMBInstalledAppInfo *)app {
     NSFileManager *manager = NSFileManager.defaultManager;
-    if ([manager fileExistsAtPath:jbroot(@"/.thebootstrapped")] &&
-        ([manager
-             fileExistsAtPath:[app.bundleURL.path stringByAppendingString:@"/../.appbackup"]] ||
-         [manager
-             fileExistsAtPath:[app.bundleURL.path stringByAppendingPathExtension:@"appbackup"]] ||
-         [manager
-             fileExistsAtPath:[app.bundleURL.path stringByAppendingPathComponent:@".jbroot"]])) {
-        return NSLocalizedString(@"This app is tweaked by Bootstrap, please disable tweak for it "
-                                 @"in the AppList of Bootstrap first.",
-                                 nil);
+    if ([manager fileExistsAtPath:jbroot(@"/.thebootstrapped")]
+        && ([manager fileExistsAtPath:[app.bundleURL.path stringByAppendingString:@"/../.appbackup"]] ||
+            [manager fileExistsAtPath:[app.bundleURL.path stringByAppendingPathExtension:@"appbackup"]] ||
+            [manager fileExistsAtPath:[app.bundleURL.path stringByAppendingPathComponent:@".jbroot"]])) {
+        return NSLocalizedString(
+            @"This app is tweaked by Bootstrap, please disable tweak for it " @"in the AppList of Bootstrap first.",
+            nil);
     }
     return nil;
 }
 
 + (BOOL)requiresCompatibilityWarning {
-    if (![[self configurationForKey:@"spinlockFixApplied"] boolValue] ||
-        NSProcessInfo.processInfo.operatingSystemVersion.majorVersion != 15) {
+    if (![[self configurationForKey:@"spinlockFixApplied"] boolValue]
+        || NSProcessInfo.processInfo.operatingSystemVersion.majorVersion != 15) {
         return NO;
     }
     cpu_subtype_t subtype = 0;
     size_t size = sizeof(subtype);
-    return sysctlbyname("hw.cpusubtype", &subtype, &size, NULL, 0) == 0 &&
-           (subtype & ~CPU_SUBTYPE_MASK) == CPU_SUBTYPE_ARM64E;
+    return sysctlbyname("hw.cpusubtype", &subtype, &size, NULL, 0) == 0
+        && (subtype & ~CPU_SUBTYPE_MASK) == CPU_SUBTYPE_ARM64E;
 }
 
 + (BOOL)setBlacklisted:(BOOL)blacklisted forApp:(UMBInstalledAppInfo *)app error:(NSError **)error {
@@ -257,8 +250,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
     @synchronized(self) {
         id stored = [self configurationForKey:@"appconfig"];
         if (stored && ![stored isKindOfClass:NSDictionary.class]) {
-            return RHFail(error, NSLocalizedString(
-                                     @"The saved configuration is not a valid dictionary.", nil));
+            return RHFail(error, NSLocalizedString(@"The saved configuration is not a valid dictionary.", nil));
         }
         NSMutableDictionary *configuration = [stored mutableCopy] ?: [NSMutableDictionary new];
         configuration[app.bundleIdentifier] = @(blacklisted);
@@ -288,20 +280,19 @@ static BOOL RHPortIsOpen(uint16_t port) {
     // IOKit is private on tvOS and absent from its SDK. Resolve the exact API
     // needed for the optional preboot inspection without linking an iOS binary.
     void *ioKit = dlopen("/System/Library/Frameworks/IOKit.framework/IOKit", RTLD_LAZY);
-    io_registry_entry_t (*IORegistryEntryFromPath)(mach_port_t, const char *) =
-        ioKit ? dlsym(ioKit, "IORegistryEntryFromPath") : NULL;
-    CFTypeRef (*IORegistryEntryCreateCFProperty)(io_registry_entry_t, CFStringRef, CFAllocatorRef,
-                                                 uint32_t) =
-        ioKit ? dlsym(ioKit, "IORegistryEntryCreateCFProperty") : NULL;
+    io_registry_entry_t (*IORegistryEntryFromPath)(mach_port_t, const char *) = ioKit
+        ? dlsym(ioKit, "IORegistryEntryFromPath")
+        : NULL;
+    CFTypeRef (*IORegistryEntryCreateCFProperty)(io_registry_entry_t, CFStringRef, CFAllocatorRef, uint32_t) = ioKit
+        ? dlsym(ioKit, "IORegistryEntryCreateCFProperty")
+        : NULL;
     kern_return_t (*IOObjectRelease)(mach_port_t) = ioKit ? dlsym(ioKit, "IOObjectRelease") : NULL;
-    io_registry_entry_t entry =
-        IORegistryEntryFromPath && IORegistryEntryCreateCFProperty && IOObjectRelease
-            ? IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen")
-            : 0;
+    io_registry_entry_t entry = IORegistryEntryFromPath && IORegistryEntryCreateCFProperty && IOObjectRelease
+        ? IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen")
+        : 0;
 #endif
     if (entry) {
-        CFTypeRef hash =
-            IORegistryEntryCreateCFProperty(entry, CFSTR("boot-manifest-hash"), NULL, 0);
+        CFTypeRef hash = IORegistryEntryCreateCFProperty(entry, CFSTR("boot-manifest-hash"), NULL, 0);
         if (hash && CFGetTypeID(hash) == CFDataGetTypeID()) {
             const UInt8 *bytes = CFDataGetBytePtr(hash);
             for (CFIndex index = 0; index < CFDataGetLength(hash); index++) {
@@ -318,53 +309,48 @@ static BOOL RHPortIsOpen(uint16_t port) {
         dlclose(ioKit);
     }
 #endif
-    NSString *bootPath =
-        bootHash.length ? [@"/private/preboot" stringByAppendingPathComponent:bootHash] : nil;
+    NSString *bootPath = bootHash.length ? [@"/private/preboot" stringByAppendingPathComponent:bootHash] : nil;
     if (bootPath && [manager fileExistsAtPath:bootPath]) {
         NSMutableSet *prebootContents = [NSMutableSet
             setWithArray:[manager contentsOfDirectoryAtPath:@"/private/preboot" error:nil] ?: @[]];
-        [prebootContents minusSet:[NSSet setWithArray:@[
-                             @".fseventsd", @"active", @"cryptex1", @"Cryptexes", bootHash
-                         ]]];
+        [prebootContents
+            minusSet:[NSSet setWithArray:@[ @".fseventsd", @"active", @"cryptex1", @"Cryptexes", bootHash ]]];
         NSMutableSet *bootContents = [NSMutableSet
             setWithArray:[manager contentsOfDirectoryAtPath:bootPath error:nil] ?: @[]];
         [bootContents
-            minusSet:[NSSet setWithArray:@[
-                @"AppleInternal", @"private", @"System", @"usr", @"LocalPolicy.cryptex1.img4"
-            ]]];
-        NSArray *unknownContents =
-            [[prebootContents.allObjects arrayByAddingObjectsFromArray:bootContents.allObjects]
-                sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
+            minusSet:[NSSet setWithArray:
+                                @[ @"AppleInternal", @"private", @"System", @"usr", @"LocalPolicy.cryptex1.img4" ]]];
+        NSArray *unknownContents = [[prebootContents.allObjects arrayByAddingObjectsFromArray:bootContents.allObjects]
+            sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
         if (unknownContents.count) {
             [warnings addObject:@{
                 @"title" : NSLocalizedString(@"Legacy rootless jailbreak(s)", nil),
                 @"message" : [NSString
-                    stringWithFormat:@"%@\n\n%@", [unknownContents componentsJoinedByString:@"\n"],
-                                     NSLocalizedString(
-                                         @"*WARNING*: Don't touch any other files in "
-                                         @"/private/preboot/, otherwise it will cause bootloop",
-                                         nil)]
+                    stringWithFormat:
+                        @"%@\n\n%@",
+                        [unknownContents componentsJoinedByString:@"\n"],
+                        NSLocalizedString(
+                            @"*WARNING*: Don't touch any other files in " @"/private/preboot/, otherwise it will cause bootloop",
+                            nil)]
             }];
             // Remounting preboot is privileged; the app itself runs as mobile.
             UMBRootUserRemountPreboot();
         }
     } else {
-        [warnings addObject:@{
-            @"title" : NSLocalizedString(@"Unknown preboot system", nil),
-            @"message" : bootHash
-        }];
+        [warnings addObject:@{@"title" : NSLocalizedString(@"Unknown preboot system", nil), @"message" : bootHash}];
     }
 
     NSArray *defaultMounts = @[
-        @"/usr/standalone/firmware", @"/System/Library/Pearl/ReferenceFrames",
+        @"/usr/standalone/firmware",
+        @"/System/Library/Pearl/ReferenceFrames",
         @"/System/Library/Caches/com.apple.factorydata"
     ];
     NSMutableArray<NSString *> *unknownMounts = [NSMutableArray new];
     struct statfs *mounts = NULL;
     int count = getmntinfo(&mounts, 0);
     for (int index = 0; index < count; index++) {
-        if (strcmp(mounts[index].f_fstypename, "bindfs") == 0 &&
-            ![defaultMounts containsObject:@(mounts[index].f_mntonname)]) {
+        if (strcmp(mounts[index].f_fstypename, "bindfs") == 0
+            && ![defaultMounts containsObject:@(mounts[index].f_mntonname)]) {
             [unknownMounts addObject:@(mounts[index].f_mntonname)];
         }
     }
@@ -377,16 +363,14 @@ static BOOL RHPortIsOpen(uint16_t port) {
     NSArray *installedServices = UMBServicePorts.installedServices;
     NSArray *serviceIDs = @[ @"openssh", @"dropbear", @"frida" ];
     NSArray *titles = @[
-        NSLocalizedString(@"SSH Server", nil), NSLocalizedString(@"Dropbear", nil),
+        NSLocalizedString(@"SSH Server", nil),
+        NSLocalizedString(@"Dropbear", nil),
         NSLocalizedString(@"Frida Server", nil)
     ];
     NSArray *messages = @[
-        NSLocalizedString(@"SSH Server has been installed, you can uninstall it via Sileo/Zebra.",
-                          nil),
-        NSLocalizedString(@"Dropbear has been installed, you can uninstall it via Sileo/Zebra.",
-                          nil),
-        NSLocalizedString(@"Frida Server has been installed, you can uninstall it via Sileo/Zebra.",
-                          nil)
+        NSLocalizedString(@"SSH Server has been installed, you can uninstall it via Sileo/Zebra.", nil),
+        NSLocalizedString(@"Dropbear has been installed, you can uninstall it via Sileo/Zebra.", nil),
+        NSLocalizedString(@"Frida Server has been installed, you can uninstall it via Sileo/Zebra.", nil)
     ];
     NSArray *checkPorts = @[ @[ @22, @2222 ], @[ @44 ], @[ @27042 ] ];
     for (NSUInteger index = 0; index < serviceIDs.count; index++) {
@@ -399,8 +383,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
             }
         }
         if (active) {
-            NSMutableDictionary *finding =
-                [@{@"title" : titles[index], @"message" : messages[index]} mutableCopy];
+            NSMutableDictionary *finding = [@{@"title" : titles[index], @"message" : messages[index]} mutableCopy];
             if ([installedServices containsObject:service]) {
                 finding[@"service"] = service;
             }
@@ -411,8 +394,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
     if ([proxySettings[(__bridge NSString *)kCFNetworkProxiesHTTPEnable] boolValue]) {
         [warnings addObject:@{
             @"title" : NSLocalizedString(@"VPN or Proxy", nil),
-            @"message" : NSLocalizedString(
-                @"Some apps may refuse to run because a VPN/Proxy is enabled.", nil)
+            @"message" : NSLocalizedString(@"Some apps may refuse to run because a VPN/Proxy is enabled.", nil)
         }];
     }
     return warnings;
@@ -428,10 +410,14 @@ static BOOL RHPortIsOpen(uint16_t port) {
         return;
     }
     NSArray<NSArray<NSString *> *> *paths = @[
-        @[ @"Library/Preferences", @".plist" ], @[ @"Library/Application Support/Containers", @"" ],
-        @[ @"Library/SplashBoard/Snapshots", @"" ], @[ @"Library/Caches", @"" ],
-        @[ @"Library/Saved Application State", @".savedState" ], @[ @"Library/WebKit", @"" ],
-        @[ @"Library/Cookies", @".binarycookies" ], @[ @"Library/HTTPStorages", @"" ]
+        @[ @"Library/Preferences", @".plist" ],
+        @[ @"Library/Application Support/Containers", @"" ],
+        @[ @"Library/SplashBoard/Snapshots", @"" ],
+        @[ @"Library/Caches", @"" ],
+        @[ @"Library/Saved Application State", @".savedState" ],
+        @[ @"Library/WebKit", @"" ],
+        @[ @"Library/Cookies", @".binarycookies" ],
+        @[ @"Library/HTTPStorages", @"" ]
     ];
     for (NSArray<NSString *> *path in paths) {
         NSString *file = [[@"/var/mobile" stringByAppendingPathComponent:path[0]]

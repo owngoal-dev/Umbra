@@ -7,8 +7,8 @@ final class UMBAppDelegate: UIResponder, UIApplicationDelegate {
     private var environmentCheck: EnvironmentCheck?
 
     func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+        _: UIApplication,
+        didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         UMBBackend.logProcessIdentity("application:didFinishLaunchingWithOptions")
         let window = UIWindow(frame: UIScreen.main.bounds)
@@ -38,7 +38,8 @@ final class UMBAppDelegate: UIResponder, UIApplicationDelegate {
                     navigation.navigationBar.prefersLargeTitles = true
                 #endif
                 navigation.tabBarItem = UITabBarItem(
-                    title: item.1, image: UIImage(systemName: item.2), tag: index)
+                    title: item.1, image: UIImage(systemName: item.2), tag: index
+                )
                 return navigation
             }
             applications.loadViewIfNeeded()
@@ -51,17 +52,19 @@ final class UMBAppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-    func applicationDidEnterBackground(_ application: UIApplication) {
+    func applicationDidEnterBackground(_: UIApplication) {
         cleanupTimer?.invalidate()
         var count = 0
         cleanupTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
             UMBBackend.cleanOwnApplicationFiles()
             count += 1
-            if count > 40 { timer.invalidate() }
+            if count > 40 {
+                timer.invalidate()
+            }
         }
     }
 
-    func applicationWillEnterForeground(_ application: UIApplication) {
+    func applicationWillEnterForeground(_: UIApplication) {
         cleanupTimer?.invalidate()
         cleanupTimer = nil
         environmentCheck?.refresh()
@@ -78,7 +81,10 @@ private final class StartupErrorViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,9 +107,11 @@ private final class StartupErrorViewController: UIViewController {
         NSLayoutConstraint.activate([
             stack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             stack.leadingAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 28),
+                equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 28
+            ),
             stack.trailingAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -28),
+                equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -28
+            ),
         ])
     }
 }

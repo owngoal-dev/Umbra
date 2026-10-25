@@ -1,11 +1,13 @@
-#import <dlfcn.h>
 #import "Platform/UMBSpawn.h"
-#import <objc/message.h>
-#import <UIKit/UIKit.h>
 #import "UMBBackend.h"
 #import "UMBInstalledAppInfo.h"
 #import "UMBServicePorts.h"
+
+#import <UIKit/UIKit.h>
+#import <dlfcn.h>
+#import <objc/message.h>
 #include <sys/stat.h>
+#include <sys/sysctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -16,8 +18,11 @@ extern int posix_spawnattr_set_persona_np(const posix_spawnattr_t *__restrict, u
 extern int posix_spawnattr_set_persona_uid_np(const posix_spawnattr_t *__restrict, uid_t);
 extern int posix_spawnattr_set_persona_gid_np(const posix_spawnattr_t *__restrict, uid_t);
 
-static int UMBSpawn(const char *path, const char **argv, const char **envp,
-                    void (^std_out)(char *, int), void (^std_err)(char *, int)) {
+static int UMBSpawn(const char *path,
+                    const char **argv,
+                    const char **envp,
+                    void (^std_out)(char *, int),
+                    void (^std_err)(char *, int)) {
 
     __block pid_t pid = 0;
     posix_spawnattr_t attr;
@@ -56,10 +61,8 @@ static int UMBSpawn(const char *path, const char **argv, const char **envp,
 
     dispatch_queue_t queue = dispatch_queue_create("spawnPipeQueue", DISPATCH_QUEUE_CONCURRENT);
 
-    dispatch_source_t stdOutSource =
-        dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, outPipe[0], 0, queue);
-    dispatch_source_t stdErrSource =
-        dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, errPipe[0], 0, queue);
+    dispatch_source_t stdOutSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, outPipe[0], 0, queue);
+    dispatch_source_t stdErrSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, errPipe[0], 0, queue);
 
     int outFD = outPipe[0];
     int errFD = errPipe[0];
@@ -141,7 +144,9 @@ int UMBSpawnRoot(NSString *path, NSArray *args, NSString **stdOut, NSString **st
     NSMutableData *outData = stdOut ? [NSMutableData new] : nil;
     NSMutableData *errData = stdErr ? [NSMutableData new] : nil;
     int retval = UMBSpawn(
-        path.fileSystemRepresentation, argsC, environ,
+        path.fileSystemRepresentation,
+        argsC,
+        environ,
         ^(char *bytes, int length) {
             [outData appendBytes:bytes length:length];
         },
@@ -198,8 +203,6 @@ BOOL UMBIsUUIDPathOf(NSString *path, NSString *parent) {
     return YES;
 }
 
-#include <sys/sysctl.h>
-
 int proc_pidpath(int pid, void *buffer, uint32_t buffersize);
 
 void UMBKillAllForBundle(const char *bundlePath) {
@@ -237,8 +240,8 @@ void UMBKillAllForBundle(const char *bundlePath) {
         char executablePath[PATH_MAX];
         if (proc_pidpath(pid, executablePath, sizeof(executablePath)) > 0) {
             char realExecutablePath[PATH_MAX];
-            if (realpath(executablePath, realExecutablePath) &&
-                strncmp(realExecutablePath, realBundlePath, realBundlePathLen) == 0) {
+            if (realpath(executablePath, realExecutablePath)
+                && strncmp(realExecutablePath, realBundlePath, realBundlePathLen) == 0) {
                 kill(pid, SIGKILL);
             }
         }
@@ -250,7 +253,9 @@ NSString *UMBRootUserClearAppData(UMBInstalledAppInfo *app) {
     NSString *error = nil;
     NSString *result = nil;
     int ret = UMBSpawnRoot(NSBundle.mainBundle.executablePath,
-                           @[ @"clearAppData", app.bundleIdentifier ], &result, &error);
+                           @[ @"clearAppData", app.bundleIdentifier ],
+                           &result,
+                           &error);
     if (ret != 0) {
         return error;
     }
@@ -260,8 +265,7 @@ NSString *UMBRootUserClearAppData(UMBInstalledAppInfo *app) {
 BOOL UMBRootUserRemoveItemAtPath(NSString *path) {
     NSString *error = nil;
     NSString *result = nil;
-    int ret = UMBSpawnRoot(NSBundle.mainBundle.executablePath, @[ @"removeItemAtPath", path ],
-                           &result, &error);
+    int ret = UMBSpawnRoot(NSBundle.mainBundle.executablePath, @[ @"removeItemAtPath", path ], &result, &error);
     if (ret != 0) {
         return NO;
     }
@@ -272,7 +276,9 @@ BOOL UMBRootUserGetDirectoryContents(NSString *path, NSString *cacheFile) {
     NSString *error = nil;
     NSString *result = nil;
     int ret = UMBSpawnRoot(NSBundle.mainBundle.executablePath,
-                           @[ @"getDirectoryContents", path, cacheFile ], &result, &error);
+                           @[ @"getDirectoryContents", path, cacheFile ],
+                           &result,
+                           &error);
     if (ret != 0) {
         return NO;
     }
@@ -302,16 +308,13 @@ static int RHRequireRoot(const char *command) {
 int main(int argc, char *argv[]) {
     [UMBBackend logProcessIdentity:@"main"];
 
-    if (argc >= 2 &&
-        (strcmp(argv[1], "servicePorts") == 0 || strcmp(argv[1], "setServicePorts") == 0)) {
+    if (argc >= 2 && (strcmp(argv[1], "servicePorts") == 0 || strcmp(argv[1], "setServicePorts") == 0)) {
         @autoreleasepool {
             NSError *error = nil;
             if (argc == 3 && strcmp(argv[1], "servicePorts") == 0) {
                 NSArray *ports = [UMBServicePorts portsForService:@(argv[2]) error:&error];
                 if (ports) {
-                    NSData *data = [NSJSONSerialization dataWithJSONObject:ports
-                                                                   options:0
-                                                                     error:&error];
+                    NSData *data = [NSJSONSerialization dataWithJSONObject:ports options:0 error:&error];
                     if (data) {
                         fwrite(data.bytes, 1, data.length, stdout);
                         fputc('\n', stdout);
@@ -327,8 +330,7 @@ int main(int argc, char *argv[]) {
                     return 0;
                 }
             }
-            fprintf(stderr, "%s\n",
-                    (error.localizedDescription ?: @"Invalid service port request").UTF8String);
+            fprintf(stderr, "%s\n", (error.localizedDescription ?: @"Invalid service port request").UTF8String);
             return 1;
         }
     }

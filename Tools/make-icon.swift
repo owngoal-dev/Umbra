@@ -31,25 +31,26 @@ func rgba(_ hex: UInt32, _ alpha: CGFloat = 1) -> CGColor {
             CGFloat((hex >> 8) & 0xFF) / 255,
             CGFloat(hex & 0xFF) / 255,
             alpha,
-        ])!
+        ]
+    )!
 }
 
-let backgroundCore: UInt32 = 0x0E_1424  // near-black blue, canvas centre
-let backgroundEdge: UInt32 = 0x0507_0D  // near-black, canvas corners
-let sunWarm: UInt32 = 0xFFD2_7A  // photosphere highlight
-let sunDeep: UInt32 = 0xFF7A_3D  // photosphere shadow
-let coronaWarm: UInt32 = 0xFF9A_4D  // outer glow
-let coronaBright: UInt32 = 0xFFD9_A0  // tight rim glow
-let umbraCore: UInt32 = 0x1A17_14  // occulting disk centre, warm charcoal
-let umbraEdge: UInt32 = 0x0B0A_08  // occulting disk edge
-let rimAmbient: UInt32 = 0xC8B8_A0  // warm-grey limb reflection
+let backgroundCore: UInt32 = 0x0E1424 // near-black blue, canvas centre
+let backgroundEdge: UInt32 = 0x05070D // near-black, canvas corners
+let sunWarm: UInt32 = 0xFFD27A // photosphere highlight
+let sunDeep: UInt32 = 0xFF7A3D // photosphere shadow
+let coronaWarm: UInt32 = 0xFF9A4D // outer glow
+let coronaBright: UInt32 = 0xFFD9A0 // tight rim glow
+let umbraCore: UInt32 = 0x1A1714 // occulting disk centre, warm charcoal
+let umbraEdge: UInt32 = 0x0B0A08 // occulting disk edge
+let rimAmbient: UInt32 = 0xC8B8A0 // warm-grey limb reflection
 
 // MARK: - Geometry (in a 1024 x 1024 design space)
 
 let canvas: CGFloat = 1024
 let umbraCentre = CGPoint(x: 496, y: 496)
 let umbraRadius: CGFloat = 356
-let eclipseOffset: CGFloat = 40  // per axis; the disk sits down-left of the sun
+let eclipseOffset: CGFloat = 40 // per axis; the disk sits down-left of the sun
 let sunCentre = CGPoint(x: umbraCentre.x + eclipseOffset, y: umbraCentre.y + eclipseOffset)
 let sunRadius: CGFloat = 352
 
@@ -57,22 +58,25 @@ func gradient(_ stops: [(UInt32, CGFloat, CGFloat)]) -> CGGradient {
     CGGradient(
         colorsSpace: sRGB,
         colors: stops.map { rgba($0.0, $0.1) } as CFArray,
-        locations: stops.map { $0.2 })!
+        locations: stops.map(\.2)
+    )!
 }
 
 func circle(_ centre: CGPoint, _ radius: CGFloat) -> CGPath {
     CGPath(
         ellipseIn: CGRect(
-            x: centre.x - radius, y: centre.y - radius, width: radius * 2, height: radius * 2),
-        transform: nil)
+            x: centre.x - radius, y: centre.y - radius, width: radius * 2, height: radius * 2
+        ),
+        transform: nil
+    )
 }
 
 // MARK: - Paths
 
 let root = URL(fileURLWithPath: CommandLine.arguments[0])
     .resolvingSymlinksInPath()
-    .deletingLastPathComponent()  // Tools
-    .deletingLastPathComponent()  // repository root
+    .deletingLastPathComponent() // Tools
+    .deletingLastPathComponent() // repository root
 let appIcon = root.appendingPathComponent("Umbra/Assets.xcassets/AppIcon.appiconset")
 let moonDiskSet = root.appendingPathComponent("Umbra/Assets.xcassets/MoonDisk.imageset")
 
@@ -89,7 +93,7 @@ struct Map {
 
     init(url: URL) {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
-            let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
+              let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
         else { fatalError("Cannot read \(url.path)") }
         width = image.width
         height = image.height
@@ -97,7 +101,8 @@ struct Map {
         let context = CGContext(
             data: &buffer, width: width, height: height, bitsPerComponent: 8,
             bytesPerRow: width, space: CGColorSpaceCreateDeviceGray(),
-            bitmapInfo: CGImageAlphaInfo.none.rawValue)!
+            bitmapInfo: CGImageAlphaInfo.none.rawValue
+        )!
         context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
         pixels = buffer
     }
@@ -121,10 +126,10 @@ struct Map {
     }
 }
 
-let viewLongitude: CGFloat = -8 * .pi / 180  // sub-observer point, slightly west
-let viewLatitude: CGFloat = 6 * .pi / 180  // ... and north, to frame the maria
-let viewRoll: CGFloat = -12 * .pi / 180  // tilt so the maria sit upper-left
-let moonTint: (CGFloat, CGFloat, CGFloat) = (1.0, 0.93, 0.84)  // warm, never blue
+let viewLongitude: CGFloat = -8 * .pi / 180 // sub-observer point, slightly west
+let viewLatitude: CGFloat = 6 * .pi / 180 // ... and north, to frame the maria
+let viewRoll: CGFloat = -12 * .pi / 180 // tilt so the maria sit upper-left
+let moonTint: (CGFloat, CGFloat, CGFloat) = (1.0, 0.93, 0.84) // warm, never blue
 
 /// The near side of the Moon as an orthographic disk with a transparent surround.
 let moonDisk: CGImage = {
@@ -133,8 +138,8 @@ let moonDisk: CGImage = {
     var pixels = [UInt8](repeating: 0, count: size * size * 4)
     let cosLat = cos(viewLatitude)
     let sinLat = sin(viewLatitude)
-    for py in 0..<size {
-        for px in 0..<size {
+    for py in 0 ..< size {
+        for px in 0 ..< size {
             let u0 = (CGFloat(px) + 0.5) / CGFloat(size) * 2 - 1
             let v0 = 1 - (CGFloat(py) + 0.5) / CGFloat(size) * 2
             let u = u0 * cos(viewRoll) - v0 * sin(viewRoll)
@@ -164,7 +169,8 @@ let moonDisk: CGImage = {
         width: size, height: size, bitsPerComponent: 8, bitsPerPixel: 32,
         bytesPerRow: size * 4, space: sRGB,
         bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
-        provider: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent)!
+        provider: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent
+    )!
 }()
 
 // MARK: - Artwork
@@ -178,7 +184,8 @@ func draw(into context: CGContext, includesBackground: Bool = true) {
             gradient([(backgroundCore, 1, 0), (backgroundEdge, 1, 1)]),
             startCenter: centre, startRadius: 0,
             endCenter: centre, endRadius: canvas * 0.62,
-            options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+            options: [.drawsBeforeStartLocation, .drawsAfterEndLocation]
+        )
     }
 
     // 2. Wide corona halo, centred on the sun so it survives downscaling.
@@ -189,14 +196,16 @@ func draw(into context: CGContext, includesBackground: Bool = true) {
         ]),
         startCenter: sunCentre, startRadius: sunRadius * 0.90,
         endCenter: sunCentre, endRadius: sunRadius * 1.92,
-        options: [])
+        options: []
+    )
 
     // 3. Tight rim glow hugging the photosphere.
     context.drawRadialGradient(
         gradient([(coronaBright, 0.85, 0), (coronaBright, 0.35, 0.45), (coronaBright, 0, 1)]),
         startCenter: sunCentre, startRadius: sunRadius * 0.99,
         endCenter: sunCentre, endRadius: sunRadius * 1.20,
-        options: [])
+        options: []
+    )
 
     // 4. The sun itself.
     context.saveGState()
@@ -206,7 +215,8 @@ func draw(into context: CGContext, includesBackground: Bool = true) {
         gradient([(sunWarm, 1, 0), (sunDeep, 1, 1)]),
         start: CGPoint(x: sunCentre.x + sunRadius * 0.7, y: sunCentre.y + sunRadius * 0.7),
         end: CGPoint(x: sunCentre.x - sunRadius * 0.7, y: sunCentre.y - sunRadius * 0.7),
-        options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+        options: [.drawsBeforeStartLocation, .drawsAfterEndLocation]
+    )
     context.restoreGState()
 
     // 5. The umbra: a slightly larger dark disk, offset down-left, so only a thin
@@ -218,7 +228,8 @@ func draw(into context: CGContext, includesBackground: Bool = true) {
         gradient([(umbraCore, 1, 0), (umbraEdge, 1, 1)]),
         startCenter: umbraCentre, startRadius: 0,
         endCenter: umbraCentre, endRadius: umbraRadius,
-        options: [.drawsAfterEndLocation])
+        options: [.drawsAfterEndLocation]
+    )
 
     // 5a. The lunar surface, laid over the dark base at low opacity so the maria
     //     and highlands read as faint relief without lifting the disk out of shadow.
@@ -227,7 +238,9 @@ func draw(into context: CGContext, includesBackground: Bool = true) {
         moonDisk,
         in: CGRect(
             x: umbraCentre.x - umbraRadius, y: umbraCentre.y - umbraRadius,
-            width: umbraRadius * 2, height: umbraRadius * 2))
+            width: umbraRadius * 2, height: umbraRadius * 2
+        )
+    )
     context.setAlpha(1)
 
     // 5b. Limb shading: a band that follows the disk's own edge, transparent
@@ -243,12 +256,14 @@ func draw(into context: CGContext, includesBackground: Bool = true) {
             gradient([(colour, 0, 0), (colour, peak * 0.35, 0.72), (colour, peak, 1)]),
             startCenter: umbraCentre, startRadius: umbraRadius * inner,
             endCenter: umbraCentre, endRadius: umbraRadius,
-            options: [.drawsAfterEndLocation])
+            options: [.drawsAfterEndLocation]
+        )
         context.setBlendMode(.destinationIn)
         context.drawLinearGradient(
-            gradient([(0xFFFF_FF, 1, 0), (0xFFFF_FF, 0.35, 0.5), (0xFFFF_FF, 0, 1)]),
+            gradient([(0xFFFFFF, 1, 0), (0xFFFFFF, 0.35, 0.5), (0xFFFFFF, 0, 1)]),
             start: from, end: to,
-            options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+            options: [.drawsBeforeStartLocation, .drawsAfterEndLocation]
+        )
         context.endTransparencyLayer()
     }
     limbBand(coronaBright, peak: 0.55, inner: 0.70, from: towardsSun, to: awayFromSun)
@@ -267,7 +282,8 @@ func draw(into context: CGContext, includesBackground: Bool = true) {
         gradient([(rimAmbient, 0.40, 0), (rimAmbient, 0.12, 0.55), (rimAmbient, 0, 1)]),
         start: CGPoint(x: umbraCentre.x - diagonal, y: umbraCentre.y - diagonal),
         end: CGPoint(x: umbraCentre.x + diagonal, y: umbraCentre.y + diagonal),
-        options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+        options: [.drawsBeforeStartLocation, .drawsAfterEndLocation]
+    )
     context.restoreGState()
 }
 
@@ -276,7 +292,8 @@ func draw(into context: CGContext, includesBackground: Bool = true) {
 func bitmap(_ pixels: Int) -> CGContext {
     let context = CGContext(
         data: nil, width: pixels, height: pixels, bitsPerComponent: 8, bytesPerRow: 0,
-        space: sRGB, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)!
+        space: sRGB, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+    )!
     context.interpolationQuality = .high
     context.setShouldAntialias(true)
     return context
@@ -297,10 +314,12 @@ func render(_ pixels: Int) -> CGImage {
 
 func write(_ image: CGImage, to url: URL) {
     try? FileManager.default.createDirectory(
-        at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        at: url.deletingLastPathComponent(), withIntermediateDirectories: true
+    )
     guard
         let destination = CGImageDestinationCreateWithURL(
-            url as CFURL, "public.png" as CFString, 1, nil)
+            url as CFURL, "public.png" as CFString, 1, nil
+        )
     else {
         fatalError("Cannot write \(url.path)")
     }
@@ -315,7 +334,8 @@ if CommandLine.arguments.contains("--tvos") {
     func metadata(_ value: [String: Any], at url: URL) {
         try! FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         let data = try! JSONSerialization.data(
-            withJSONObject: value, options: [.prettyPrinted, .sortedKeys])
+            withJSONObject: value, options: [.prettyPrinted, .sortedKeys]
+        )
         try! data.write(to: url.appendingPathComponent("Contents.json"))
     }
     let info: [String: Any] = ["author": "xcode", "version": 1]
@@ -329,7 +349,8 @@ if CommandLine.arguments.contains("--tvos") {
                     "size": "\(width)x\(height)",
                 ]
             },
-        ], at: assets)
+        ], at: assets
+    )
     for (name, width, height) in specifications {
         let stack = assets.appendingPathComponent("\(name).imagestack")
         metadata(
@@ -339,7 +360,8 @@ if CommandLine.arguments.contains("--tvos") {
                     ["filename": "Artwork.imagestacklayer"],
                     ["filename": "Background.imagestacklayer"],
                 ],
-            ], at: stack)
+            ], at: stack
+        )
         let layer = stack.appendingPathComponent("Artwork.imagestacklayer")
         metadata(["info": info], at: layer)
         let content = layer.appendingPathComponent("Content.imageset")
@@ -347,13 +369,15 @@ if CommandLine.arguments.contains("--tvos") {
             [
                 "info": info,
                 "images": [
-                    ["filename": "artwork.png", "idiom": "tv", "scale": "1x"]
+                    ["filename": "artwork.png", "idiom": "tv", "scale": "1x"],
                 ],
-            ], at: content)
+            ], at: content
+        )
         let context = CGContext(
             data: nil, width: width, height: height, bitsPerComponent: 8,
             bytesPerRow: 0, space: sRGB,
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        )!
         context.translateBy(x: CGFloat(width - height) / 2, y: 0)
         context.scaleBy(x: CGFloat(height) / canvas, y: CGFloat(height) / canvas)
         draw(into: context, includesBackground: false)
@@ -365,15 +389,18 @@ if CommandLine.arguments.contains("--tvos") {
             [
                 "info": info,
                 "images": [["filename": "background.png", "idiom": "tv", "scale": "1x"]],
-            ], at: backgroundContent)
+            ], at: backgroundContent
+        )
         let background = CGContext(
             data: nil, width: width, height: height, bitsPerComponent: 8,
             bytesPerRow: 0, space: sRGB,
-            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)!
+            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        )!
         background.setFillColor(rgba(backgroundEdge))
         background.fill(CGRect(x: 0, y: 0, width: width, height: height))
         write(
-            background.makeImage()!, to: backgroundContent.appendingPathComponent("background.png"))
+            background.makeImage()!, to: backgroundContent.appendingPathComponent("background.png")
+        )
     }
     exit(0)
 }
@@ -398,10 +425,12 @@ for (name, pixels) in appIconSizes {
     write(image, to: appIcon.appendingPathComponent(name))
     print("\(name) \(pixels)x\(pixels)")
 }
+
 let moonDiskSize = 360
 let moonDiskContext = CGContext(
     data: nil, width: moonDiskSize, height: moonDiskSize, bitsPerComponent: 8, bytesPerRow: 0,
-    space: sRGB, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+    space: sRGB, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+)!
 moonDiskContext.interpolationQuality = .high
 moonDiskContext.draw(moonDisk, in: CGRect(x: 0, y: 0, width: moonDiskSize, height: moonDiskSize))
 write(moonDiskContext.makeImage()!, to: moonDiskSet.appendingPathComponent("MoonDisk.png"))

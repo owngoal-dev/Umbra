@@ -5,25 +5,25 @@ enum ManagedService: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .openssh: return "OpenSSH"
-        case .dropbear: return "Dropbear"
-        case .frida: return "Frida"
+        case .openssh: "OpenSSH"
+        case .dropbear: "Dropbear"
+        case .frida: "Frida"
         }
     }
 
     var symbol: String {
         switch self {
-        case .openssh: return "terminal.fill"
-        case .dropbear: return "key.fill"
-        case .frida: return "ladybug.fill"
+        case .openssh: "terminal.fill"
+        case .dropbear: "key.fill"
+        case .frida: "ladybug.fill"
         }
     }
 
     var defaultPorts: [Int] {
         switch self {
-        case .openssh: return [22, 2222]
-        case .dropbear: return [44]
-        case .frida: return [27042]
+        case .openssh: [22, 2222]
+        case .dropbear: [44]
+        case .frida: [27042]
         }
     }
 
@@ -39,7 +39,8 @@ enum ManagedService: String, CaseIterable {
             Bundle.main.preferredLocalizations.first?.hasPrefix("zh") == true ? "、" : ", "
         return String(
             format: localized("Listening on %@"),
-            ports.map(\.stringValue).joined(separator: separator))
+            ports.map(\.stringValue).joined(separator: separator)
+        )
     }
 }
 
@@ -75,7 +76,10 @@ final class ServicePortsViewController: UITableViewController {
         }
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,13 +88,15 @@ final class ServicePortsViewController: UITableViewController {
         tableView.estimatedRowHeight = 52
         tableView.keyboardDismissMode = .onDrag
         navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: localized("Cancel"), style: .plain, target: self, action: #selector(cancel))
+            title: localized("Cancel"), style: .plain, target: self, action: #selector(cancel)
+        )
         saveButton = UIBarButtonItem(
-            title: localized("Save"), style: .done, target: self, action: #selector(save))
+            title: localized("Save"), style: .done, target: self, action: #selector(save)
+        )
         if loadError == nil {
             navigationItem.rightBarButtonItem = saveButton
             var ports = originalPorts
-            if service == .openssh && ports.count == 1 {
+            if service == .openssh, ports.count == 1 {
                 ports.append(UMBServicePorts.opensshBackupPort().intValue)
             }
             fields = ports.enumerated().map { index, port in
@@ -103,7 +109,7 @@ final class ServicePortsViewController: UITableViewController {
                 field.adjustsFontForContentSizeCategory = true
                 field.accessibilityLabel =
                     service == .openssh
-                    ? localized(index == 0 ? "Primary Port" : "Backup Port") : localized("Port")
+                        ? localized(index == 0 ? "Primary Port" : "Backup Port") : localized("Port")
                 field.addTarget(self, action: #selector(updateSaveButton), for: .editingChanged)
                 return field
             }
@@ -117,15 +123,15 @@ final class ServicePortsViewController: UITableViewController {
         fields.first?.becomeFirstResponder()
     }
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    override func numberOfSections(in _: UITableView) -> Int {
         service == .openssh && loadError == nil ? 2 : 1
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
         section == 1 && backupSwitch.isOn ? 2 : 1
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int)
+    override func tableView(_: UITableView, titleForHeaderInSection section: Int)
         -> String?
     {
         service == .openssh
@@ -151,7 +157,7 @@ final class ServicePortsViewController: UITableViewController {
         if let loadError {
             content.text = loadError
             content.textProperties.color = .secondaryLabel
-        } else if indexPath.section == 1 && indexPath.row == 0 {
+        } else if indexPath.section == 1, indexPath.row == 0 {
             content.text = localized("Enabled")
             cell.accessoryView = backupSwitch
         } else {
@@ -159,7 +165,8 @@ final class ServicePortsViewController: UITableViewController {
             let field = fields[indexPath.section]
             field.frame = CGRect(
                 x: 0, y: 0, width: max(100, tableView.bounds.width * 0.32),
-                height: max(36, field.font!.lineHeight + 12))
+                height: max(36, field.font!.lineHeight + 12)
+            )
             cell.accessoryView = field
         }
         cell.contentConfiguration = content
@@ -170,7 +177,7 @@ final class ServicePortsViewController: UITableViewController {
         override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
             tableView.deselectRow(at: indexPath, animated: true)
             guard loadError == nil, !isSaving else { return }
-            if indexPath.section == 1 && indexPath.row == 0 {
+            if indexPath.section == 1, indexPath.row == 0 {
                 backupSwitch.isOn.toggle()
                 toggleBackup()
             } else {
@@ -186,7 +193,7 @@ final class ServicePortsViewController: UITableViewController {
         for field in activeFields {
             let value = (field.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
             guard !value.isEmpty, value.utf8.allSatisfy({ $0 >= 48 && $0 <= 57 }),
-                let port = Int(value), (1...65535).contains(port)
+                  let port = Int(value), (1 ... 65535).contains(port)
             else { return nil }
             ports.append(port)
         }
@@ -199,7 +206,9 @@ final class ServicePortsViewController: UITableViewController {
     }
 
     @objc private func toggleBackup() {
-        if !backupSwitch.isOn { fields[1].resignFirstResponder() }
+        if !backupSwitch.isOn {
+            fields[1].resignFirstResponder()
+        }
         let row = IndexPath(row: 1, section: 1)
         if backupSwitch.isOn {
             tableView.insertRows(at: [row], with: .fade)
@@ -209,26 +218,32 @@ final class ServicePortsViewController: UITableViewController {
         updateSaveButton()
     }
 
-    @objc private func cancel() { dismiss(animated: true) }
+    @objc private func cancel() {
+        dismiss(animated: true)
+    }
 
     @objc private func save() {
         guard !isSaving else { return }
         guard let ports = requestedPorts else {
             showMessage(
                 localized("Enter a port from 1 to 65535."),
-                title: localized("Could not save service ports."), from: self)
+                title: localized("Could not save service ports."), from: self
+            )
             return
         }
         guard Set(ports).count == ports.count else {
             showMessage(
                 localized("Each port must be different."),
-                title: localized("Could not save service ports."), from: self)
+                title: localized("Could not save service ports."), from: self
+            )
             return
         }
         view.endEditing(true)
         isSaving = true
         navigationController?.isModalInPresentation = true
-        for field in fields { field.isEnabled = false }
+        for field in fields {
+            field.isEnabled = false
+        }
         backupSwitch.isEnabled = false
         navigationItem.leftBarButtonItem?.isEnabled = false
         let spinner = UIActivityIndicatorView(style: .medium)
@@ -238,12 +253,15 @@ final class ServicePortsViewController: UITableViewController {
         DispatchQueue.global(qos: .userInitiated).async {
             let result = Result {
                 try UMBServicePorts.setPorts(
-                    ports.map { NSNumber(value: $0) }, for: self.service.rawValue)
+                    ports.map { NSNumber(value: $0) }, for: self.service.rawValue
+                )
             }
             DispatchQueue.main.async {
                 self.isSaving = false
                 self.navigationController?.isModalInPresentation = false
-                for field in self.fields { field.isEnabled = true }
+                for field in self.fields {
+                    field.isEnabled = true
+                }
                 self.backupSwitch.isEnabled = true
                 self.navigationItem.leftBarButtonItem?.isEnabled = true
                 self.navigationItem.rightBarButtonItem = self.saveButton
@@ -252,10 +270,11 @@ final class ServicePortsViewController: UITableViewController {
                 case .success:
                     self.onSave()
                     self.dismiss(animated: true)
-                case .failure(let error):
+                case let .failure(error):
                     showMessage(
                         error.localizedDescription,
-                        title: localized("Could not save service ports."), from: self)
+                        title: localized("Could not save service ports."), from: self
+                    )
                 }
             }
         }

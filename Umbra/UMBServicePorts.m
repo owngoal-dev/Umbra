@@ -1,5 +1,7 @@
 #import "UMBServicePorts.h"
+
 #import "roothide.h"
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <sys/socket.h>
@@ -9,34 +11,28 @@ extern int UMBSpawnRoot(NSString *path, NSArray *args, NSString **stdOut, NSStri
 
 static BOOL PortError(NSError **error, NSString *message) {
     if (error) {
-        *error = [NSError errorWithDomain:@"wiki.qaq.umbra.serviceports"
-                                     code:1
+        *error = [NSError errorWithDomain:@"wiki.qaq.umbra.serviceports" code:1
                                  userInfo:@{NSLocalizedDescriptionKey : message}];
     }
     return NO;
 }
 
 static NSString *ServiceLabel(NSString *service) {
-    return @{
-        @"openssh" : @"com.openssh.sshd",
-        @"dropbear" : @"com.mkj.dropbear",
-        @"frida" : @"re.frida.server"
-    }[service];
+    return
+        @{@"openssh" : @"com.openssh.sshd", @"dropbear" : @"com.mkj.dropbear", @"frida" : @"re.frida.server"}[service];
 }
 
 static NSString *ServicePath(NSString *service) {
     NSString *label = ServiceLabel(service);
-    return label ? jbroot([@"/Library/LaunchDaemons/" stringByAppendingFormat:@"%@.plist", label])
-                 : nil;
+    return label ? jbroot([@"/Library/LaunchDaemons/" stringByAppendingFormat:@"%@.plist", label]) : nil;
 }
 
 static NSNumber *PortNumber(id value) {
     NSString *text = [value isKindOfClass:NSNumber.class] ? [value stringValue] : value;
     if (![text isKindOfClass:NSString.class] || !text.length || text.length > 5 ||
-        [text rangeOfCharacterFromSet:[NSCharacterSet
-                                          characterSetWithCharactersInString:@"0123456789"]
-                                          .invertedSet]
-                .location != NSNotFound) {
+        [text rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"0123456789"].invertedSet]
+                .location
+            != NSNotFound) {
         return nil;
     }
     NSInteger port = text.integerValue;
@@ -49,13 +45,13 @@ static NSNumber *EndpointPort(NSString *endpoint) {
 
 static NSString *ChangedEndpoint(NSString *endpoint, NSNumber *port) {
     NSRange colon = [endpoint rangeOfString:@":" options:NSBackwardsSearch];
-    NSString *prefix =
-        colon.location == NSNotFound ? @"" : [endpoint substringToIndex:colon.location + 1];
+    NSString *prefix = colon.location == NSNotFound ? @"" : [endpoint substringToIndex:colon.location + 1];
     return [prefix stringByAppendingString:port.stringValue];
 }
 
 // Only the port-bearing fields are changed; launch arguments and binding addresses stay intact.
-static NSArray<NSNumber *> *ConfigPorts(NSMutableDictionary *config, NSString *service,
+static NSArray<NSNumber *> *ConfigPorts(NSMutableDictionary *config,
+                                        NSString *service,
                                         NSArray<NSNumber *> *replacement) {
     NSArray *args = config[@"ProgramArguments"];
     if (![args isKindOfClass:NSArray.class]) {
@@ -69,17 +65,14 @@ static NSArray<NSNumber *> *ConfigPorts(NSMutableDictionary *config, NSString *s
     NSMutableArray<NSNumber *> *ports = [NSMutableArray new];
     if ([service isEqualToString:@"openssh"]) {
         NSDictionary *sockets = config[@"Sockets"];
-        if (![args containsObject:@"-i"] || ![sockets isKindOfClass:NSDictionary.class] ||
-            !sockets.count) {
+        if (![args containsObject:@"-i"] || ![sockets isKindOfClass:NSDictionary.class] || !sockets.count) {
             return nil;
         }
-        if (!sockets[@"SSHListener"] || sockets.count > 2 ||
-            (sockets.count == 2 && !sockets[@"SSHListener2"]) ||
-            (replacement && (replacement.count < 1 || replacement.count > 2))) {
+        if (!sockets[@"SSHListener"] || sockets.count > 2 || (sockets.count == 2 && !sockets[@"SSHListener2"])
+            || (replacement && (replacement.count < 1 || replacement.count > 2))) {
             return nil;
         }
-        NSArray *keys =
-            sockets[@"SSHListener2"] ? @[ @"SSHListener", @"SSHListener2" ] : @[ @"SSHListener" ];
+        NSArray *keys = sockets[@"SSHListener2"] ? @[ @"SSHListener", @"SSHListener2" ] : @[ @"SSHListener" ];
         NSMutableDictionary *changed = sockets.mutableCopy;
         for (NSString *key in keys) {
             NSDictionary *socket = sockets[key];
@@ -106,12 +99,10 @@ static NSArray<NSNumber *> *ConfigPorts(NSMutableDictionary *config, NSString *s
             config[@"Sockets"] = changed;
         }
     } else if ([service isEqualToString:@"dropbear"]) {
-        NSUInteger wrapper =
-            [args indexOfObjectPassingTest:^BOOL(NSString *arg, NSUInteger index, BOOL *stop) {
-                return [arg.lastPathComponent isEqualToString:@"dropbear-wrapper"];
-            }];
-        if (wrapper == NSNotFound || args.count != wrapper + 2 ||
-            (replacement && replacement.count != 1)) {
+        NSUInteger wrapper = [args indexOfObjectPassingTest:^BOOL(NSString *arg, NSUInteger index, BOOL *stop) {
+            return [arg.lastPathComponent isEqualToString:@"dropbear-wrapper"];
+        }];
+        if (wrapper == NSNotFound || args.count != wrapper + 2 || (replacement && replacement.count != 1)) {
             return nil;
         }
         NSNumber *port = EndpointPort(args.lastObject);
@@ -138,8 +129,7 @@ static NSArray<NSNumber *> *ConfigPorts(NSMutableDictionary *config, NSString *s
                 [arg.lastPathComponent isEqualToString:@"frida-server"]) {
                 knownProgram = YES;
             }
-            if ([arg isEqualToString:@"-l"] || [arg isEqualToString:@"--listen"] ||
-                [arg hasPrefix:@"--listen="]) {
+            if ([arg isEqualToString:@"-l"] || [arg isEqualToString:@"--listen"] || [arg hasPrefix:@"--listen="]) {
                 if (option != NSNotFound) {
                     return nil;
                 }
@@ -190,12 +180,10 @@ static NSMutableDictionary *ReadConfig(NSString *service, NSData **original, NSE
     if (!data) {
         return nil;
     }
-    id config = [NSPropertyListSerialization propertyListWithData:data
-                                                          options:NSPropertyListMutableContainers
+    id config = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListMutableContainers
                                                            format:nil
                                                             error:error];
-    if (![config isKindOfClass:NSMutableDictionary.class] ||
-        ![config[@"Label"] isEqual:ServiceLabel(service)]) {
+    if (![config isKindOfClass:NSMutableDictionary.class] || ![config[@"Label"] isEqual:ServiceLabel(service)]) {
         PortError(error, NSLocalizedString(@"Unsupported service configuration.", nil));
         return nil;
     }
@@ -281,8 +269,7 @@ static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
 @implementation UMBServicePorts
 
 + (NSArray<NSString *> *)installedServices {
-    NSString *status = [NSString stringWithContentsOfFile:jbroot(@"/var/lib/dpkg/status")
-                                                 encoding:NSUTF8StringEncoding
+    NSString *status = [NSString stringWithContentsOfFile:jbroot(@"/var/lib/dpkg/status") encoding:NSUTF8StringEncoding
                                                     error:nil];
     NSMutableSet *packages = [NSMutableSet new];
     for (NSString *paragraph in [status componentsSeparatedByString:@"\n\n"]) {
@@ -301,28 +288,24 @@ static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
         }
     }
     NSMutableArray *services = [NSMutableArray new];
-    if ([packages containsObject:@"openssh-server"] ||
-        ([packages containsObject:@"openssh"] &&
-         [NSFileManager.defaultManager fileExistsAtPath:ServicePath(@"openssh")])) {
+    if ([packages containsObject:@"openssh-server"]
+        || ([packages containsObject:@"openssh"] &&
+            [NSFileManager.defaultManager fileExistsAtPath:ServicePath(@"openssh")])) {
         [services addObject:@"openssh"];
     }
     if ([packages containsObject:@"dropbear"]) {
         [services addObject:@"dropbear"];
     }
-    if ([packages containsObject:@"re.frida.server"] ||
-        [packages containsObject:@"re.frida.server64"]) {
+    if ([packages containsObject:@"re.frida.server"] || [packages containsObject:@"re.frida.server64"]) {
         [services addObject:@"frida"];
     }
     return services;
 }
 
 + (NSNumber *)opensshBackupPort {
-    NSDictionary *socket =
-        [NSDictionary dictionaryWithContentsOfFile:[ServicePath(@"openssh")
-                                                       stringByAppendingString:@".backup-socket"]];
-    return [socket isKindOfClass:NSDictionary.class]
-               ? (PortNumber(socket[@"SockServiceName"]) ?: @2222)
-               : @2222;
+    NSDictionary *socket = [NSDictionary
+        dictionaryWithContentsOfFile:[ServicePath(@"openssh") stringByAppendingString:@".backup-socket"]];
+    return [socket isKindOfClass:NSDictionary.class] ? (PortNumber(socket[@"SockServiceName"]) ?: @2222) : @2222;
 }
 
 + (NSArray<NSNumber *> *)portsForService:(NSString *)service error:(NSError **)error {
@@ -337,9 +320,7 @@ static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
     return ports;
 }
 
-+ (BOOL)setPorts:(NSArray<NSNumber *> *)ports
-      forService:(NSString *)service
-           error:(NSError **)error {
++ (BOOL)setPorts:(NSArray<NSNumber *> *)ports forService:(NSString *)service error:(NSError **)error {
     @synchronized(self) {
         NSMutableSet *unique = [NSMutableSet new];
         NSMutableArray *validated = [NSMutableArray new];
@@ -362,11 +343,12 @@ static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
             NSString *message = nil;
             NSString *values = [[ports valueForKey:@"stringValue"] componentsJoinedByString:@","];
             int result = UMBSpawnRoot(NSBundle.mainBundle.executablePath,
-                                      @[ @"setServicePorts", service, values ], nil, &message);
-            return result == 0 ||
-                   PortError(error, message.length
-                                        ? message
-                                        : NSLocalizedString(@"Could not save service ports.", nil));
+                                      @[ @"setServicePorts", service, values ],
+                                      nil,
+                                      &message);
+            return result == 0
+                || PortError(error,
+                             message.length ? message : NSLocalizedString(@"Could not save service ports.", nil));
         }
         NSData *original = nil;
         NSMutableDictionary *config = ReadConfig(service, &original, error);
@@ -385,10 +367,8 @@ static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
             NSDictionary *secondary = sockets[@"SSHListener2"];
             if (ports.count == 2 && !secondary) {
                 id saved = [NSDictionary
-                    dictionaryWithContentsOfFile:[ServicePath(@"openssh")
-                                                     stringByAppendingString:@".backup-socket"]];
-                sockets[@"SSHListener2"] =
-                    [saved isKindOfClass:NSDictionary.class] ? saved : sockets[@"SSHListener"];
+                    dictionaryWithContentsOfFile:[ServicePath(@"openssh") stringByAppendingString:@".backup-socket"]];
+                sockets[@"SSHListener2"] = [saved isKindOfClass:NSDictionary.class] ? saved : sockets[@"SSHListener"];
                 config[@"Sockets"] = sockets;
             }
         }
@@ -398,52 +378,41 @@ static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
         for (NSNumber *port in ports) {
             if (![oldPorts containsObject:port] && !PortIsFree(port)) {
                 return PortError(error,
-                                 [NSString stringWithFormat:NSLocalizedString(
-                                                                @"Port %@ is already in use.", nil),
-                                                            port]);
+                                 [NSString
+                                     stringWithFormat:NSLocalizedString(@"Port %@ is already in use.", nil), port]);
             }
         }
         NSString *path = ServicePath(service);
         NSString *backup = [path stringByAppendingString:@".umbra-backup"];
-        NSDictionary *attributes = [NSFileManager.defaultManager attributesOfItemAtPath:path
-                                                                                  error:error];
+        NSDictionary *attributes = [NSFileManager.defaultManager attributesOfItemAtPath:path error:error];
         if (!attributes) {
             return NO;
         }
-        NSData *data =
-            [NSPropertyListSerialization dataWithPropertyList:config
-                                                       format:NSPropertyListXMLFormat_v1_0
-                                                      options:0
-                                                        error:error];
+        NSData *data = [NSPropertyListSerialization dataWithPropertyList:config format:NSPropertyListXMLFormat_v1_0
+                                                                 options:0
+                                                                   error:error];
         if (!data || !WriteConfig(original, backup, attributes, error)) {
             return NO;
         }
         if ([service isEqualToString:@"openssh"] && oldPorts.count == 2 && ports.count == 1) {
-            NSDictionary *previous = [NSPropertyListSerialization propertyListWithData:original
-                                                                               options:0
-                                                                                format:nil
+            NSDictionary *previous = [NSPropertyListSerialization propertyListWithData:original options:0 format:nil
                                                                                  error:error];
-            NSData *socket = [NSPropertyListSerialization
-                dataWithPropertyList:previous[@"Sockets"][@"SSHListener2"]
-                              format:NSPropertyListXMLFormat_v1_0
-                             options:0
-                               error:error];
-            if (!socket || !WriteConfig(socket, [path stringByAppendingString:@".backup-socket"],
-                                        attributes, error)) {
+            NSData *socket = [NSPropertyListSerialization dataWithPropertyList:previous[@"Sockets"][@"SSHListener2"]
+                                                                        format:NSPropertyListXMLFormat_v1_0
+                                                                       options:0
+                                                                         error:error];
+            if (!socket || !WriteConfig(socket, [path stringByAppendingString:@".backup-socket"], attributes, error)) {
                 return NO;
             }
         }
-        BOOL loaded =
-            LaunchControl(
-                @[ @"print", [@"system/" stringByAppendingString:ServiceLabel(service)] ]) == 0;
+        BOOL loaded = LaunchControl(@[ @"print", [@"system/" stringByAppendingString:ServiceLabel(service)] ]) == 0;
         if (!WriteConfig(data, path, attributes, error)) {
             return NO;
         }
         if (!loaded) {
             return YES;
         }
-        BOOL restarted =
-            LaunchControl(@[ @"unload", path ]) == 0 && LaunchControl(@[ @"load", path ]) == 0;
+        BOOL restarted = LaunchControl(@[ @"unload", path ]) == 0 && LaunchControl(@[ @"load", path ]) == 0;
         for (NSUInteger attempt = 0; restarted && attempt < 80; attempt++) {
             if (PortsAreListening(ports)) {
                 return YES;
@@ -451,19 +420,17 @@ static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
             [NSThread sleepForTimeInterval:0.1];
         }
         if (!WriteConfig(original, path, attributes, error)) {
-            return PortError(
-                error, NSLocalizedString(@"Could not restore the original configuration.", nil));
+            return PortError(error, NSLocalizedString(@"Could not restore the original configuration.", nil));
         }
         LaunchControl(@[ @"unload", path ]);
         if (LaunchControl(@[ @"load", path ]) != 0) {
-            return PortError(
-                error, NSLocalizedString(
-                           @"Could not restore the service. Restart it in your terminal.", nil));
+            return PortError(error,
+                             NSLocalizedString(@"Could not restore the service. Restart it in your terminal.", nil));
         }
-        return PortError(
-            error,
-            NSLocalizedString(
-                @"Could not restart the service. The original configuration was restored.", nil));
+        return PortError(error,
+                         NSLocalizedString(@"Could not restart the service. The original configuration was restored.",
+                                           nil));
     }
 }
+
 @end

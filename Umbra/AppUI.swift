@@ -36,13 +36,15 @@ func openInFileManager(path: String, from controller: UIViewController) {
             guard !opened else { return }
             #if os(iOS)
                 let message = localized(
-                    "Neither Fila nor Filza could be opened. The path has been copied.")
+                    "Neither Fila nor Filza could be opened. The path has been copied."
+                )
             #else
                 let message = path
             #endif
             showMessage(
                 message,
-                title: localized("Open in File Manager"), from: controller)
+                title: localized("Open in File Manager"), from: controller
+            )
         }
     }
 }
@@ -57,7 +59,9 @@ final class EnvironmentCheck {
     private(set) var isChecking = false
     private(set) var findings: [[String: String]] = []
 
-    init() { findings = UMBBackend.startupWarnings() }
+    init() {
+        findings = UMBBackend.startupWarnings()
+    }
 
     var summary: String {
         let titles = findings.compactMap { $0["title"] }
@@ -121,21 +125,25 @@ final class EnvironmentCheck {
         content.secondaryTextProperties.numberOfLines = 0
         content.secondaryTextProperties.color = .secondaryLabel
         content.directionalLayoutMargins = NSDirectionalEdgeInsets(
-            top: 16, leading: 20, bottom: 16, trailing: 20)
+            top: 16, leading: 20, bottom: 16, trailing: 20
+        )
         content.textToSecondaryTextVerticalPadding = 6
         content.image = UIImage(
             systemName: isChecking && findings.isEmpty
                 ? "clock"
                 : findings.isEmpty
-                    ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
+                ? "checkmark.shield.fill" : "exclamationmark.shield.fill"
+        )
         content.imageProperties.maximumSize = CGSize(
-            width: AppPlatform.listSymbolPointSize, height: AppPlatform.listSymbolPointSize)
+            width: AppPlatform.listSymbolPointSize, height: AppPlatform.listSymbolPointSize
+        )
         content.imageProperties.reservedLayoutSize = AppPlatform.listSymbolReservedSize
         content.imageProperties.preferredSymbolConfiguration = UIImage.SymbolConfiguration(
-            pointSize: AppPlatform.listSymbolPointSize)
+            pointSize: AppPlatform.listSymbolPointSize
+        )
         content.imageProperties.tintColor =
             isChecking && findings.isEmpty
-            ? .secondaryLabel : findings.isEmpty ? AppTheme.tint : .systemOrange
+                ? .secondaryLabel : findings.isEmpty ? AppTheme.tint : .systemOrange
         cell.contentConfiguration = content
         cell.accessoryType = hasFindings ? .disclosureIndicator : .none
         cell.selectionStyle = hasFindings ? .default : .none
@@ -156,21 +164,24 @@ final class EnvironmentCheck {
             badge.clipsToBounds = true
             NSLayoutConstraint.activate([
                 badge.widthAnchor.constraint(
-                    equalToConstant: max(height, ceil(badge.intrinsicContentSize.width) + 12)),
+                    equalToConstant: max(height, ceil(badge.intrinsicContentSize.width) + 12)
+                ),
                 badge.heightAnchor.constraint(equalToConstant: height),
             ])
             let indicator = UIImageView(
                 image: UIImage(
                     systemName: "chevron.forward",
                     withConfiguration: UIImage.SymbolConfiguration(pointSize: 13, weight: .semibold)
-                ))
+                )
+            )
             indicator.tintColor = .tertiaryLabel
             let accessory = UIStackView(arrangedSubviews: [badge, indicator])
             accessory.alignment = .center
             accessory.spacing = 8
             accessory.isUserInteractionEnabled = false
             accessory.frame.size = accessory.systemLayoutSizeFitting(
-                UIView.layoutFittingCompressedSize)
+                UIView.layoutFittingCompressedSize
+            )
             cell.accessoryView = accessory
             cell.accessibilityValue = badge.text
         }
@@ -187,7 +198,10 @@ final class EnvironmentViewController: UITableViewController {
         title = localized("Environment Check")
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     #if os(tvOS)
         override func viewWillAppear(_ animated: Bool) {
@@ -205,23 +219,30 @@ final class EnvironmentViewController: UITableViewController {
         tableView.estimatedRowHeight = 110
         configureRefresh(action: #selector(refreshCheck))
         NotificationCenter.default.addObserver(
-            self, selector: #selector(update), name: EnvironmentCheck.didChange, object: check)
+            self, selector: #selector(update), name: EnvironmentCheck.didChange, object: check
+        )
         update()
     }
 
-    @objc private func refreshCheck() { check.refresh() }
+    @objc private func refreshCheck() {
+        check.refresh()
+    }
 
     @objc private func update() {
-        if check.isChecking && !check.findings.isEmpty { return }
-        if !check.isChecking { endRefreshing() }
+        if check.isChecking, !check.findings.isEmpty {
+            return
+        }
+        if !check.isChecking {
+            endRefreshing()
+        }
         tableView.reloadData()
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
         max(1, check.findings.count)
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int)
+    override func tableView(_: UITableView, titleForHeaderInSection _: Int)
         -> String?
     {
         localized("Check Results")
@@ -254,20 +275,24 @@ final class EnvironmentViewController: UITableViewController {
             content.text = finding["title"]
             content.secondaryText = finding["message"]
             content.image = UIImage(
-                systemName: symbols[finding["title"] ?? ""] ?? "exclamationmark.triangle.fill")
+                systemName: symbols[finding["title"] ?? ""] ?? "exclamationmark.triangle.fill"
+            )
             content.imageProperties.tintColor = .systemOrange
             content.secondaryTextProperties.numberOfLines = 0
             content.secondaryTextProperties.color = .secondaryLabel
         }
         content.imageProperties.maximumSize = CGSize(
-            width: AppPlatform.listSymbolPointSize, height: AppPlatform.listSymbolPointSize)
+            width: AppPlatform.listSymbolPointSize, height: AppPlatform.listSymbolPointSize
+        )
         content.imageProperties.reservedLayoutSize = AppPlatform.listSymbolReservedSize
         content.imageProperties.preferredSymbolConfiguration = UIImage.SymbolConfiguration(
-            pointSize: AppPlatform.listSymbolPointSize)
+            pointSize: AppPlatform.listSymbolPointSize
+        )
         content.textProperties.numberOfLines = 0
         content.textToSecondaryTextVerticalPadding = 8
         content.directionalLayoutMargins = NSDirectionalEdgeInsets(
-            top: 20, leading: 20, bottom: 20, trailing: 20)
+            top: 20, leading: 20, bottom: 20, trailing: 20
+        )
         cell.contentConfiguration = content
         return cell
     }
@@ -280,13 +305,12 @@ final class EnvironmentViewController: UITableViewController {
     #endif
 
     override func tableView(
-        _ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath
+        _: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath
     ) {
         guard indexPath.row < check.findings.count,
-            let identifier = check.findings[indexPath.row]["service"],
-            let service = ManagedService(rawValue: identifier)
+              let identifier = check.findings[indexPath.row]["service"],
+              let service = ManagedService(rawValue: identifier)
         else { return }
         presentServicePorts(service, from: self) { [weak self] in self?.check.refresh() }
     }
-
 }

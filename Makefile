@@ -75,18 +75,17 @@ archive:
 ipa: archive
 	python3 Tools/package-ipa.py "$(ARCHIVE_PATH)/Products/Applications/Umbra.app" "$(IPA_PATH)"
 
-SWIFT_FORMAT ?= xcrun swift-format
+SWIFT_FORMAT ?= swiftformat
 CLANG_FORMAT ?= clang-format
-SWIFT_SOURCES := $(wildcard Umbra/*.swift Umbra/Platform/*.swift Tests/*.swift Tools/*.swift)
-CLANG_SOURCES := $(filter-out Umbra/NSJSONSerialization+UMBComments.h Umbra/NSJSONSerialization+UMBComments.m,$(wildcard Umbra/*.[mh] Umbra/AppDataCleaner/*.[mh] Umbra/Platform/*.h Tests/*.m))
+CLANG_SOURCES := $(wildcard Umbra/*.[mh] Umbra/AppDataCleaner/*.[mh] Umbra/Platform/*.h Tests/*.m)
 
 .PHONY: format format-check check
 format:
-	$(SWIFT_FORMAT) format --in-place $(SWIFT_SOURCES)
+	$(SWIFT_FORMAT) .
 	$(CLANG_FORMAT) -i $(CLANG_SOURCES)
 
 format-check:
-	$(SWIFT_FORMAT) lint --strict $(SWIFT_SOURCES)
+	$(SWIFT_FORMAT) . --lint
 	$(CLANG_FORMAT) --dry-run --Werror $(CLANG_SOURCES)
 
 check:

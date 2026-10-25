@@ -19,20 +19,20 @@ private enum CleanerRow: Hashable {
 private final class CleanerDataSource: UITableViewDiffableDataSource<CleanerSection, CleanerRow> {
     var errors: [String: String] = [:]
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int)
+    override func tableView(_: UITableView, titleForHeaderInSection section: Int)
         -> String?
     {
         switch sectionIdentifier(for: section) {
-        case .information: return localized("Purpose")
-        case .directory(let path): return path
-        case nil: return nil
+        case .information: localized("Purpose")
+        case let .directory(path): path
+        case nil: nil
         }
     }
 
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int)
+    override func tableView(_: UITableView, titleForFooterInSection section: Int)
         -> String?
     {
-        guard case .directory(let directory) = sectionIdentifier(for: section) else { return nil }
+        guard case let .directory(directory) = sectionIdentifier(for: section) else { return nil }
         return errors[directory].map {
             localized("Read access failed") + ": " + $0
         }
@@ -60,7 +60,10 @@ private final class CleanerCheckbox: UIView {
         checkmark.strokeEnd = 0
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -131,8 +134,14 @@ final class CleanerViewController: UITableViewController {
     private var progressButton: UIBarButtonItem!
     private var informationError: String?
 
-    init() { super.init(style: AppPlatform.tableStyle) }
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    init() {
+        super.init(style: AppPlatform.tableStyle)
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -142,10 +151,12 @@ final class CleanerViewController: UITableViewController {
         view.tintColor = AppTheme.tint
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: localized("Select All"), style: .plain, target: self,
-            action: #selector(toggleAll))
+            action: #selector(toggleAll)
+        )
         removeButton = UIBarButtonItem(
             title: localized("Remove"), style: .done, target: self,
-            action: #selector(confirmCleanup))
+            action: #selector(confirmCleanup)
+        )
         spinner.frame = CGRect(x: 0, y: 0, width: 44, height: 32)
         spinner.isAccessibilityElement = true
         progressButton = UIBarButtonItem(customView: spinner)
@@ -158,10 +169,12 @@ final class CleanerViewController: UITableViewController {
             let cell = table.dequeueReusableCell(withIdentifier: "File", for: indexPath)
             guard let self else { return cell }
             switch identifier {
-            case .file(let file):
-                if let item = self.files[file] { self.configure(cell, item: item, animated: false) }
+            case let .file(file):
+                if let item = files[file] {
+                    configure(cell, item: item, animated: false)
+                }
             case .information, .state:
-                self.configureInformation(cell, state: identifier == .state)
+                configureInformation(cell, state: identifier == .state)
             }
             return cell
         }
@@ -170,16 +183,30 @@ final class CleanerViewController: UITableViewController {
         NotificationCenter.default.addObserver(
             self, selector: #selector(autoRefresh),
             name: UIApplication.willEnterForegroundNotification,
-            object: nil)
+            object: nil
+        )
         apply([], animated: false) { self.refresh(keepingSelection: false) }
     }
 
-    private var items: [UMBCleanItem] { groups.flatMap(\.items) }
-    private var selectedItems: [UMBCleanItem] { items.filter(\.checked) }
-    private var allEligibleSelected: Bool { !items.contains { !$0.ignored && !$0.checked } }
+    private var items: [UMBCleanItem] {
+        groups.flatMap(\.items)
+    }
 
-    @objc private func manualRefresh() { refresh(keepingSelection: false) }
-    @objc private func autoRefresh() { refresh(keepingSelection: true) }
+    private var selectedItems: [UMBCleanItem] {
+        items.filter(\.checked)
+    }
+
+    private var allEligibleSelected: Bool {
+        !items.contains { !$0.ignored && !$0.checked }
+    }
+
+    @objc private func manualRefresh() {
+        refresh(keepingSelection: false)
+    }
+
+    @objc private func autoRefresh() {
+        refresh(keepingSelection: true)
+    }
 
     private func refresh(keepingSelection: Bool, afterCleanup: Bool = false) {
         guard operation == nil, !isConfirmingCleanup, !isUpdatingList else {
@@ -191,10 +218,11 @@ final class CleanerViewController: UITableViewController {
         pendingRefresh = nil
         let selection =
             keepSelection
-            ? Dictionary(
-                items.map { ($0.path, NSNumber(value: $0.checked)) },
-                uniquingKeysWith: { first, _ in first })
-            : [:]
+                ? Dictionary(
+                    items.map { ($0.path, NSNumber(value: $0.checked)) },
+                    uniquingKeysWith: { first, _ in first }
+                )
+                : [:]
         operation = localized("Scanning…")
         updateInterface()
         worker.async { [weak self] in
@@ -206,9 +234,9 @@ final class CleanerViewController: UITableViewController {
                 let wasLoaded = self.hasLoaded
                 self.hasLoaded = true
                 switch result {
-                case .success(let groups):
+                case let .success(groups):
                     if afterCleanup,
-                        let unreadable = groups.first(where: { $0.errorMessage != nil })
+                       let unreadable = groups.first(where: { $0.errorMessage != nil })
                     {
                         self.scanError = unreadable.path + ": " + (unreadable.errorMessage ?? "")
                         self.apply(self.groups, animated: wasLoaded) { self.refreshIfNeeded() }
@@ -223,7 +251,7 @@ final class CleanerViewController: UITableViewController {
                     let existingPaths = Set(groups.flatMap(\.items).map(\.path))
                     self.failures = self.failures.filter { existingPaths.contains($0.key) }
                     self.apply(groups, animated: wasLoaded) { self.refreshIfNeeded() }
-                case .failure(let error):
+                case let .failure(error):
                     self.scanError = error.localizedDescription
                     self.apply(self.groups, animated: wasLoaded) { self.refreshIfNeeded() }
                 }
@@ -244,7 +272,9 @@ final class CleanerViewController: UITableViewController {
         var snapshot = NSDiffableDataSourceSnapshot<CleanerSection, CleanerRow>()
         snapshot.appendSections([.information])
         snapshot.appendItems([.information], toSection: .information)
-        if groups.isEmpty { snapshot.appendItems([.state], toSection: .information) }
+        if groups.isEmpty {
+            snapshot.appendItems([.state], toSection: .information)
+        }
         for group in groups {
             snapshot.appendSections([.directory(group.path)])
             dataSource.errors[group.path] = group.errorMessage
@@ -258,7 +288,8 @@ final class CleanerViewController: UITableViewController {
         snapshot.reconfigureItems(
             snapshot.itemIdentifiers.filter {
                 previous.contains($0) && ($0 != .information || informationChanged)
-            })
+            }
+        )
         isUpdatingList = true
         dataSource.apply(
             snapshot, animatingDifferences: animated && !UIAccessibility.isReduceMotionEnabled
@@ -270,17 +301,21 @@ final class CleanerViewController: UITableViewController {
     }
 
     private func refreshIfNeeded() {
-        if let pendingRefresh { refresh(keepingSelection: pendingRefresh) }
+        if let pendingRefresh {
+            refresh(keepingSelection: pendingRefresh)
+        }
     }
 
     @objc private func toggleAll() {
         guard operation == nil, !isUpdatingList, scanError == nil else { return }
         let deselect = allEligibleSelected
-        for item in items where deselect || !item.ignored { item.checked = !deselect }
+        for item in items where deselect || !item.ignored {
+            item.checked = !deselect
+        }
         for indexPath in tableView.indexPathsForVisibleRows ?? [] {
-            if case .file(let identifier) = dataSource.itemIdentifier(for: indexPath),
-                let item = files[identifier],
-                let cell = tableView.cellForRow(at: indexPath)
+            if case let .file(identifier) = dataSource.itemIdentifier(for: indexPath),
+               let item = files[identifier],
+               let cell = tableView.cellForRow(at: indexPath)
             {
                 configure(cell, item: item, animated: true)
             }
@@ -290,7 +325,7 @@ final class CleanerViewController: UITableViewController {
 
     @objc private func confirmCleanup() {
         guard operation == nil, !isUpdatingList, scanError == nil, presentedViewController == nil,
-            !selectedItems.isEmpty
+              !selectedItems.isEmpty
         else { return }
         let paths = selectedItems.map(\.path)
         let alert = UIAlertController(
@@ -298,18 +333,22 @@ final class CleanerViewController: UITableViewController {
             message: String(
                 format: localized("The %ld selected items will be permanently deleted."),
                 locale: Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en"),
-                paths.count),
-            preferredStyle: .alert)
+                paths.count
+            ),
+            preferredStyle: .alert
+        )
         alert.addAction(
             UIAlertAction(title: localized("Cancel"), style: .cancel) { [weak self] _ in
                 self?.isConfirmingCleanup = false
                 self?.refreshIfNeeded()
-            })
+            }
+        )
         alert.addAction(
             UIAlertAction(title: localized("Remove"), style: .destructive) { [weak self] _ in
                 self?.isConfirmingCleanup = false
                 self?.clean(paths: paths)
-            })
+            }
+        )
         isConfirmingCleanup = true
         present(alert, animated: true)
     }
@@ -332,7 +371,8 @@ final class CleanerViewController: UITableViewController {
                         notification: .announcement,
                         argument: failures.isEmpty
                             ? localized("Items removed")
-                            : localized("Could not delete some items"))
+                            : localized("Could not delete some items")
+                    )
                     self.refresh(keepingSelection: true, afterCleanup: true)
                 }
             }
@@ -341,9 +381,14 @@ final class CleanerViewController: UITableViewController {
 
     private func updateInterface() {
         removeButton.accessibilityValue = String(
-            format: localized("Selected: %ld"), selectedItems.count)
+            format: localized("Selected: %ld"), selectedItems.count
+        )
         spinner.accessibilityLabel = operation
-        if operation == nil { spinner.stopAnimating() } else { spinner.startAnimating() }
+        if operation == nil {
+            spinner.stopAnimating()
+        } else {
+            spinner.startAnimating()
+        }
         let action = operation == nil ? removeButton : progressButton
         if navigationItem.rightBarButtonItem !== action {
             navigationItem.rightBarButtonItem = action
@@ -351,7 +396,7 @@ final class CleanerViewController: UITableViewController {
         let canEdit = operation == nil && !isUpdatingList && scanError == nil
         navigationItem.leftBarButtonItem?.title =
             allEligibleSelected
-            ? localized("Deselect All") : localized("Select All")
+                ? localized("Deselect All") : localized("Select All")
         navigationItem.leftBarButtonItem?.isEnabled =
             canEdit && (!allEligibleSelected || !selectedItems.isEmpty)
         removeButton.isEnabled = canEdit && !selectedItems.isEmpty
@@ -388,12 +433,13 @@ final class CleanerViewController: UITableViewController {
             #if os(iOS)
                 content.secondaryText =
                     scanError
-                    ?? localized("No files match the current rules. Pull down to check again.")
+                        ?? localized("No files match the current rules. Pull down to check again.")
             #else
                 content.secondaryText = scanError
             #endif
             content.image = UIImage(
-                systemName: scanError == nil ? "checkmark.circle" : "exclamationmark.triangle")
+                systemName: scanError == nil ? "checkmark.circle" : "exclamationmark.triangle"
+            )
             content.imageProperties.tintColor = scanError == nil ? AppTheme.tint : .systemOrange
         }
         cell.contentConfiguration = content
@@ -410,10 +456,10 @@ final class CleanerViewController: UITableViewController {
             item.ignored && !item.checked ? .secondaryLabel : AppTheme.tint
         content.secondaryText =
             failures[item.path]
-            ?? (item.ignored
-                ? (item.checked
-                    ? localized("Selected Manually") : localized("Protected by a custom rule"))
-                : nil)
+                ?? (item.ignored
+                    ? (item.checked
+                        ? localized("Selected Manually") : localized("Protected by a custom rule"))
+                    : nil)
         content.secondaryTextProperties.color =
             failures[item.path] == nil ? .secondaryLabel : .systemRed
         content.secondaryTextProperties.numberOfLines = 0
@@ -432,7 +478,7 @@ final class CleanerViewController: UITableViewController {
         header.textLabel?.numberOfLines = 0
     }
 
-    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath)
+    override func tableView(_: UITableView, willSelectRowAt indexPath: IndexPath)
         -> IndexPath?
     {
         guard case .file = dataSource.itemIdentifier(for: indexPath) else { return nil }
@@ -442,8 +488,8 @@ final class CleanerViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         guard operation == nil, !isUpdatingList, scanError == nil,
-            case .file(let identifier) = dataSource.itemIdentifier(for: indexPath),
-            let item = files[identifier]
+              case let .file(identifier) = dataSource.itemIdentifier(for: indexPath),
+              let item = files[identifier]
         else { return }
         #if os(tvOS)
             if #unavailable(tvOS 17.0) {
@@ -461,24 +507,27 @@ final class CleanerViewController: UITableViewController {
     #if os(tvOS)
         private func presentActions(for item: UMBCleanItem, at indexPath: IndexPath) {
             let alert = UIAlertController(
-                title: item.name, message: item.path, preferredStyle: .alert)
+                title: item.name, message: item.path, preferredStyle: .alert
+            )
             alert.addAction(
                 UIAlertAction(
                     title: localized(item.checked ? "Deselect" : "Select"), style: .default
                 ) { [weak self] _ in
-                    guard let self, self.operation == nil, !self.isUpdatingList else { return }
+                    guard let self, operation == nil, !self.isUpdatingList else { return }
                     item.checked.toggle()
-                    if let cell = self.tableView.cellForRow(at: indexPath) {
-                        self.configure(cell, item: item, animated: true)
+                    if let cell = tableView.cellForRow(at: indexPath) {
+                        configure(cell, item: item, animated: true)
                     }
-                    self.updateInterface()
-                })
+                    updateInterface()
+                }
+            )
             alert.addAction(
                 UIAlertAction(title: localized("Open in File Manager"), style: .default) {
                     [weak self] _ in
                     guard let self else { return }
                     openInFileManager(path: item.path, from: self)
-                })
+                }
+            )
             alert.addAction(UIAlertAction(title: localized("Cancel"), style: .cancel))
             present(alert, animated: true)
         }
@@ -486,12 +535,12 @@ final class CleanerViewController: UITableViewController {
 
     @available(tvOS 17.0, *)
     override func tableView(
-        _ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
-        point: CGPoint
+        _: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point _: CGPoint
     ) -> UIContextMenuConfiguration? {
         guard operation == nil, !isUpdatingList,
-            case .file(let identifier) = dataSource.itemIdentifier(for: indexPath),
-            let path = files[identifier]?.path
+              case let .file(identifier) = dataSource.itemIdentifier(for: indexPath),
+              let path = files[identifier]?.path
         else { return nil }
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             var actions = [
@@ -501,7 +550,7 @@ final class CleanerViewController: UITableViewController {
                     _ in
                     guard let self else { return }
                     openInFileManager(path: path, from: self)
-                }
+                },
             ]
             #if os(iOS)
                 actions.append(
@@ -509,10 +558,10 @@ final class CleanerViewController: UITableViewController {
                         title: localized("Copy Path"), image: UIImage(systemName: "doc.on.doc")
                     ) { _ in
                         UIPasteboard.general.string = path
-                    })
+                    }
+                )
             #endif
             return UIMenu(children: actions)
         }
     }
-
 }

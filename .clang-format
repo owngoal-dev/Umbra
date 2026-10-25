@@ -1,9 +1,47 @@
+---
 BasedOnStyle: LLVM
+
+ColumnLimit: 120
 IndentWidth: 4
-ColumnLimit: 100
-BreakBeforeBraces: Attach
+ContinuationIndentWidth: 4
 ObjCBlockIndentWidth: 4
-ObjCSpaceAfterProperty: true
+TabWidth: 4
+UseTab: Never
+
+BreakBeforeBraces: Attach
+IndentCaseLabels: true
 PointerAlignment: Right
-SortIncludes: Never
+DerivePointerAlignment: false
+
+# Keep the main header first, then project headers, then system headers.
+SortIncludes: true
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^".*"'
+    Priority: 1
+  - Regex: '^<.*>'
+    Priority: 2
+ReflowComments: false
+SeparateDefinitionBlocks: Always
+BreakStringLiterals: false
+BreakAdjacentStringLiterals: false
+SkipMacroDefinitionBody: true
+
+# Keep ordinary calls and Objective-C messages compact. Once a call must wrap,
+# place its arguments on auditable lines instead of packing unrelated groups.
+BinPackArguments: false
+BinPackParameters: OnePerLine
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+ObjCBreakBeforeNestedBlockParam: false
+PenaltyBreakBeforeFirstCallParameter: 1000000
+PenaltyBreakAssignment: 1000000
+PenaltyReturnTypeOnItsOwnLine: 1000
+
 AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBinaryOperators: All
+AlignOperands: DontAlign
+FixNamespaceComments: false
+...

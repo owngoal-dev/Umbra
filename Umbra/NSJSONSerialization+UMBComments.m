@@ -8,16 +8,16 @@
 
 #import "NSJSONSerialization+UMBComments.h"
 
-
-static const int EncLen_UTF8[256] = {
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 1, 1};
+static const int EncLen_UTF8[256] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                                     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+                                     3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 1, 1};
 
 static inline void copyUTF8CharacterAndAdvancePointers(UTF8Char **source, UTF8Char **target) {
     UTF8Char character = **source;
@@ -34,13 +34,13 @@ static inline void copyUTF8CharacterAndAdvancePointers(UTF8Char **source, UTF8Ch
     }
 }
 
-static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8[**source]; }
-
+static inline void skipUTF8Character(UTF8Char **source) {
+    *source += EncLen_UTF8[**source];
+}
 
 @implementation NSJSONSerialization (UMBComments)
 
-+ (NSData *)umb_dataByStrippingJSONCommentsAndWhiteSpaceOfUTF8Data:(NSData *)data
-                                                     skipBytes:(NSUInteger)bytesToSkip {
++ (NSData *)umb_dataByStrippingJSONCommentsAndWhiteSpaceOfUTF8Data:(NSData *)data skipBytes:(NSUInteger)bytesToSkip {
     UTF8Char *originalString = (UTF8Char *)[data bytes];
     NSUInteger length = [data length];
 
@@ -50,15 +50,13 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
     UTF8Char *originalStringEnd = originalString + length;
     UTF8Char *modifiedStringCurrent = modifiedString;
 
-
     // skip bytes
     originalStringCurrent += bytesToSkip;
 
     while (originalStringCurrent < originalStringEnd) {
         UTF8Char currentChar = *originalStringCurrent;
 
-        if (currentChar == '\t' || currentChar == ' ' || currentChar == '\r'
-            || currentChar == '\n') {
+        if (currentChar == '\t' || currentChar == ' ' || currentChar == '\r' || currentChar == '\n') {
             // skip whitespace
 
             // Ignore whitespace tokens. According to ES 5.1 section 15.12.1.1,
@@ -69,7 +67,7 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
             // we found a string! -> handle it
             *modifiedStringCurrent++ = currentChar;
             originalStringCurrent++;
-					
+
             UTF8Char lastChar = 0;
 
             while (originalStringCurrent < originalStringEnd) {
@@ -92,8 +90,7 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
                     break;
                 } else {
                     // still in string -> copy character
-                    copyUTF8CharacterAndAdvancePointers(&originalStringCurrent,
-                                                        &modifiedStringCurrent);
+                    copyUTF8CharacterAndAdvancePointers(&originalStringCurrent, &modifiedStringCurrent);
                 }
                 lastChar = currentChar;
             }
@@ -154,25 +151,18 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
 
     if (modifiedStringLength != length) {
         modifiedString = realloc(modifiedString, sizeof(UTF8Char) * modifiedStringLength);
-        return [NSData dataWithBytesNoCopy:modifiedString
-                                    length:modifiedStringLength
-                              freeWhenDone:YES];
+        return [NSData dataWithBytesNoCopy:modifiedString length:modifiedStringLength freeWhenDone:YES];
     } else {
         free(modifiedString);
         return data;
     }
 }
 
-
-+ (id)umb_JSONObjectWithCommentedUTF8Data:(NSData *)data
-                              options:(NSJSONReadingOptions)opt
-                                error:(NSError **)error {
-    NSData *strippedData =
-        [self umb_dataByStrippingJSONCommentsAndWhiteSpaceOfUTF8Data:data skipBytes:0];
++ (id)umb_JSONObjectWithCommentedUTF8Data:(NSData *)data options:(NSJSONReadingOptions)opt error:(NSError **)error {
+    NSData *strippedData = [self umb_dataByStrippingJSONCommentsAndWhiteSpaceOfUTF8Data:data skipBytes:0];
 
     return [self JSONObjectWithData:strippedData options:opt error:error];
 }
-
 
 + (NSStringEncoding)umb_stringEncodingFromData:(NSData *)data detectedBOMSize:(NSUInteger *)bomSize {
     NSStringEncoding encoding = 0;
@@ -202,8 +192,7 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
                     *bomSize = 2;
                 }
             } else if (fileSize >= 4) {
-                if (bomBuffer[0] == 0x00 && bomBuffer[1] == 0x00 && bomBuffer[2] == 0xFE
-                    && bomBuffer[3] == 0xFF) {
+                if (bomBuffer[0] == 0x00 && bomBuffer[1] == 0x00 && bomBuffer[2] == 0xFE && bomBuffer[3] == 0xFF) {
                     // Big Endian
                     encoding = NSUTF32StringEncoding;
                     if (bomSize) {
@@ -235,9 +224,7 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
     return encoding;
 }
 
-+ (id)umb_JSONObjectWithCommentedData:(NSData *)data
-                          options:(NSJSONReadingOptions)opt
-                            error:(NSError **)error {
++ (id)umb_JSONObjectWithCommentedData:(NSData *)data options:(NSJSONReadingOptions)opt error:(NSError **)error {
     if (data) {
         NSUInteger bomSize = 0;
         NSStringEncoding encoding = [self umb_stringEncodingFromData:data detectedBOMSize:&bomSize];
@@ -251,16 +238,12 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
             if (!string) {
                 if (error) {
                     // use the same error description, domain, and code as NSJSONSerialization
-                    *error =
-                        [NSError errorWithDomain:NSCocoaErrorDomain
-                                            code:0xf00
-                                        userInfo:@{
-                                            (NSString *)kCFErrorDescriptionKey :
-                                                @"Unable to convert data to a string using the "
-                                            @"detected encoding. The data may be corrupt."
-                                                }];
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:0xf00 userInfo:@{
+                        (NSString *)kCFErrorDescriptionKey :
+                            @"Unable to convert data to a string using the " @"detected encoding. The data may be corrupt."
+                    }];
                 }
-				return nil;
+                return nil;
             } else {
                 data = [string dataUsingEncoding:NSUTF8StringEncoding];
                 [string release];
@@ -274,34 +257,27 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
     }
 }
 
-
-+ (id)umb_JSONObjectWithCommentedContentsOfURL:(NSURL *)url
-                                   options:(NSJSONReadingOptions)opt
-                                     error:(NSError **)error {
++ (id)umb_JSONObjectWithCommentedContentsOfURL:(NSURL *)url options:(NSJSONReadingOptions)opt error:(NSError **)error {
     // load data from URL
     NSData *data = [NSData dataWithContentsOfURL:url options:NSDataReadingUncached error:error];
     return [self umb_JSONObjectWithCommentedData:data options:opt error:error];
 }
 
 + (id)umb_JSONObjectWithCommentedContentsOfFile:(NSString *)path
-                                    options:(NSJSONReadingOptions)opt
-                                      error:(NSError **)error {
+                                        options:(NSJSONReadingOptions)opt
+                                          error:(NSError **)error {
     // load data from file
     NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingUncached error:error];
 
     return [self umb_JSONObjectWithCommentedData:data options:opt error:error];
 }
 
-+ (id)umb_JSONObjectWithCommentedString:(NSString *)string
-                            options:(NSJSONReadingOptions)opt
-                              error:(NSError **)error {
++ (id)umb_JSONObjectWithCommentedString:(NSString *)string options:(NSJSONReadingOptions)opt error:(NSError **)error {
     NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
     return [self umb_JSONObjectWithCommentedUTF8Data:data options:opt error:error];
 }
 
-+ (NSString *)umb_stringWithJSONObject:(id)obj
-                           options:(NSJSONWritingOptions)opt
-                             error:(NSError **)error {
++ (NSString *)umb_stringWithJSONObject:(id)obj options:(NSJSONWritingOptions)opt error:(NSError **)error {
     NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:opt error:error];
     if (data) {
         NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];

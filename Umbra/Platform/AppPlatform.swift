@@ -28,7 +28,9 @@ enum AppPlatform {
     /// tvOS exposes state as a readable badge; selecting the focused row changes it.
     final class AppSwitch: UIControl {
         private let label = UILabel()
-        var isOn = false { didSet { updateAppearance() } }
+        var isOn = false {
+            didSet { updateAppearance() }
+        }
 
         override var isEnabled: Bool {
             didSet { updateAppearance() }
@@ -53,14 +55,16 @@ enum AppPlatform {
             updateAppearance()
         }
 
-        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+        @available(*, unavailable)
+        required init?(coder _: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
 
         override var intrinsicContentSize: CGSize {
             let font = label.font ?? .preferredFont(forTextStyle: .callout)
-            let enabledWidth = (localized("Enabled") as NSString).size(withAttributes: [.font: font]
-            ).width
+            let enabledWidth = (localized("Enabled") as NSString).size(withAttributes: [.font: font]).width
             let disabledWidth = (localized("Disabled") as NSString).size(withAttributes: [
-                .font: font
+                .font: font,
             ]).width
             return CGSize(
                 width: ceil(max(enabledWidth, disabledWidth)) + 36,

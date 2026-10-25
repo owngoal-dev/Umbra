@@ -4,8 +4,13 @@ final class SettingsViewController: UITableViewController {
     private let check: EnvironmentCheck
     private var services: [ManagedService] = []
     private var showsURLSchemeReplacements = false
-    private var servicesSection: Int { 0 }
-    private var rulesSection: Int { services.isEmpty ? 0 : 1 }
+    private var servicesSection: Int {
+        0
+    }
+
+    private var rulesSection: Int {
+        services.isEmpty ? 0 : 1
+    }
 
     init(check: EnvironmentCheck) {
         self.check = check
@@ -13,7 +18,10 @@ final class SettingsViewController: UITableViewController {
         title = localized("Settings")
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -30,7 +38,8 @@ final class SettingsViewController: UITableViewController {
         tableView.tableHeaderView = brandHeader()
         NotificationCenter.default.addObserver(
             self, selector: #selector(refreshServices),
-            name: UIApplication.willEnterForegroundNotification, object: nil)
+            name: UIApplication.willEnterForegroundNotification, object: nil
+        )
     }
 
     @objc private func refreshServices() {
@@ -53,13 +62,15 @@ final class SettingsViewController: UITableViewController {
         }
     }
 
-    override func numberOfSections(in tableView: UITableView) -> Int { rulesSection + 1 }
+    override func numberOfSections(in _: UITableView) -> Int {
+        rulesSection + 1
+    }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
         section == rulesSection ? (showsURLSchemeReplacements ? 2 : 1) : services.count
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int)
+    override func tableView(_: UITableView, titleForHeaderInSection section: Int)
         -> String?
     {
         localized(section == rulesSection ? "Advanced" : "Services")
@@ -74,12 +85,12 @@ final class SettingsViewController: UITableViewController {
         var content = cell.defaultContentConfiguration()
         content.text =
             isRule
-            ? localized(isReplacement ? "URL Scheme Replacements" : "Custom Cleanup Rules")
-            : services[indexPath.row].title
+                ? localized(isReplacement ? "URL Scheme Replacements" : "Custom Cleanup Rules")
+                : services[indexPath.row].title
         content.secondaryText =
             isRule
-            ? (isReplacement ? nil : localized("Edit cleanup rules in a file manager."))
-            : services[indexPath.row].portSummary
+                ? (isReplacement ? nil : localized("Edit cleanup rules in a file manager."))
+                : services[indexPath.row].portSummary
         content.textProperties.numberOfLines = 0
         content.secondaryTextProperties.numberOfLines = 0
         content.secondaryTextProperties.color = .secondaryLabel
@@ -87,15 +98,19 @@ final class SettingsViewController: UITableViewController {
         content.image = UIImage(
             systemName: isRule
                 ? (isReplacement ? "arrow.triangle.branch" : "doc.text")
-                : services[indexPath.row].symbol)
+                : services[indexPath.row].symbol
+        )
         content.imageProperties.tintColor = AppTheme.tint
         content.imageProperties.maximumSize = CGSize(
-            width: AppPlatform.listSymbolPointSize, height: AppPlatform.listSymbolPointSize)
+            width: AppPlatform.listSymbolPointSize, height: AppPlatform.listSymbolPointSize
+        )
         content.imageProperties.reservedLayoutSize = AppPlatform.listSymbolReservedSize
         content.imageProperties.preferredSymbolConfiguration = UIImage.SymbolConfiguration(
-            pointSize: AppPlatform.listSymbolPointSize)
+            pointSize: AppPlatform.listSymbolPointSize
+        )
         content.directionalLayoutMargins = NSDirectionalEdgeInsets(
-            top: 16, leading: 20, bottom: 16, trailing: 20)
+            top: 16, leading: 20, bottom: 16, trailing: 20
+        )
         cell.contentConfiguration = content
         cell.accessoryType = isRule ? .disclosureIndicator : AppPlatform.detailAccessory
         #if os(iOS)
@@ -117,12 +132,14 @@ final class SettingsViewController: UITableViewController {
         let name = UILabel()
         name.text = "Umbra"
         name.font = UIFontMetrics(forTextStyle: .title2).scaledFont(
-            for: .systemFont(ofSize: 24, weight: .semibold))
+            for: .systemFont(ofSize: 24, weight: .semibold)
+        )
         let version = UILabel()
         version.text = String(
             format: localized("Version %@"),
             Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-                ?? "—")
+                ?? "—"
+        )
         version.font = .preferredFont(forTextStyle: .subheadline)
         version.textColor = .secondaryLabel
         for label in [name, version] {
@@ -146,7 +163,8 @@ final class SettingsViewController: UITableViewController {
             stack.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -24),
             stack.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 24),
             stack.trailingAnchor.constraint(
-                equalTo: header.trailingAnchor, constant: -24),
+                equalTo: header.trailingAnchor, constant: -24
+            ),
         ])
         header.isAccessibilityElement = true
         header.accessibilityLabel = name.text
@@ -164,9 +182,10 @@ final class SettingsViewController: UITableViewController {
             }
         #endif
         if indexPath.section == rulesSection {
-            if showsURLSchemeReplacements && indexPath.row == 0 {
+            if showsURLSchemeReplacements, indexPath.row == 0 {
                 navigationController?.pushViewController(
-                    URLSchemeRulesViewController(), animated: true)
+                    URLSchemeRulesViewController(), animated: true
+                )
             } else {
                 openInFileManager(path: UMBBackend.customRulesPath(), from: self)
             }
@@ -174,7 +193,7 @@ final class SettingsViewController: UITableViewController {
     }
 
     override func tableView(
-        _ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath
+        _: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath
     ) {
         guard indexPath.section == servicesSection, !services.isEmpty else { return }
         presentServicePorts(services[indexPath.row], from: self) { [weak self] in

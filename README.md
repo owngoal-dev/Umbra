@@ -40,12 +40,12 @@ The app installs to `/Applications/Umbra.app`. Bundle ID and package name are `w
 ### Checks
 
 ```sh
-make format         # Format with swift-format and clang-format
-make format-check   # Strict format check
+make format         # Format with SwiftFormat and clang-format
+make format-check   # Format check
 make check          # Regression checks: localization, environment summary, service ports, cleanup rules and rule CRC
 ```
 
-`clang-format` must be in PATH, or set `CLANG_FORMAT="$(xcrun --find clang-format)"`. `make check` needs Python 3 and the Xcode command line tools and never performs any cleanup.
+`swiftformat` and `clang-format` must be in PATH, or set `SWIFT_FORMAT` and `CLANG_FORMAT`. `make check` needs Python 3 and the Xcode command line tools and never performs any cleanup.
 
 After editing `Umbra/VarCleanRules.json`, update the checksum in `Umbra/VarCleanRules.h`, or the app will refuse to load the bundled rules. Theos builds do this automatically. To update it by hand:
 
@@ -114,12 +114,12 @@ App 安装到 `/Applications/Umbra.app`，Bundle ID 与包名均为 `wiki.qaq.um
 ### 检查
 
 ```sh
-make format         # 使用 swift-format 与 clang-format 格式化
-make format-check   # 严格格式检查
+make format         # 使用 SwiftFormat 与 clang-format 格式化
+make format-check   # 格式检查
 make check          # 回归检查：本地化、环境摘要、服务端口、清理规则与规则 CRC
 ```
 
-`clang-format` 需在 PATH 中，或设置 `CLANG_FORMAT="$(xcrun --find clang-format)"`。`make check` 需要 Python 3 和 Xcode 命令行工具，不会执行任何清理操作。
+`swiftformat` 与 `clang-format` 需在 PATH 中，或设置 `SWIFT_FORMAT` 与 `CLANG_FORMAT`。`make check` 需要 Python 3 和 Xcode 命令行工具，不会执行任何清理操作。
 
 修改 `Umbra/VarCleanRules.json` 后需更新 `Umbra/VarCleanRules.h` 中的校验值，否则 App 会拒绝加载内置规则。Theos 构建会自动生成，手动更新：
 

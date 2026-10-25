@@ -2,22 +2,21 @@
 // modified by Shadow-
 
 #import "UMBInstalledAppInfo.h"
+
 #import <TargetConditionals.h>
 
 @interface UIImage ()
-+ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)identifier
-                                               format:(int)format
-                                                scale:(double)scale;
++ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)identifier format:(int)format scale:(double)scale;
 @end
 
 @interface PrivateApi_LSApplicationProxy : NSObject
 + (instancetype)applicationProxyForIdentifier:(NSString *)identifier;
-@property (nonatomic, readonly) NSString *localizedShortName;
-@property (nonatomic, readonly) NSString *localizedName;
-@property (nonatomic, readonly) NSString *bundleIdentifier;
-@property (nonatomic, readonly) NSArray *appTags;
-@property (nonatomic, readonly) NSURL *bundleURL;
-@property (nonatomic, readonly) NSURL *containerURL;
+@property(nonatomic, readonly) NSString *localizedShortName;
+@property(nonatomic, readonly) NSString *localizedName;
+@property(nonatomic, readonly) NSString *bundleIdentifier;
+@property(nonatomic, readonly) NSArray *appTags;
+@property(nonatomic, readonly) NSURL *bundleURL;
+@property(nonatomic, readonly) NSURL *containerURL;
 @end
 
 @implementation UMBInstalledAppInfo {
@@ -38,11 +37,9 @@
     if (nil == _icon) {
 #else
     if (nil == _icon &&
-        [UIImage
-            respondsToSelector:@selector(_applicationIconImageForBundleIdentifier:format:scale:)]) {
+        [UIImage respondsToSelector:@selector(_applicationIconImageForBundleIdentifier:format:scale:)]) {
 #endif
-        _icon = [UIImage _applicationIconImageForBundleIdentifier:self.bundleIdentifier
-                                                           format:10
+        _icon = [UIImage _applicationIconImageForBundleIdentifier:self.bundleIdentifier format:10
                                                             scale:UIScreen.mainScreen.scale];
     }
 
@@ -52,6 +49,7 @@
 - (NSURL *)bundleURL {
     return _applicationProxy.bundleURL;
 }
+
 - (NSURL *)containerURL {
     return _applicationProxy.containerURL;
 }
@@ -72,8 +70,7 @@
 - (instancetype)initWithBundleIdentifier:(NSString *)bundleIdentifier {
     self = [super init];
     if (self != nil) {
-        _applicationProxy = [NSClassFromString(@"LSApplicationProxy")
-            applicationProxyForIdentifier:bundleIdentifier];
+        _applicationProxy = [NSClassFromString(@"LSApplicationProxy") applicationProxyForIdentifier:bundleIdentifier];
     }
 
     return self;

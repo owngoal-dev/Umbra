@@ -1,0 +1,3 @@
+--swiftversion 6.0
+--disable redundantSendable
+--exclude .build,.theos,build,DerivedData,packages,Umbra/roothide

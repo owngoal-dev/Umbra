@@ -7,8 +7,14 @@ import UIKit
         private var configuration: [String: Bool] = [:]
         private var isLoading = false
 
-        init() { super.init(style: AppPlatform.tableStyle) }
-        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+        init() {
+            super.init(style: AppPlatform.tableStyle)
+        }
+
+        @available(*, unavailable)
+        required init?(coder _: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
 
         override func viewDidLoad() {
             super.viewDidLoad()
@@ -25,8 +31,7 @@ import UIKit
             }
         }
 
-        override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
-        {
+        override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
             max(1, apps.count)
         }
 
@@ -38,7 +43,8 @@ import UIKit
             cell.accessoryType = .none
             var content = cell.defaultContentConfiguration()
             content.directionalLayoutMargins = NSDirectionalEdgeInsets(
-                top: 14, leading: 16, bottom: 14, trailing: 16)
+                top: 14, leading: 16, bottom: 14, trailing: 16
+            )
             content.imageToTextPadding = 14
             content.textProperties.numberOfLines = 0
             content.secondaryTextProperties.numberOfLines = 0
@@ -81,10 +87,12 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
     #if os(tvOS)
         private let searchResults: ApplicationSearchResultsViewController
         private lazy var searchContainer = UISearchContainerViewController(
-            searchController: search)
+            searchController: search
+        )
     #endif
     private let workQueue = DispatchQueue(
-        label: "wiki.qaq.umbra.applications", qos: .userInitiated)
+        label: "wiki.qaq.umbra.applications", qos: .userInitiated
+    )
     private var apps: [UMBInstalledAppInfo] = []
     private var filtered: [UMBInstalledAppInfo] = []
     private var configuration: [String: Bool] = [:]
@@ -124,7 +132,10 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         #endif
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -142,11 +153,13 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         configureRefresh(action: #selector(manualRefresh))
         NotificationCenter.default.addObserver(
             self, selector: #selector(environmentChanged), name: EnvironmentCheck.didChange,
-            object: check)
+            object: check
+        )
         NotificationCenter.default.addObserver(
             self, selector: #selector(foregroundRefresh),
             name: UIApplication.willEnterForegroundNotification,
-            object: nil)
+            object: nil
+        )
         refresh(resort: true, synchronously: true)
     }
 
@@ -159,7 +172,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
 
     @objc private func environmentChanged() {
         guard showsDeviceStatus,
-            let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
+              let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
         else { return }
         UIView.performWithoutAnimation {
             check.configure(cell)
@@ -167,8 +180,13 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         }
     }
 
-    @objc private func manualRefresh() { refresh(resort: true) }
-    @objc private func foregroundRefresh() { refresh(resort: false) }
+    @objc private func manualRefresh() {
+        refresh(resort: true)
+    }
+
+    @objc private func foregroundRefresh() {
+        refresh(resort: false)
+    }
 
     private func refresh(resort: Bool, synchronously: Bool = false) {
         guard !isLoading, !isWorking, pendingChanges.isEmpty else {
@@ -192,7 +210,9 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                     self.apps = apps.sorted {
                         let left = configuration[$0.bundleIdentifier ?? ""] ?? false
                         let right = configuration[$1.bundleIdentifier ?? ""] ?? false
-                        if left != right { return left }
+                        if left != right {
+                            return left
+                        }
                         return ($0.name ?? "").localizedStandardCompare($1.name ?? "")
                             == .orderedAscending
                     }
@@ -201,11 +221,14 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                         self.apps.enumerated().map {
                             ($0.element.bundleIdentifier ?? "", $0.offset)
                         },
-                        uniquingKeysWith: { first, _ in first })
+                        uniquingKeysWith: { first, _ in first }
+                    )
                     self.apps = apps.sorted {
                         let left = positions[$0.bundleIdentifier ?? ""] ?? Int.max
                         let right = positions[$1.bundleIdentifier ?? ""] ?? Int.max
-                        if left != right { return left < right }
+                        if left != right {
+                            return left < right
+                        }
                         return ($0.name ?? "").localizedStandardCompare($1.name ?? "")
                             == .orderedAscending
                     }
@@ -244,21 +267,24 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         #endif
         filtered =
             text.isEmpty
-            ? apps
-            : apps.filter {
-                ($0.name ?? "").localizedStandardContains(text)
-                    || ($0.bundleIdentifier ?? "").localizedStandardContains(text)
-            }
+                ? apps
+                : apps.filter {
+                    ($0.name ?? "").localizedStandardContains(text)
+                        || ($0.bundleIdentifier ?? "").localizedStandardContains(text)
+                }
         #if os(iOS)
             tableView.reloadData()
         #else
             searchResults.update(
-                apps: filtered, configuration: configuration, isLoading: isLoading)
-            if !searchController.isActive { tableView.reloadData() }
+                apps: filtered, configuration: configuration, isLoading: isLoading
+            )
+            if !searchController.isActive {
+                tableView.reloadData()
+            }
         #endif
     }
 
-    func willPresentSearchController(_ searchController: UISearchController) {
+    func willPresentSearchController(_: UISearchController) {
         #if os(iOS)
             showsDeviceStatus = false
             tableView.reloadData()
@@ -270,27 +296,37 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         updateSearchResults(for: searchController)
     }
 
-    override func numberOfSections(in tableView: UITableView) -> Int { applicationsSection + 1 }
+    override func numberOfSections(in _: UITableView) -> Int {
+        applicationsSection + 1
+    }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == applicationsSection { return max(1, filtered.count) }
+    override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == applicationsSection {
+            return max(1, filtered.count)
+        }
         #if os(tvOS)
-            if section == 1 { return 1 }
+            if section == 1 {
+                return 1
+            }
         #endif
         return operationStatus == nil ? 1 : 2
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int)
+    override func tableView(_: UITableView, titleForHeaderInSection section: Int)
         -> String?
     {
-        if section == applicationsSection { return localized("Applications") }
+        if section == applicationsSection {
+            return localized("Applications")
+        }
         #if os(tvOS)
-            if section == 1 { return nil }
+            if section == 1 {
+                return nil
+            }
         #endif
         return localized("Status")
     }
 
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int)
+    override func tableView(_: UITableView, titleForFooterInSection section: Int)
         -> String?
     {
         section == applicationsSection ? unavailableReason : nil
@@ -301,7 +337,8 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
     ) -> UITableViewCell {
         let cell = detailCell(
             in: tableView,
-            reuseIdentifier: indexPath.section == applicationsSection ? "App" : "Status")
+            reuseIdentifier: indexPath.section == applicationsSection ? "App" : "Status"
+        )
         cell.accessoryView = nil
         cell.accessoryType = .none
         cell.accessibilityValue = nil
@@ -319,10 +356,12 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                 content.imageProperties.tintColor = AppTheme.tint
                 content.imageProperties.maximumSize = CGSize(
                     width: AppPlatform.listSymbolPointSize,
-                    height: AppPlatform.listSymbolPointSize)
+                    height: AppPlatform.listSymbolPointSize
+                )
                 content.imageProperties.reservedLayoutSize = AppPlatform.listSymbolReservedSize
                 content.imageProperties.preferredSymbolConfiguration = UIImage.SymbolConfiguration(
-                    pointSize: AppPlatform.listSymbolPointSize)
+                    pointSize: AppPlatform.listSymbolPointSize
+                )
                 cell.contentConfiguration = content
                 cell.accessoryType = .disclosureIndicator
                 cell.selectionStyle = .default
@@ -346,7 +385,8 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         }
         var content = cell.defaultContentConfiguration()
         content.directionalLayoutMargins = NSDirectionalEdgeInsets(
-            top: 14, leading: 16, bottom: 14, trailing: 16)
+            top: 14, leading: 16, bottom: 14, trailing: 16
+        )
         content.imageToTextPadding = 14
         content.textToSecondaryTextVerticalPadding = 4
         content.textProperties.numberOfLines = 0
@@ -355,8 +395,8 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         if filtered.isEmpty {
             content.text =
                 isLoading
-                ? localized("Loading…")
-                : apps.isEmpty ? localized("No apps found") : localized("No search results")
+                    ? localized("Loading…")
+                    : apps.isEmpty ? localized("No apps found") : localized("No search results")
             #if os(iOS)
                 content.secondaryText =
                     apps.isEmpty && !isLoading ? localized("Pull to refresh") : nil
@@ -384,7 +424,8 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                 UIAction { [weak self, weak toggle] _ in
                     guard let self, let toggle else { return }
                     self.toggle(app, enabled: toggle.isOn)
-                }, for: .valueChanged)
+                }, for: .valueChanged
+            )
             #if os(tvOS)
                 cell.selectionStyle = .default
             #endif
@@ -396,10 +437,11 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if showsDeviceStatus && indexPath.section == 0 && indexPath.row == 0 {
+        if showsDeviceStatus, indexPath.section == 0, indexPath.row == 0 {
             guard !check.findings.isEmpty else { return }
             navigationController?.pushViewController(
-                EnvironmentViewController(check: check), animated: true)
+                EnvironmentViewController(check: check), animated: true
+            )
             return
         }
         #if os(tvOS)
@@ -408,7 +450,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                 return
             }
             guard indexPath.section == applicationsSection, !filtered.isEmpty,
-                !isLoading, !isWorking, pendingChanges.isEmpty
+                  !isLoading, !isWorking, pendingChanges.isEmpty
             else { return }
             let app = filtered[indexPath.row]
             if #unavailable(tvOS 17.0) {
@@ -424,17 +466,20 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         private func presentActions(for app: UMBInstalledAppInfo) {
             let enabled = configuration[app.bundleIdentifier ?? ""] ?? false
             let alert = UIAlertController(
-                title: app.name, message: app.bundleIdentifier, preferredStyle: .alert)
+                title: app.name, message: app.bundleIdentifier, preferredStyle: .alert
+            )
             alert.addAction(
                 UIAlertAction(title: localized(enabled ? "Disable" : "Enable"), style: .default) {
                     [weak self] _ in
                     self?.toggle(app, enabled: !enabled)
-                })
+                }
+            )
             alert.addAction(
                 UIAlertAction(title: localized("Clear App Data"), style: .destructive) {
                     [weak self] _ in
                     self?.confirmClear(app)
-                })
+                }
+            )
             alert.addAction(UIAlertAction(title: localized("Cancel"), style: .cancel))
             present(alert, animated: true)
         }
@@ -443,7 +488,8 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
             search.searchBar.text = nil
             filtered = apps
             searchResults.update(
-                apps: filtered, configuration: configuration, isLoading: isLoading)
+                apps: filtered, configuration: configuration, isLoading: isLoading
+            )
             searchContainer.modalPresentationStyle = .fullScreen
             present(searchContainer, animated: true) { [weak self] in
                 self?.search.isActive = true
@@ -458,10 +504,10 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
             dismiss(animated: true) { [weak self] in
                 guard let self else { return }
                 if #available(tvOS 17.0, *) {
-                    let enabled = self.configuration[app.bundleIdentifier ?? ""] ?? false
-                    self.toggle(app, enabled: !enabled)
+                    let enabled = configuration[app.bundleIdentifier ?? ""] ?? false
+                    toggle(app, enabled: !enabled)
                 } else {
-                    self.presentActions(for: app)
+                    presentActions(for: app)
                 }
             }
         }
@@ -478,20 +524,22 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
             showMessage(reason, title: localized("Blacklist is unavailable"), from: self)
             return
         }
-        if enabled && !didShowCompatibilityWarning && UMBBackend.requiresCompatibilityWarning() {
+        if enabled, !didShowCompatibilityWarning, UMBBackend.requiresCompatibilityWarning() {
             updateApp(identifier)
             let alert = UIAlertController(
                 title: localized("Warning"),
                 message: localized(
                     "\nFor iOS15 A12+ devices:\n\nthe blacklisted app will have its app extension disabled, and may cause a spinlock panic when the app is running in the foreground/background.\n\nYou can first try disabling tweak injection for this app in Choicy, and only blacklist the app if it doesn't work."
                 ),
-                preferredStyle: .alert)
+                preferredStyle: .alert
+            )
             alert.addAction(UIAlertAction(title: localized("Cancel"), style: .cancel))
             alert.addAction(
                 UIAlertAction(title: localized("Continue"), style: .default) { _ in
                     self.didShowCompatibilityWarning = true
                     self.save(app, enabled: enabled)
-                })
+                }
+            )
             present(alert, animated: true)
         } else {
             save(app, enabled: enabled)
@@ -521,7 +569,8 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                         localized("Could not save changes") + "\n" + error.localizedDescription
                     self.updateApp(identifier)
                     UIAccessibility.post(
-                        notification: .announcement, argument: self.saveErrors[identifier])
+                        notification: .announcement, argument: self.saveErrors[identifier]
+                    )
                     self.refreshIfNeeded()
                 }
             }
@@ -530,12 +579,13 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
 
     private func updateApp(_ identifier: String) {
         guard let row = filtered.firstIndex(where: { $0.bundleIdentifier == identifier }),
-            let cell = tableView.cellForRow(at: IndexPath(row: row, section: applicationsSection)),
-            let toggle = cell.accessoryView as? AppSwitch
+              let cell = tableView.cellForRow(at: IndexPath(row: row, section: applicationsSection)),
+              let toggle = cell.accessoryView as? AppSwitch
         else { return }
         toggle.setOn(
             unavailableReason == nil && (configuration[identifier] ?? false),
-            animated: !UIAccessibility.isReduceMotionEnabled)
+            animated: !UIAccessibility.isReduceMotionEnabled
+        )
         toggle.isEnabled = !isLoading && !isWorking && !pendingChanges.contains(identifier)
         guard var content = cell.contentConfiguration as? UIListContentConfiguration else { return }
         let detail = saveErrors[identifier] ?? identifier
@@ -549,11 +599,11 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
 
     @available(tvOS 17.0, *)
     override func tableView(
-        _ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
-        point: CGPoint
+        _: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point _: CGPoint
     ) -> UIContextMenuConfiguration? {
         guard indexPath.section == applicationsSection, !filtered.isEmpty, !isWorking,
-            !isLoading, pendingChanges.isEmpty
+              !isLoading, pendingChanges.isEmpty
         else { return nil }
         let app = filtered[indexPath.row]
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
@@ -564,22 +614,22 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                         attributes: .destructive
                     ) {
                         [weak self] _ in self?.confirmClear(app)
-                    }
-                ])
+                    },
+                ]
+            )
         }
     }
 
     #if os(iOS)
         override func tableView(
-            _ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+            _: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
         ) -> UISwipeActionsConfiguration? {
             guard indexPath.section == applicationsSection, !filtered.isEmpty, !isWorking,
-                !isLoading,
-                pendingChanges.isEmpty
+                  !isLoading,
+                  pendingChanges.isEmpty
             else { return nil }
             let app = filtered[indexPath.row]
-            let action = UIContextualAction(style: .destructive, title: localized("Clear App Data"))
-            {
+            let action = UIContextualAction(style: .destructive, title: localized("Clear App Data")) {
                 [weak self] _, _, done in
                 done(false)
                 self?.confirmClear(app)
@@ -598,7 +648,8 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         let alert = UIAlertController(
             title: String(format: localized("Clear data for %@?"), name),
             message: localized("This permanently removes this app’s data. This cannot be undone."),
-            preferredStyle: .alert)
+            preferredStyle: .alert
+        )
         alert.addAction(UIAlertAction(title: localized("Cancel"), style: .cancel))
         alert.addAction(
             UIAlertAction(title: localized("Clear Data"), style: .destructive) { _ in
@@ -615,10 +666,12 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                         self.tableView.reloadData()
                         if self.showsDeviceStatus {
                             self.tableView.scrollToRow(
-                                at: IndexPath(row: 1, section: 0), at: .top, animated: true)
+                                at: IndexPath(row: 1, section: 0), at: .top, animated: true
+                            )
                         }
                         UIAccessibility.post(
-                            notification: .announcement, argument: self.operationStatus)
+                            notification: .announcement, argument: self.operationStatus
+                        )
                         self.refreshIfNeeded()
                     }
                 }
@@ -628,10 +681,12 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                     self.tableView.reloadData()
                     if self.showsDeviceStatus {
                         self.tableView.scrollToRow(
-                            at: IndexPath(row: 1, section: 0), at: .top, animated: true)
+                            at: IndexPath(row: 1, section: 0), at: .top, animated: true
+                        )
                     }
                 }
-            })
+            }
+        )
         present(alert, animated: true)
     }
 }

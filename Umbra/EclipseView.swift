@@ -87,13 +87,18 @@ final class EclipseView: UIView {
         let center = NotificationCenter.default
         center.addObserver(
             self, selector: #selector(syncAnimations),
-            name: UIApplication.didBecomeActiveNotification, object: nil)
+            name: UIApplication.didBecomeActiveNotification, object: nil
+        )
         center.addObserver(
             self, selector: #selector(syncAnimations),
-            name: UIAccessibility.reduceMotionStatusDidChangeNotification, object: nil)
+            name: UIAccessibility.reduceMotionStatusDidChangeNotification, object: nil
+        )
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -247,7 +252,9 @@ final class EclipseView: UIView {
 
     // MARK: Layout
 
-    private var unit: CGFloat { bounds.width / Self.design }
+    private var unit: CGFloat {
+        bounds.width / Self.design
+    }
 
     private func point(_ design: CGPoint) -> CGPoint {
         CGPoint(x: design.x * unit, y: design.y * unit)
@@ -274,18 +281,21 @@ final class EclipseView: UIView {
         {
             CGRect(
                 x: bounds.midX - halfWidth * unit, y: bounds.midY - tip * unit,
-                width: halfWidth * 2 * unit, height: (tip - base) * unit)
+                width: halfWidth * 2 * unit, height: (tip - base) * unit
+            )
         }
         streamers.frame = square(sunCentre, sunRadius * 2.0)
         spokes.frame = streamers.bounds
         spoke.frame = beamFrame(
             in: streamers.bounds, base: sunRadius * 0.95, tip: sunRadius * 1.95,
-            halfWidth: sunRadius * 0.07)
+            halfWidth: sunRadius * 0.07
+        )
         wisps.frame = square(sunCentre, sunRadius * 2.5)
         wispSpokes.frame = wisps.bounds
         wisp.frame = beamFrame(
             in: wisps.bounds, base: sunRadius * 1.0, tip: sunRadius * 2.45,
-            halfWidth: sunRadius * 0.05)
+            halfWidth: sunRadius * 0.05
+        )
 
         let moonRadius = Self.moonRadius
         moon.bounds = CGRect(origin: .zero, size: square(.zero, moonRadius).size)
@@ -303,7 +313,8 @@ final class EclipseView: UIView {
             ).cgPath
 
         let contact = CGPoint(
-            x: sunCentre.x + sunRadius * 0.7071, y: sunCentre.y - sunRadius * 0.7071)
+            x: sunCentre.x + sunRadius * 0.7071, y: sunCentre.y - sunRadius * 0.7071
+        )
         diamond.frame = square(contact, sunRadius * 0.55)
     }
 
@@ -356,8 +367,10 @@ final class EclipseView: UIView {
         moon.add(
             cycle(
                 "position", [tot, tot, end, end, start, start, tot], Self.keyTimes,
-                timing: travel),
-            forKey: "position")
+                timing: travel
+            ),
+            forKey: "position"
+        )
 
         // The limb lighting keeps facing the Sun as the Moon passes it.
         let downRight = CGPoint(x: 1, y: 1)
@@ -382,17 +395,21 @@ final class EclipseView: UIView {
         wisps.add(cycle("opacity", [0, 0, 0.8, 0.8, 0, 0], bloomTimes), forKey: "opacity")
         rimGlow.add(
             cycle("opacity", [1, 1, 0.35, 0.35, 0.35, 1], [0, 0.36, 0.49, 0.72, 0.87, 1]),
-            forKey: "opacity")
+            forKey: "opacity"
+        )
         glare.add(
             cycle("opacity", [0, 0, 0.7, 1, 0.7, 0, 0], [0, 0.37, 0.50, 0.72, 0.86, 0.99, 1]),
-            forKey: "opacity")
+            forKey: "opacity"
+        )
 
         // Diamond ring flashes as totality begins and ends.
         diamond.add(
             cycle(
                 "opacity", [0, 0, 1, 0, 0, 1, 0],
-                [0, 0.345, 0.37, 0.395, 0.95, 0.975, 1]),
-            forKey: "opacity")
+                [0, 0.345, 0.37, 0.395, 0.95, 0.975, 1]
+            ),
+            forKey: "opacity"
+        )
 
         // Slow, continuous life: the corona breathes and the streamers turn.
         let breathe = CABasicAnimation(keyPath: "transform.scale")

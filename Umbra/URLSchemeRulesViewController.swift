@@ -8,10 +8,14 @@ final class URLSchemeRulesViewController: UITableViewController {
         super.init(style: AppPlatform.tableStyle)
         title = localized("URL Scheme Replacements")
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .add, target: self, action: #selector(addRule))
+            barButtonSystemItem: .add, target: self, action: #selector(addRule)
+        )
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,7 +23,8 @@ final class URLSchemeRulesViewController: UITableViewController {
         tableView.estimatedRowHeight = 60
         NotificationCenter.default.addObserver(
             self, selector: #selector(refreshRules),
-            name: UIApplication.willEnterForegroundNotification, object: nil)
+            name: UIApplication.willEnterForegroundNotification, object: nil
+        )
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -39,17 +44,17 @@ final class URLSchemeRulesViewController: UITableViewController {
         tableView.reloadData()
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
         loadError != nil ? 1 : max(1, rules.count)
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int)
+    override func tableView(_: UITableView, titleForHeaderInSection _: Int)
         -> String?
     {
         localized("Replacement Rules")
     }
 
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int)
+    override func tableView(_: UITableView, titleForFooterInSection _: Int)
         -> String?
     {
         localized("Replacement rules do not apply to blacklisted apps.")
@@ -64,7 +69,8 @@ final class URLSchemeRulesViewController: UITableViewController {
         var content = cell.defaultContentConfiguration()
         content.textProperties.numberOfLines = 0
         content.directionalLayoutMargins = NSDirectionalEdgeInsets(
-            top: 16, leading: 20, bottom: 16, trailing: 20)
+            top: 16, leading: 20, bottom: 16, trailing: 20
+        )
         if let loadError {
             content.text = loadError
             content.textProperties.color = .secondaryLabel
@@ -83,27 +89,31 @@ final class URLSchemeRulesViewController: UITableViewController {
             toggle.addAction(
                 UIAction { [weak self, weak toggle] _ in
                     guard let self, let toggle,
-                        let row = self.rules.firstIndex(where: { $0.source == rule.source })
+                          let row = rules.firstIndex(where: { $0.source == rule.source })
                     else { return }
-                    var updated = self.rules[row]
+                    var updated = rules[row]
                     updated.enabled = toggle.isOn
                     do {
                         try URLSchemeRules.save(updated, replacing: rule.source)
-                        self.rules[row] = updated
+                        rules[row] = updated
                     } catch {
-                        toggle.setOn(self.rules[row].enabled, animated: true)
+                        toggle.setOn(rules[row].enabled, animated: true)
                         showMessage(
                             error.localizedDescription, title: localized("Could not save changes"),
-                            from: self)
+                            from: self
+                        )
                     }
-                }, for: .valueChanged)
+                }, for: .valueChanged
+            )
             cell.accessoryView = toggle
         }
         cell.contentConfiguration = content
         return cell
     }
 
-    @objc private func addRule() { edit(nil) }
+    @objc private func addRule() {
+        edit(nil)
+    }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -125,7 +135,8 @@ final class URLSchemeRulesViewController: UITableViewController {
             } catch {
                 showMessage(
                     error.localizedDescription, title: localized("Could not save changes"),
-                    from: self)
+                    from: self
+                )
             }
         #endif
     }
@@ -143,23 +154,27 @@ final class URLSchemeRulesViewController: UITableViewController {
                     updated.enabled.toggle()
                     do {
                         try URLSchemeRules.save(updated, replacing: rule.source)
-                        self.refreshRules()
+                        refreshRules()
                     } catch {
                         showMessage(
                             error.localizedDescription, title: localized("Could not save changes"),
-                            from: self)
+                            from: self
+                        )
                     }
-                })
+                }
+            )
             alert.addAction(
                 UIAlertAction(title: localized("Edit Replacement Rule"), style: .default) {
                     [weak self] _ in
                     self?.edit(rule)
-                })
+                }
+            )
             alert.addAction(
                 UIAlertAction(title: localized("Remove"), style: .destructive) { [weak self] _ in
                     guard let self else { return }
-                    self.tableView(self.tableView, commit: .delete, forRowAt: indexPath)
-                })
+                    tableView(tableView, commit: .delete, forRowAt: indexPath)
+                }
+            )
             alert.addAction(UIAlertAction(title: localized("Cancel"), style: .cancel))
             present(alert, animated: true)
         }
@@ -167,7 +182,7 @@ final class URLSchemeRulesViewController: UITableViewController {
         @available(tvOS 17.0, *)
         override func tableView(
             _ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath,
-            point: CGPoint
+            point _: CGPoint
         ) -> UIContextMenuConfiguration? {
             guard loadError == nil, !rules.isEmpty else { return nil }
             let rule = rules[indexPath.row]
@@ -198,7 +213,7 @@ final class URLSchemeRulesViewController: UITableViewController {
         present(navigation, animated: true) { form.focusSource() }
     }
 
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    override func tableView(_: UITableView, canEditRowAt _: IndexPath) -> Bool {
         loadError == nil && !rules.isEmpty
     }
 
@@ -217,7 +232,8 @@ final class URLSchemeRulesViewController: UITableViewController {
             }
         } catch {
             showMessage(
-                error.localizedDescription, title: localized("Could not save changes"), from: self)
+                error.localizedDescription, title: localized("Could not save changes"), from: self
+            )
         }
     }
 }
@@ -234,12 +250,17 @@ private final class URLSchemeRuleForm: UITableViewController {
         super.init(style: AppPlatform.tableStyle)
         title = localized(rule == nil ? "Add Replacement Rule" : "Edit Replacement Rule")
         navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: localized("Cancel"), style: .plain, target: self, action: #selector(cancel))
+            title: localized("Cancel"), style: .plain, target: self, action: #selector(cancel)
+        )
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: localized("Save"), style: .done, target: self, action: #selector(save))
+            title: localized("Save"), style: .done, target: self, action: #selector(save)
+        )
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -256,7 +277,8 @@ private final class URLSchemeRuleForm: UITableViewController {
         target.returnKeyType = .done
         source.addAction(
             UIAction { [weak self] _ in self?.target.becomeFirstResponder() },
-            for: .editingDidEndOnExit)
+            for: .editingDidEndOnExit
+        )
         target.addTarget(self, action: #selector(save), for: .editingDidEndOnExit)
         for field in [source, target] {
             field.keyboardType = .URL
@@ -268,19 +290,21 @@ private final class URLSchemeRuleForm: UITableViewController {
         }
     }
 
-    func focusSource() { source.becomeFirstResponder() }
+    func focusSource() {
+        source.becomeFirstResponder()
+    }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
         2
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int)
+    override func tableView(_: UITableView, titleForHeaderInSection _: Int)
         -> String?
     {
         localized("URL Schemes")
     }
 
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int)
+    override func tableView(_: UITableView, titleForFooterInSection _: Int)
         -> String?
     {
         localized("Replace only the App scheme. Paths and parameters stay unchanged.")
@@ -297,7 +321,8 @@ private final class URLSchemeRuleForm: UITableViewController {
         content.text = localized(indexPath.row == 0 ? "Source Scheme" : "Target Scheme")
         field.frame = CGRect(
             x: 0, y: 0, width: max(130, tableView.bounds.width * 0.38),
-            height: max(36, field.font!.lineHeight + 12))
+            height: max(36, field.font!.lineHeight + 12)
+        )
         cell.accessoryView = field
         cell.contentConfiguration = content
         return cell
@@ -310,26 +335,31 @@ private final class URLSchemeRuleForm: UITableViewController {
         }
     #endif
 
-    @objc private func cancel() { dismiss(animated: true) }
+    @objc private func cancel() {
+        dismiss(animated: true)
+    }
 
     @objc private func save() {
         guard let source = URLSchemeRules.normalize(source.text),
-            let target = URLSchemeRules.normalize(target.text)
+              let target = URLSchemeRules.normalize(target.text)
         else {
             showMessage(
                 localized("Enter a custom App scheme, such as filza."),
-                title: localized("Could not save changes"), from: self)
+                title: localized("Could not save changes"), from: self
+            )
             return
         }
         do {
             try URLSchemeRules.save(
                 URLSchemeRule(source: source, target: target, enabled: original?.enabled ?? true),
-                replacing: original?.source)
+                replacing: original?.source
+            )
             onSave()
             dismiss(animated: true)
         } catch {
             showMessage(
-                error.localizedDescription, title: localized("Could not save changes"), from: self)
+                error.localizedDescription, title: localized("Could not save changes"), from: self
+            )
         }
     }
 }
