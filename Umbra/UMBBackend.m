@@ -1,6 +1,6 @@
-#import "RHBackend.h"
-#import "RHServicePorts.h"
-#import "NSJSONSerialization+Comments.h"
+#import "UMBBackend.h"
+#import "UMBServicePorts.h"
+#import "NSJSONSerialization+UMBComments.h"
 #import "VarCleanRules.h"
 #import "roothide.h"
 #import <CFNetwork/CFNetwork.h>
@@ -15,7 +15,7 @@ typedef mach_port_t io_registry_entry_t;
 #endif
 #include <arpa/inet.h>
 #include <mach/machine.h>
-#include "Platform/RHSpawn.h"
+#include "Platform/UMBSpawn.h"
 #include <sys/mount.h>
 #include <sys/socket.h>
 #include <sys/sysctl.h>
@@ -27,11 +27,11 @@ typedef mach_port_t io_registry_entry_t;
 - (NSArray *)allInstalledApplications;
 @end
 
-BOOL isUUIDPathOf(NSString *path, NSString *parent);
-void killAllForBundle(const char *bundlePath);
-NSString *clearAppData(UMBInstalledAppInfo *app);
-NSString *RootUserClearAppData(UMBInstalledAppInfo *app);
-BOOL RootUserRemountPreboot(void);
+BOOL UMBIsUUIDPathOf(NSString *path, NSString *parent);
+void UMBKillAllForBundle(const char *bundlePath);
+NSString *UMBClearAppData(UMBInstalledAppInfo *app);
+NSString *UMBRootUserClearAppData(UMBInstalledAppInfo *app);
+BOOL UMBRootUserRemountPreboot(void);
 
 static BOOL RHFail(NSError **error, NSString *message) {
     if (error) {
@@ -96,7 +96,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
         return RHFail(error,
                       NSLocalizedString(@"The bundled cleaning rules failed verification.", nil));
     }
-    id rules = [NSJSONSerialization JSONObjectWithCommentedData:data options:0 error:error];
+    id rules = [NSJSONSerialization umb_JSONObjectWithCommentedData:data options:0 error:error];
     if (!rules) {
         return NO;
     }
@@ -149,7 +149,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
     for (id proxy in LSApplicationWorkspace.defaultWorkspace.allInstalledApplications) {
         UMBInstalledAppInfo *app = [UMBInstalledAppInfo appWithPrivateProxy:proxy];
         if (!app.isHiddenApp && ![app.bundleIdentifier hasPrefix:@"com.apple."] &&
-            isUUIDPathOf(app.bundleURL.path, @"/private/var/containers/Bundle/Application/")) {
+            UMBIsUUIDPathOf(app.bundleURL.path, @"/private/var/containers/Bundle/Application/")) {
             [applications addObject:app];
         }
     }
@@ -240,7 +240,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
             return NO;
         }
     }
-    killAllForBundle(app.bundleURL.path.UTF8String);
+    UMBKillAllForBundle(app.bundleURL.path.UTF8String);
     return YES;
 }
 
@@ -248,8 +248,8 @@ static BOOL RHPortIsOpen(uint16_t port) {
     if (!app.bundleIdentifier.length || !app.bundleURL.path.length) {
         return NSLocalizedString(@"The selected app is no longer available.", nil);
     }
-    killAllForBundle(app.bundleURL.path.UTF8String);
-    return geteuid() == 0 && getegid() == 0 ? clearAppData(app) : RootUserClearAppData(app);
+    UMBKillAllForBundle(app.bundleURL.path.UTF8String);
+    return geteuid() == 0 && getegid() == 0 ? UMBClearAppData(app) : UMBRootUserClearAppData(app);
 }
 
 + (NSArray<NSDictionary<NSString *, NSString *> *> *)startupWarnings {
@@ -320,7 +320,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
                                          nil)]
             }];
             // Remounting preboot is privileged; the app itself runs as mobile.
-            RootUserRemountPreboot();
+            UMBRootUserRemountPreboot();
         }
     } else {
         [warnings addObject:@{

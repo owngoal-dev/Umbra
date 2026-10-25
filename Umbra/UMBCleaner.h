@@ -25,6 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
     NS_SWIFT_NAME(remove(paths:));
 @end
 
-FOUNDATION_EXPORT NSArray<NSDictionary *> *_Nullable GetDirectoryContents(NSString *path);
+FOUNDATION_EXPORT NSArray<NSDictionary *> *_Nullable UMBGetDirectoryContents(NSString *path);
 
 NS_ASSUME_NONNULL_END

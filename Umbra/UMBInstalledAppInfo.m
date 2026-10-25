@@ -1,7 +1,7 @@
 // https://github.com/wujianguo/iOSAppsInfo
 // modified by Shadow-
 
-#import "AppInfo.h"
+#import "UMBInstalledAppInfo.h"
 #import <TargetConditionals.h>
 
 @interface UIImage ()

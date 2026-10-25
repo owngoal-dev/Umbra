@@ -1,9 +1,9 @@
-#import "RHCleaner.h"
+#import "UMBCleaner.h"
 #import "roothide.h"
 #include <unistd.h>
 
-extern BOOL RootUserGetDirectoryContents(NSString *path, NSString *cacheFile);
-extern BOOL RootUserRemoveItemAtPath(NSString *path);
+extern BOOL UMBRootUserGetDirectoryContents(NSString *path, NSString *cacheFile);
+extern BOOL UMBRootUserRemoveItemAtPath(NSString *path);
 
 @implementation UMBCleanItem
 @end
@@ -35,8 +35,8 @@ static BOOL Matches(NSString *name, NSArray *list) {
 }
 
 NSArray<UMBCleanItem *> *
-RHCleanerItemsForDirectory(NSString *path, NSArray<NSDictionary *> *contents, NSDictionary *rule,
-                           NSDictionary *custom, NSDictionary<NSString *, NSNumber *> *selection) {
+UMBCleanerItemsForDirectory(NSString *path, NSArray<NSDictionary *> *contents, NSDictionary *rule,
+                            NSDictionary *custom, NSDictionary<NSString *, NSNumber *> *selection) {
     NSMutableArray<UMBCleanItem *> *items = [NSMutableArray new];
     for (id entry in contents) {
         if (![entry isKindOfClass:NSDictionary.class])
@@ -87,7 +87,7 @@ RHCleanerItemsForDirectory(NSString *path, NSArray<NSDictionary *> *contents, NS
     return items;
 }
 
-NSArray<NSDictionary *> *GetDirectoryContents(NSString *path) {
+NSArray<NSDictionary *> *UMBGetDirectoryContents(NSString *path) {
     NSFileManager *manager = NSFileManager.defaultManager;
     NSArray<NSString *> *contents = [manager contentsOfDirectoryAtPath:path error:nil];
     if (!contents)
@@ -197,10 +197,10 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
     NSMutableArray<UMBCleanGroup *> *groups = [NSMutableArray new];
     NSFileManager *manager = NSFileManager.defaultManager;
     for (NSString *path in paths) {
-        NSArray *contents = GetDirectoryContents(path);
+        NSArray *contents = UMBGetDirectoryContents(path);
         if (!contents && [manager fileExistsAtPath:path] && (geteuid() != 0 || getegid() != 0)) {
             NSString *cacheFile = jbroot(@"/tmp/.dircontentscache");
-            if (RootUserGetDirectoryContents(path, cacheFile)) {
+            if (UMBRootUserGetDirectoryContents(path, cacheFile)) {
                 contents = [NSArray arrayWithContentsOfFile:cacheFile];
                 [manager removeItemAtPath:cacheFile error:nil];
             }
@@ -208,8 +208,8 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
 
         UMBCleanGroup *group = [UMBCleanGroup new];
         group.path = path;
-        group.items = RHCleanerItemsForDirectory(path, contents, rules[path] ?: customRules[path],
-                                                 rules[path] ? customRules[path] : nil, selection);
+        group.items = UMBCleanerItemsForDirectory(path, contents, rules[path] ?: customRules[path],
+                                                  rules[path] ? customRules[path] : nil, selection);
         if (!contents && [manager fileExistsAtPath:path]) {
             group.errorMessage = NSLocalizedString(@"The folder could not be read.", nil);
         }
@@ -232,7 +232,7 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
         if ([error.domain isEqualToString:NSCocoaErrorDomain] &&
             error.code == NSFileNoSuchFileError)
             continue;
-        if ((geteuid() != 0 || getegid() != 0) && RootUserRemoveItemAtPath(path))
+        if ((geteuid() != 0 || getegid() != 0) && UMBRootUserRemoveItemAtPath(path))
             continue;
         failures[path] =
             error.localizedDescription ?: NSLocalizedString(@"The file could not be removed.", nil);

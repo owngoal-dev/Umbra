@@ -78,7 +78,7 @@ ipa: archive
 SWIFT_FORMAT ?= xcrun swift-format
 CLANG_FORMAT ?= clang-format
 SWIFT_SOURCES := $(wildcard Umbra/*.swift Umbra/Platform/*.swift Tests/*.swift Tools/*.swift)
-CLANG_SOURCES := $(filter-out Umbra/NSJSONSerialization+Comments.h Umbra/NSJSONSerialization+Comments.m,$(wildcard Umbra/*.[mh] Umbra/AppDataCleaner/*.[mh] Umbra/Platform/*.h Tests/*.m))
+CLANG_SOURCES := $(filter-out Umbra/NSJSONSerialization+UMBComments.h Umbra/NSJSONSerialization+UMBComments.m,$(wildcard Umbra/*.[mh] Umbra/AppDataCleaner/*.[mh] Umbra/Platform/*.h Tests/*.m))
 
 .PHONY: format format-check check
 format:

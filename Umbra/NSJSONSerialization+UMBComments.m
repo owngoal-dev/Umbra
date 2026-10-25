@@ -1,12 +1,12 @@
 //
-//  NSJSONSerialization+Comments.m
+//  NSJSONSerialization+UMBComments.m
 //  ABCodeEditor
 //
 //  Created by Alexander Blach on 22.07.14.
 //  Copyright (c) 2014 Alexander Blach. All rights reserved.
 //
 
-#import "NSJSONSerialization+Comments.h"
+#import "NSJSONSerialization+UMBComments.h"
 
 
 static const int EncLen_UTF8[256] = {
@@ -37,9 +37,9 @@ static inline void copyUTF8CharacterAndAdvancePointers(UTF8Char **source, UTF8Ch
 static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8[**source]; }
 
 
-@implementation NSJSONSerialization (Comments)
+@implementation NSJSONSerialization (UMBComments)
 
-+ (NSData *)dataByStrippingJSONCommentsAndWhiteSpaceOfUTF8Data:(NSData *)data
++ (NSData *)umb_dataByStrippingJSONCommentsAndWhiteSpaceOfUTF8Data:(NSData *)data
                                                      skipBytes:(NSUInteger)bytesToSkip {
     UTF8Char *originalString = (UTF8Char *)[data bytes];
     NSUInteger length = [data length];
@@ -164,17 +164,17 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
 }
 
 
-+ (id)JSONObjectWithCommentedUTF8Data:(NSData *)data
++ (id)umb_JSONObjectWithCommentedUTF8Data:(NSData *)data
                               options:(NSJSONReadingOptions)opt
                                 error:(NSError **)error {
     NSData *strippedData =
-        [self dataByStrippingJSONCommentsAndWhiteSpaceOfUTF8Data:data skipBytes:0];
+        [self umb_dataByStrippingJSONCommentsAndWhiteSpaceOfUTF8Data:data skipBytes:0];
 
     return [self JSONObjectWithData:strippedData options:opt error:error];
 }
 
 
-+ (NSStringEncoding)stringEncodingFromData:(NSData *)data detectedBOMSize:(NSUInteger *)bomSize {
++ (NSStringEncoding)umb_stringEncodingFromData:(NSData *)data detectedBOMSize:(NSUInteger *)bomSize {
     NSStringEncoding encoding = 0;
     if (bomSize) {
         *bomSize = 0;
@@ -235,12 +235,12 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
     return encoding;
 }
 
-+ (id)JSONObjectWithCommentedData:(NSData *)data
++ (id)umb_JSONObjectWithCommentedData:(NSData *)data
                           options:(NSJSONReadingOptions)opt
                             error:(NSError **)error {
     if (data) {
         NSUInteger bomSize = 0;
-        NSStringEncoding encoding = [self stringEncodingFromData:data detectedBOMSize:&bomSize];
+        NSStringEncoding encoding = [self umb_stringEncodingFromData:data detectedBOMSize:&bomSize];
 
         if (encoding == 0 || // assume UTF-8 if no BOM is detected
             encoding == NSUTF8StringEncoding) {
@@ -268,38 +268,38 @@ static inline void skipUTF8Character(UTF8Char **source) { *source += EncLen_UTF8
             }
         }
 
-        return [self JSONObjectWithCommentedUTF8Data:data options:opt error:error];
+        return [self umb_JSONObjectWithCommentedUTF8Data:data options:opt error:error];
     } else {
         return nil;
     }
 }
 
 
-+ (id)JSONObjectWithCommentedContentsOfURL:(NSURL *)url
++ (id)umb_JSONObjectWithCommentedContentsOfURL:(NSURL *)url
                                    options:(NSJSONReadingOptions)opt
                                      error:(NSError **)error {
     // load data from URL
     NSData *data = [NSData dataWithContentsOfURL:url options:NSDataReadingUncached error:error];
-    return [self JSONObjectWithCommentedData:data options:opt error:error];
+    return [self umb_JSONObjectWithCommentedData:data options:opt error:error];
 }
 
-+ (id)JSONObjectWithCommentedContentsOfFile:(NSString *)path
++ (id)umb_JSONObjectWithCommentedContentsOfFile:(NSString *)path
                                     options:(NSJSONReadingOptions)opt
                                       error:(NSError **)error {
     // load data from file
     NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingUncached error:error];
 
-    return [self JSONObjectWithCommentedData:data options:opt error:error];
+    return [self umb_JSONObjectWithCommentedData:data options:opt error:error];
 }
 
-+ (id)JSONObjectWithCommentedString:(NSString *)string
++ (id)umb_JSONObjectWithCommentedString:(NSString *)string
                             options:(NSJSONReadingOptions)opt
                               error:(NSError **)error {
     NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
-    return [self JSONObjectWithCommentedUTF8Data:data options:opt error:error];
+    return [self umb_JSONObjectWithCommentedUTF8Data:data options:opt error:error];
 }
 
-+ (NSString *)stringWithJSONObject:(id)obj
++ (NSString *)umb_stringWithJSONObject:(id)obj
                            options:(NSJSONWritingOptions)opt
                              error:(NSError **)error {
     NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:opt error:error];

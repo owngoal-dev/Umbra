@@ -1,4 +1,4 @@
-#import "AppInfo.h"
-#import "RHBackend.h"
-#import "RHCleaner.h"
-#import "RHServicePorts.h"
+#import "UMBInstalledAppInfo.h"
+#import "UMBBackend.h"
+#import "UMBCleaner.h"
+#import "UMBServicePorts.h"

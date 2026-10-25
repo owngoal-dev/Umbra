@@ -1,24 +1,24 @@
-#import "RHCleaner.h"
+#import "UMBCleaner.h"
 #include <assert.h>
 
-extern NSArray<UMBCleanItem *> *RHCleanerItemsForDirectory(NSString *, NSArray<NSDictionary *> *,
-                                                           NSDictionary *, NSDictionary *,
-                                                           NSDictionary<NSString *, NSNumber *> *);
+extern NSArray<UMBCleanItem *> *UMBCleanerItemsForDirectory(NSString *, NSArray<NSDictionary *> *,
+                                                            NSDictionary *, NSDictionary *,
+                                                            NSDictionary<NSString *, NSNumber *> *);
 
-BOOL RootUserGetDirectoryContents(NSString *path, NSString *cacheFile) {
+BOOL UMBRootUserGetDirectoryContents(NSString *path, NSString *cacheFile) {
     abort();
 }
 
-BOOL RootUserRemoveItemAtPath(NSString *path) {
+BOOL UMBRootUserRemoveItemAtPath(NSString *path) {
     abort();
 }
 
 static UMBCleanItem *Item(NSDictionary *rule, NSDictionary *custom, NSNumber *previous) {
-    return RHCleanerItemsForDirectory(@"/test", @[ @{
-                                          @"name" : @"sample",
-                                          @"isDirectory" : @NO
-                                      } ],
-                                      rule, custom, previous ? @{@"/test/sample" : previous} : @{})
+    return UMBCleanerItemsForDirectory(@"/test", @[ @{
+                                           @"name" : @"sample",
+                                           @"isDirectory" : @NO
+                                       } ],
+                                       rule, custom, previous ? @{@"/test/sample" : previous} : @{})
         .firstObject;
 }
 
@@ -64,7 +64,7 @@ int main(void) {
         assert(!Item(black, white, @YES).checked);
         assert(Item(black, nil, nil).checked);
 
-        NSArray<UMBCleanItem *> *items = RHCleanerItemsForDirectory(@"/test", @[
+        NSArray<UMBCleanItem *> *items = UMBCleanerItemsForDirectory(@"/test", @[
             @{@"name" : @"a-file",
               @"isDirectory" : @NO},
             @{@"name" : @"z-folder",
@@ -76,7 +76,7 @@ int main(void) {
             @{@"name" : @"outside/file",
               @"isDirectory" : @NO}
         ],
-                                                                    @{}, nil, @{});
+                                                                     @{}, nil, @{});
         assert(items.count == 3);
         assert([items[0].name isEqualToString:@"b-folder"]);
         assert([items[1].name isEqualToString:@"z-folder"]);

@@ -1,9 +1,9 @@
 #import <dlfcn.h>
-#import "Platform/RHSpawn.h"
+#import "Platform/UMBSpawn.h"
 #import <objc/message.h>
 #import <UIKit/UIKit.h>
-#import "AppInfo.h"
-#import "RHServicePorts.h"
+#import "UMBInstalledAppInfo.h"
+#import "UMBServicePorts.h"
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -15,8 +15,8 @@ extern int posix_spawnattr_set_persona_np(const posix_spawnattr_t *__restrict, u
 extern int posix_spawnattr_set_persona_uid_np(const posix_spawnattr_t *__restrict, uid_t);
 extern int posix_spawnattr_set_persona_gid_np(const posix_spawnattr_t *__restrict, uid_t);
 
-int spawn(const char *path, const char **argv, const char **envp, void (^std_out)(char *, int),
-          void (^std_err)(char *, int)) {
+static int UMBSpawn(const char *path, const char **argv, const char **envp,
+                    void (^std_out)(char *, int), void (^std_err)(char *, int)) {
 
     __block pid_t pid = 0;
     posix_spawnattr_t attr;
@@ -124,7 +124,7 @@ int spawn(const char *path, const char **argv, const char **envp, void (^std_out
     return -1;
 }
 
-int spawnRoot(NSString *path, NSArray *args, NSString **stdOut, NSString **stdErr) {
+int UMBSpawnRoot(NSString *path, NSArray *args, NSString **stdOut, NSString **stdErr) {
 
     NSMutableArray *argsM = args.mutableCopy ?: [NSMutableArray new];
     [argsM insertObject:path atIndex:0];
@@ -139,7 +139,7 @@ int spawnRoot(NSString *path, NSArray *args, NSString **stdOut, NSString **stdEr
 
     NSMutableData *outData = stdOut ? [NSMutableData new] : nil;
     NSMutableData *errData = stdErr ? [NSMutableData new] : nil;
-    int retval = spawn(
+    int retval = UMBSpawn(
         path.fileSystemRepresentation, argsC, environ,
         ^(char *bytes, int length) {
             [outData appendBytes:bytes length:length];
@@ -161,7 +161,7 @@ int spawnRoot(NSString *path, NSArray *args, NSString **stdOut, NSString **stdEr
     return retval;
 }
 
-BOOL isUUIDPathOf(NSString *path, NSString *parent) {
+BOOL UMBIsUUIDPathOf(NSString *path, NSString *parent) {
     if (!path || !parent)
         return NO;
 
@@ -201,7 +201,7 @@ BOOL isUUIDPathOf(NSString *path, NSString *parent) {
 
 int proc_pidpath(int pid, void *buffer, uint32_t buffersize);
 
-void killAllForBundle(const char *bundlePath) {
+void UMBKillAllForBundle(const char *bundlePath) {
 
     char realBundlePath[PATH_MAX + 1];
     if (!realpath(bundlePath, realBundlePath))
@@ -245,42 +245,42 @@ void killAllForBundle(const char *bundlePath) {
     free(info);
 }
 
-NSString *RootUserClearAppData(UMBInstalledAppInfo *app) {
+NSString *UMBRootUserClearAppData(UMBInstalledAppInfo *app) {
     NSString *error = nil;
     NSString *result = nil;
-    int ret = spawnRoot(NSBundle.mainBundle.executablePath,
-                        @[ @"clearAppData", app.bundleIdentifier ], &result, &error);
+    int ret = UMBSpawnRoot(NSBundle.mainBundle.executablePath,
+                           @[ @"clearAppData", app.bundleIdentifier ], &result, &error);
     if (ret != 0) {
         return error;
     }
     return nil;
 }
 
-BOOL RootUserRemoveItemAtPath(NSString *path) {
+BOOL UMBRootUserRemoveItemAtPath(NSString *path) {
     NSString *error = nil;
     NSString *result = nil;
-    int ret = spawnRoot(NSBundle.mainBundle.executablePath, @[ @"removeItemAtPath", path ], &result,
-                        &error);
+    int ret = UMBSpawnRoot(NSBundle.mainBundle.executablePath, @[ @"removeItemAtPath", path ],
+                           &result, &error);
     if (ret != 0) {
         return NO;
     }
     return YES;
 }
 
-BOOL RootUserGetDirectoryContents(NSString *path, NSString *cacheFile) {
+BOOL UMBRootUserGetDirectoryContents(NSString *path, NSString *cacheFile) {
     NSString *error = nil;
     NSString *result = nil;
-    int ret = spawnRoot(NSBundle.mainBundle.executablePath,
-                        @[ @"getDirectoryContents", path, cacheFile ], &result, &error);
+    int ret = UMBSpawnRoot(NSBundle.mainBundle.executablePath,
+                           @[ @"getDirectoryContents", path, cacheFile ], &result, &error);
     if (ret != 0) {
         return NO;
     }
     return YES;
 }
 
-BOOL RootUserRemountPreboot(void) {
+BOOL UMBRootUserRemountPreboot(void) {
     NSString *error = nil;
-    int ret = spawnRoot(NSBundle.mainBundle.executablePath, @[ @"remountPreboot" ], nil, &error);
+    int ret = UMBSpawnRoot(NSBundle.mainBundle.executablePath, @[ @"remountPreboot" ], nil, &error);
     if (ret != 0) {
         NSLog(@"remountPreboot failed: %@", error);
         return NO;
@@ -289,7 +289,7 @@ BOOL RootUserRemountPreboot(void) {
 }
 
 // The app itself runs as mobile; these commands are only reachable through
-// spawnRoot and must never perform privileged work for an unprivileged caller.
+// UMBSpawnRoot and must never perform privileged work for an unprivileged caller.
 static int RHRequireRoot(const char *command) {
     if (geteuid() != 0 || getegid() != 0) {
         fprintf(stderr, "%s requires root privileges\n", command);
@@ -347,8 +347,8 @@ int main(int argc, char *argv[]) {
             if (RHRequireRoot(argv[1]) != 0) {
                 return 1;
             }
-            NSArray *GetDirectoryContents(NSString * path);
-            NSArray *contents = GetDirectoryContents(@(argv[2]));
+            NSArray *UMBGetDirectoryContents(NSString * path);
+            NSArray *contents = UMBGetDirectoryContents(@(argv[2]));
             if (!contents) {
                 return -1;
             }
@@ -364,8 +364,8 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
             UMBInstalledAppInfo *app = [UMBInstalledAppInfo appWithBundleIdentifier:@(argv[2])];
-            NSString *clearAppData(UMBInstalledAppInfo * app);
-            NSString *error = clearAppData(app);
+            NSString *UMBClearAppData(UMBInstalledAppInfo * app);
+            NSString *error = UMBClearAppData(app);
             if (error) {
                 fprintf(stderr, "%s", error.UTF8String);
                 return -1;

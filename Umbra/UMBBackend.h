@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import "AppInfo.h"
+#import "UMBInstalledAppInfo.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

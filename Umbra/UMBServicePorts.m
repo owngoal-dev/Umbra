@@ -1,11 +1,11 @@
-#import "RHServicePorts.h"
+#import "UMBServicePorts.h"
 #import "roothide.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
-extern int spawnRoot(NSString *path, NSArray *args, NSString **stdOut, NSString **stdErr);
+extern int UMBSpawnRoot(NSString *path, NSArray *args, NSString **stdOut, NSString **stdErr);
 
 static BOOL PortError(NSError **error, NSString *message) {
     if (error) {
@@ -257,7 +257,7 @@ static BOOL PortIsFree(NSNumber *port) {
 }
 
 static int LaunchControl(NSArray<NSString *> *arguments) {
-    return spawnRoot(jbroot(@"/usr/bin/launchctl"), arguments, nil, nil);
+    return UMBSpawnRoot(jbroot(@"/usr/bin/launchctl"), arguments, nil, nil);
 }
 
 static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
@@ -361,8 +361,8 @@ static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
         if (geteuid() != 0 || getegid() != 0) {
             NSString *message = nil;
             NSString *values = [[ports valueForKey:@"stringValue"] componentsJoinedByString:@","];
-            int result = spawnRoot(NSBundle.mainBundle.executablePath,
-                                   @[ @"setServicePorts", service, values ], nil, &message);
+            int result = UMBSpawnRoot(NSBundle.mainBundle.executablePath,
+                                      @[ @"setServicePorts", service, values ], nil, &message);
             return result == 0 ||
                    PortError(error, message.length
                                         ? message
