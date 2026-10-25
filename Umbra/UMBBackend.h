@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
     startupWarnings NS_SWIFT_NAME(startupWarnings());
 + (NSString *)customRulesPath NS_SWIFT_NAME(customRulesPath());
 + (void)cleanOwnApplicationFiles NS_SWIFT_NAME(cleanOwnApplicationFiles());
++ (void)logProcessIdentity:(NSString *)context NS_SWIFT_NAME(logProcessIdentity(_:));
 
 @end
 

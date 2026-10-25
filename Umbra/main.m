@@ -2,6 +2,7 @@
 #import "Platform/UMBSpawn.h"
 #import <objc/message.h>
 #import <UIKit/UIKit.h>
+#import "UMBBackend.h"
 #import "UMBInstalledAppInfo.h"
 #import "UMBServicePorts.h"
 #include <sys/stat.h>
@@ -299,6 +300,7 @@ static int RHRequireRoot(const char *command) {
 }
 
 int main(int argc, char *argv[]) {
+    [UMBBackend logProcessIdentity:@"main"];
 
     if (argc >= 2 &&
         (strcmp(argv[1], "servicePorts") == 0 || strcmp(argv[1], "setServicePorts") == 0)) {

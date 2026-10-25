@@ -10,6 +10,7 @@ final class UMBAppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        UMBBackend.logProcessIdentity("application:didFinishLaunchingWithOptions")
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.tintColor = AppTheme.tint
         self.window = window

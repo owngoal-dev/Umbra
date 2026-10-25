@@ -50,6 +50,23 @@ static BOOL RHWriteDictionary(NSDictionary *dictionary, NSString *path, NSError 
     return data && [data writeToFile:path options:NSDataWritingAtomic error:error];
 }
 
+static void UMBGetSVUGID(uid_t *svuid, gid_t *svgid) {
+    struct kinfo_proc info = {0};
+    int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()};
+    size_t length = sizeof(info);
+    if (sysctl(mib, 4, &info, &length, NULL, 0) == 0) {
+        if (svuid)
+            *svuid = info.kp_eproc.e_pcred.p_svuid;
+        if (svgid)
+            *svgid = info.kp_eproc.e_pcred.p_svgid;
+    } else {
+        if (svuid)
+            *svuid = (uid_t)-1;
+        if (svgid)
+            *svgid = (gid_t)-1;
+    }
+}
+
 static BOOL RHPortIsOpen(uint16_t port) {
     int descriptor = socket(AF_INET, SOCK_STREAM, 0);
     if (descriptor < 0) {
@@ -65,6 +82,15 @@ static BOOL RHPortIsOpen(uint16_t port) {
 }
 
 @implementation UMBBackend
+
++ (void)logProcessIdentity:(NSString *)context {
+    uid_t svuid = (uid_t)-1;
+    gid_t svgid = (gid_t)-1;
+    UMBGetSVUGID(&svuid, &svgid);
+    NSLog(@"%@: uid=%d euid=%d svuid=%d gid=%d egid=%d svgid=%d issetugid=%d", context,
+          (int)getuid(), (int)geteuid(), (int)svuid, (int)getgid(), (int)getegid(), (int)svgid,
+          issetugid());
+}
 
 + (BOOL)prepareWithError:(NSError **)error {
     NSFileManager *manager = NSFileManager.defaultManager;
