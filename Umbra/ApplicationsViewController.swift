@@ -333,9 +333,6 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         if indexPath.section != applicationsSection {
             if indexPath.row == 0 {
                 check.configure(cell)
-                #if os(iOS)
-                    cell.selectionStyle = .default
-                #endif
             } else {
                 var content = cell.defaultContentConfiguration()
                 content.text = operationStatus
@@ -400,9 +397,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if showsDeviceStatus && indexPath.section == 0 && indexPath.row == 0 {
-            #if os(tvOS)
-                guard !check.findings.isEmpty else { return }
-            #endif
+            guard !check.findings.isEmpty else { return }
             navigationController?.pushViewController(
                 EnvironmentViewController(check: check), animated: true)
             return

@@ -137,14 +137,9 @@ final class EnvironmentCheck {
             isChecking && findings.isEmpty
             ? .secondaryLabel : findings.isEmpty ? AppTheme.tint : .systemOrange
         cell.contentConfiguration = content
-        #if os(iOS)
-            cell.accessoryType = .disclosureIndicator
-        #else
-            cell.accessoryType = hasFindings ? .disclosureIndicator : .none
-            cell.selectionStyle = hasFindings ? .default : .none
-            cell.isUserInteractionEnabled = hasFindings
-            cell.accessibilityTraits = hasFindings ? .button : .staticText
-        #endif
+        cell.accessoryType = hasFindings ? .disclosureIndicator : .none
+        cell.selectionStyle = hasFindings ? .default : .none
+        cell.accessibilityTraits = hasFindings ? .button : .staticText
         cell.accessoryView = nil
         cell.accessibilityValue = nil
         if hasFindings {
@@ -179,11 +174,7 @@ final class EnvironmentCheck {
             cell.accessoryView = accessory
             cell.accessibilityValue = badge.text
         }
-        #if os(iOS)
-            cell.accessibilityHint = localized("Show Details")
-        #else
-            cell.accessibilityHint = hasFindings ? localized("Show Details") : nil
-        #endif
+        cell.accessibilityHint = hasFindings ? localized("Show Details") : nil
     }
 }
 

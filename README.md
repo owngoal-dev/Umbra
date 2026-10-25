@@ -10,14 +10,13 @@ Umbra is the manager app for RootHide custom firmware. It hides signs of custom 
 
 ### Features
 
-- **Blacklist**: Choose which apps custom firmware is hidden from. Search, refresh, and clear an app's data via long press or swipe. An environment check summary sits at the top of the list, with a detail page that supports pull to refresh.
+- **Blacklist**: Choose which apps custom firmware is hidden from. Search, refresh, and clear an app's data via long press or swipe. An environment check summary sits at the top of the list; its detail page opens only when issues are found and supports pull to refresh.
 - **var Cleanup**: Scan for files that apps may use to detect custom firmware, listed by rule priority. Select items individually or in bulk, copy paths, or open them in a file manager (Fila first, then Filza). Removal asks for confirmation, runs in the background, and keeps failed items for retry.
 - **Settings**
-  - General: Whitelist mode (placeholder, not yet enabled).
   - Services: Manage listening ports for SSH, Dropbear, Frida and similar services. The original plist is backed up before changes.
   - Advanced: Custom cleanup rules; URL scheme replacement (requires Relaxin 0.5.4 or later).
 
-Localized in English, Simplified Chinese, Japanese, German, French, Italian, Arabic and Vietnamese.
+Localized in English, Simplified Chinese, Traditional Chinese, Japanese, German, French, Italian, Arabic and Vietnamese.
 
 ### Building
 
@@ -85,14 +84,13 @@ Umbra 是 RootHide 自定义固件的管理 App，用于对 App 隐藏自定义�
 
 ### 功能
 
-- **黑名单**：按 App 选择是否隐藏自定义固件，支持搜索、刷新，长按或侧滑清除 App 数据。列表顶部汇总环境检查结果，详情页可下拉刷新。
+- **黑名单**：按 App 选择是否隐藏自定义固件，支持搜索、刷新，长按或侧滑清除 App 数据。列表顶部汇总环境检查结果；仅在发现问题时可进入详情页，详情页可下拉刷新。
 - **var 清理**：扫描可能被 App 用于识别自定义固件的文件，按规则优先级列出。支持单选、批量选择、复制路径，或在文件管理器中打开（优先 Fila，其次 Filza）。移除前确认，后台执行，失败项保留供重试。
 - **设置**
-  - 通用：白名单模式（占位，暂未启用）。
   - 服务：管理 SSH、Dropbear、Frida 等服务的监听端口，修改前自动备份原始 plist。
   - 高级：自定义清理规则；URL Scheme 替换（需已安装 Relaxin 0.5.4 或更新版本）。
 
-支持英语、简体中文、日语、德语、法语、意大利语、阿拉伯语、越南语。
+支持英语、简体中文、繁体中文、日语、德语、法语、意大利语、阿拉伯语、越南语。
 
 ### 构建
 

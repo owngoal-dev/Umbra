@@ -4,6 +4,9 @@
 #import <UIKit/UIKit.h>
 #import "AppInfo.h"
 #import "RHServicePorts.h"
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 extern const char **environ;
 
@@ -26,14 +29,24 @@ int spawn(const char *path, const char **argv, const char **envp, void (^std_out
     posix_spawn_file_actions_t action;
     posix_spawn_file_actions_init(&action);
 
-    int outPipe[2];
-    pipe(outPipe);
+    int outPipe[2] = {0};
+    if (pipe(outPipe) != 0) {
+        posix_spawnattr_destroy(&attr);
+        posix_spawn_file_actions_destroy(&action);
+        return -1;
+    }
     posix_spawn_file_actions_addclose(&action, outPipe[0]);
     posix_spawn_file_actions_adddup2(&action, outPipe[1], STDOUT_FILENO);
     posix_spawn_file_actions_addclose(&action, outPipe[1]);
 
-    int errPipe[2];
-    pipe(errPipe);
+    int errPipe[2] = {0};
+    if (pipe(errPipe) != 0) {
+        close(outPipe[0]);
+        close(outPipe[1]);
+        posix_spawnattr_destroy(&attr);
+        posix_spawn_file_actions_destroy(&action);
+        return -1;
+    }
     posix_spawn_file_actions_addclose(&action, errPipe[0]);
     posix_spawn_file_actions_adddup2(&action, errPipe[1], STDERR_FILENO);
     posix_spawn_file_actions_addclose(&action, errPipe[1]);
@@ -265,6 +278,26 @@ BOOL RootUserGetDirectoryContents(NSString *path, NSString *cacheFile) {
     return YES;
 }
 
+BOOL RootUserRemountPreboot(void) {
+    NSString *error = nil;
+    int ret = spawnRoot(NSBundle.mainBundle.executablePath, @[ @"remountPreboot" ], nil, &error);
+    if (ret != 0) {
+        NSLog(@"remountPreboot failed: %@", error);
+        return NO;
+    }
+    return YES;
+}
+
+// The app itself runs as mobile; these commands are only reachable through
+// spawnRoot and must never perform privileged work for an unprivileged caller.
+static int RHRequireRoot(const char *command) {
+    if (geteuid() != 0 || getegid() != 0) {
+        fprintf(stderr, "%s requires root privileges\n", command);
+        return -1;
+    }
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
 
     if (argc >= 2 &&
@@ -284,6 +317,9 @@ int main(int argc, char *argv[]) {
                     }
                 }
             } else if (argc == 4 && strcmp(argv[1], "setServicePorts") == 0) {
+                if (RHRequireRoot(argv[1]) != 0) {
+                    return 1;
+                }
                 NSArray *ports = [@(argv[3]) componentsSeparatedByString:@","];
                 if ([RHServicePorts setPorts:ports forService:@(argv[2]) error:&error]) {
                     return 0;
@@ -297,7 +333,10 @@ int main(int argc, char *argv[]) {
 
     if (argc >= 2) {
         if (argc == 3 && strcmp(argv[1], "removeItemAtPath") == 0) {
-            NSError *err;
+            if (RHRequireRoot(argv[1]) != 0) {
+                return 1;
+            }
+            NSError *err = nil;
             if (![NSFileManager.defaultManager removeItemAtPath:@(argv[2]) error:&err]) {
                 fprintf(stderr, "%s", err.description.UTF8String);
                 return -1;
@@ -305,6 +344,9 @@ int main(int argc, char *argv[]) {
             return 0;
         }
         if (argc == 4 && strcmp(argv[1], "getDirectoryContents") == 0) {
+            if (RHRequireRoot(argv[1]) != 0) {
+                return 1;
+            }
             NSArray *GetDirectoryContents(NSString * path);
             NSArray *contents = GetDirectoryContents(@(argv[2]));
             if (!contents) {
@@ -313,15 +355,37 @@ int main(int argc, char *argv[]) {
             if (![contents writeToFile:@(argv[3]) atomically:YES]) {
                 return -2;
             }
+            // The app reads this cache as mobile; do not depend on the helper's umask.
+            chmod(argv[3], 0644);
             return 0;
         }
         if (argc == 3 && strcmp(argv[1], "clearAppData") == 0) {
+            if (RHRequireRoot(argv[1]) != 0) {
+                return 1;
+            }
             AppInfo *app = [AppInfo appWithBundleIdentifier:@(argv[2])];
             NSString *clearAppData(AppInfo * app);
             NSString *error = clearAppData(app);
             if (error) {
                 fprintf(stderr, "%s", error.UTF8String);
                 return -1;
+            }
+            return 0;
+        }
+        if (argc == 2 && strcmp(argv[1], "remountPreboot") == 0) {
+            if (RHRequireRoot(argv[1]) != 0) {
+                return 1;
+            }
+            pid_t pid = 0;
+            char *arguments[] = {"/sbin/mount", "-u", "-w", "/private/preboot", NULL};
+            if (posix_spawn(&pid, arguments[0], NULL, NULL, arguments, NULL) != 0 || pid <= 0) {
+                fprintf(stderr, "could not start /sbin/mount\n");
+                return 1;
+            }
+            int status = 0;
+            if (waitpid(pid, &status, 0) < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+                fprintf(stderr, "/sbin/mount failed with status %d\n", status);
+                return 1;
             }
             return 0;
         }

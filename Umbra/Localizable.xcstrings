@@ -51,6 +51,12 @@
             "state": "translated",
             "value": "在运行 iOS 15、搭载 A12 或更新芯片的设备上，将应用加入黑名单会禁用其应用扩展。应用在前台或后台运行时，可能触发 spinlock panic，导致设备崩溃重启。\n\n建议先在 Choicy 中关闭此应用的插件注入，仅在无效时再加入黑名单。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "適用於執行 iOS 15 的 A12 或更新晶片裝置：\n\n加入黑名單的 App 會停用其 App 延伸功能，且 App 在前景或背景執行時可能觸發 spinlock panic。\n\n建議先在 Choicy 中停用此 App 的 Tweak 注入，若仍無效再將其加入黑名單。"
+          }
         }
       }
     },
@@ -103,6 +109,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 等服务"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 等服務"
           }
         }
       }
@@ -157,6 +169,12 @@
             "state": "translated",
             "value": "%@ 服务"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 服務"
+          }
         }
       }
     },
@@ -209,6 +227,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "警告：请勿修改 /private/preboot/ 中的其他文件，否则会导致设备循环重启。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "警告：請勿修改 /private/preboot/ 中的其他檔案，否則會導致開機循環。"
           }
         }
       }
@@ -263,6 +287,12 @@
             "state": "translated",
             "value": "此原 Scheme 已有替换规则。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此來源 Scheme 已有替換規則。"
+          }
         }
       }
     },
@@ -315,6 +345,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加替换规则"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增替換規則"
           }
         }
       }
@@ -369,6 +405,12 @@
             "state": "translated",
             "value": "高级"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "進階"
+          }
         }
       }
     },
@@ -421,6 +463,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "应用"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App"
           }
         }
       }
@@ -475,58 +523,11 @@
             "state": "translated",
             "value": "当前环境默认已将应用加入黑名单。请在 Bootstrap 的 AppList 中关闭此应用的插件注入。"
           }
-        }
-      }
-    },
-    "Automatically blacklist newly installed apps.": {
-      "extractionState": "manual",
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إضافة التطبيقات المثبتة حديثًا إلى القائمة السوداء تلقائيًا."
-          }
         },
-        "de": {
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Neu installierte Apps automatisch zur Blacklist hinzufügen."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Automatically blacklist newly installed apps."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajouter automatiquement les nouvelles apps à la liste noire."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aggiungi automaticamente le nuove app alla lista nera."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "新しくインストールした App を自動的にブラックリストに追加します。"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tự động thêm ứng dụng mới cài đặt vào danh sách đen."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自动将新安装的 App 加入黑名单。"
+            "value": "目前環境預設會將 App 加入黑名單。請在 Bootstrap 的 AppList 中停用此 App 的 Tweak 注入。"
           }
         }
       }
@@ -581,6 +582,12 @@
             "state": "translated",
             "value": "备用端口"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "備用埠"
+          }
         }
       }
     },
@@ -633,6 +640,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "黑名单"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "黑名單"
           }
         }
       }
@@ -687,6 +700,12 @@
             "state": "translated",
             "value": "当前环境不支持黑名单。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前環境不支援黑名單。"
+          }
         }
       }
     },
@@ -740,6 +759,12 @@
             "state": "translated",
             "value": "黑名单不可用"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "黑名單無法使用"
+          }
         }
       }
     },
@@ -789,6 +814,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "取消"
@@ -846,6 +877,12 @@
             "state": "translated",
             "value": "检查结果"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "檢查結果"
+          }
         }
       }
     },
@@ -898,6 +935,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在检查环境…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在檢查環境…"
           }
         }
       }
@@ -952,6 +995,12 @@
             "state": "translated",
             "value": "清除应用数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除 App 資料"
+          }
         }
       }
     },
@@ -1004,6 +1053,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "清除数据"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除資料"
           }
         }
       }
@@ -1058,6 +1113,12 @@
             "state": "translated",
             "value": "清除“%@”的数据？"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要清除「%@」的資料嗎？"
+          }
         }
       }
     },
@@ -1110,6 +1171,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在清除 “%@” 的数据…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在清除「%@」的資料…"
           }
         }
       }
@@ -1164,6 +1231,12 @@
             "state": "translated",
             "value": "继续"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "繼續"
+          }
         }
       }
     },
@@ -1216,6 +1289,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "复制路径"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "複製路徑"
           }
         }
       }
@@ -1270,6 +1349,12 @@
             "state": "translated",
             "value": "无法清除 “%@” 的数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法清除「%@」的資料"
+          }
         }
       }
     },
@@ -1322,6 +1407,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "部分项目无法删除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "部分項目無法刪除"
           }
         }
       }
@@ -1376,6 +1467,12 @@
             "state": "translated",
             "value": "服务重启失败，已恢复原配置。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法重新啟動服務，已還原原始設定。"
+          }
         }
       }
     },
@@ -1428,6 +1525,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法恢复原配置，请在终端中检查服务。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法還原原始設定，請在終端機中檢查服務。"
           }
         }
       }
@@ -1482,6 +1585,12 @@
             "state": "translated",
             "value": "无法恢复服务，请在终端中重新启动。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法還原服務，請在終端機中重新啟動。"
+          }
         }
       }
     },
@@ -1534,6 +1643,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法保存更改"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法儲存變更"
           }
         }
       }
@@ -1588,6 +1703,12 @@
             "state": "translated",
             "value": "无法保存服务端口。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法儲存服務埠。"
+          }
         }
       }
     },
@@ -1640,6 +1761,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "自定义清理规则"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自訂清理規則"
           }
         }
       }
@@ -1694,6 +1821,12 @@
             "state": "translated",
             "value": "已清除 “%@” 的数据"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已清除「%@」的資料"
+          }
         }
       }
     },
@@ -1747,6 +1880,12 @@
             "state": "translated",
             "value": "取消全选"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消全選"
+          }
         }
       }
     },
@@ -1796,6 +1935,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "完成"
@@ -1853,6 +1998,12 @@
             "state": "translated",
             "value": "Dropbear"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dropbear"
+          }
         }
       }
     },
@@ -1905,6 +2056,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已检测到 Dropbear，可通过 Sileo 卸载，或修改默认端口。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已偵測到 Dropbear，可透過 Sileo 移除，或修改預設埠。"
           }
         }
       }
@@ -1959,6 +2116,12 @@
             "state": "translated",
             "value": "端口号不能重复。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每個埠號必須不同。"
+          }
         }
       }
     },
@@ -2011,6 +2174,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "编辑替换规则"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯替換規則"
           }
         }
       }
@@ -2065,6 +2234,12 @@
             "state": "translated",
             "value": "在文件管理器中编辑清理规则。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在檔案管理員中編輯清理規則。"
+          }
         }
       }
     },
@@ -2117,6 +2292,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "启用"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已啟用"
           }
         }
       }
@@ -2171,6 +2352,12 @@
             "state": "translated",
             "value": "请输入自定义 App Scheme，例如 filza。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入自訂 App Scheme，例如 filza。"
+          }
         }
       }
     },
@@ -2223,6 +2410,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "请输入 1 至 65535 之间的端口号。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入 1 至 65535 之間的埠號。"
           }
         }
       }
@@ -2277,6 +2470,12 @@
             "state": "translated",
             "value": "环境检查"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "環境檢查"
+          }
         }
       }
     },
@@ -2329,6 +2528,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法删除应用数据容器：\n%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法移除 App 資料容器：\n%@"
           }
         }
       }
@@ -2383,6 +2588,12 @@
             "state": "translated",
             "value": "Frida 服务"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frida 服務"
+          }
         }
       }
     },
@@ -2436,58 +2647,11 @@
             "state": "translated",
             "value": "已检测到 Frida 服务，可通过 Sileo 卸载，或修改默认端口。"
           }
-        }
-      }
-    },
-    "General": {
-      "extractionState": "manual",
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "عام"
-          }
         },
-        "de": {
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Allgemein"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "General"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Général"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Generali"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一般"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cài đặt chung"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通用"
+            "value": "已偵測到 Frida 服務，可透過 Sileo 移除，或修改預設埠。"
           }
         }
       }
@@ -2542,6 +2706,12 @@
             "state": "translated",
             "value": "已移除所选项目"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已移除所選項目"
+          }
         }
       }
     },
@@ -2594,6 +2764,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "旧版无根越狱文件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "舊版無根越獄檔案"
           }
         }
       }
@@ -2648,6 +2824,12 @@
             "state": "translated",
             "value": "监听端口"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "監聽埠"
+          }
         }
       }
     },
@@ -2700,6 +2882,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "监听端口：%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "監聽埠：%@"
           }
         }
       }
@@ -2754,6 +2942,12 @@
             "state": "translated",
             "value": "正在加载…"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在載入…"
+          }
         }
       }
     },
@@ -2806,6 +3000,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法打开 Fila 或 Filza，路径已复制。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法開啟 Fila 或 Filza，路徑已複製。"
           }
         }
       }
@@ -2860,6 +3060,12 @@
             "state": "translated",
             "value": "未发现匹配项目"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有符合的項目"
+          }
         }
       }
     },
@@ -2912,6 +3118,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "未找到应用"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找不到 App"
           }
         }
       }
@@ -2966,6 +3178,12 @@
             "state": "translated",
             "value": "当前规则未匹配到文件。下拉可重新检查。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前規則沒有符合的檔案。下拉即可重新檢查。"
+          }
         }
       }
     },
@@ -3018,6 +3236,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "未发现问题"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未發現問題"
           }
         }
       }
@@ -3072,6 +3296,12 @@
             "state": "translated",
             "value": "暂无替换规则"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無替換規則"
+          }
         }
       }
     },
@@ -3124,6 +3354,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "无搜索结果"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有搜尋結果"
           }
         }
       }
@@ -3178,6 +3414,12 @@
             "state": "translated",
             "value": "在文件管理器中打开"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在檔案管理員中開啟"
+          }
         }
       }
     },
@@ -3230,6 +3472,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "端口"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "埠"
           }
         }
       }
@@ -3284,6 +3532,12 @@
             "state": "translated",
             "value": "端口 %@ 已被占用。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "埠 %@ 已被使用。"
+          }
         }
       }
     },
@@ -3336,6 +3590,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "端口设置不可用"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "埠設定無法使用"
           }
         }
       }
@@ -3390,6 +3650,12 @@
             "state": "translated",
             "value": "主端口"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主要埠"
+          }
         }
       }
     },
@@ -3442,6 +3708,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "受自定义规则保护"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受自訂規則保護"
           }
         }
       }
@@ -3496,6 +3768,12 @@
             "state": "translated",
             "value": "下拉刷新"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下拉重新整理"
+          }
         }
       }
     },
@@ -3545,6 +3823,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用途"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "用途"
@@ -3602,6 +3886,12 @@
             "state": "translated",
             "value": "无法读取"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法讀取"
+          }
         }
       }
     },
@@ -3651,6 +3941,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "移除"
@@ -3708,6 +4004,12 @@
             "state": "translated",
             "value": "移除所选项目"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除所選項目"
+          }
         }
       }
     },
@@ -3757,6 +4059,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在移除…"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "正在移除…"
@@ -3814,6 +4122,12 @@
             "state": "translated",
             "value": "仅替换 App 的 Scheme，保留路径和参数。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅替換 App 的 Scheme，路徑與參數維持不變。"
+          }
         }
       }
     },
@@ -3866,6 +4180,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "替换规则"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "替換規則"
           }
         }
       }
@@ -3920,6 +4240,12 @@
             "state": "translated",
             "value": "替换规则不适用于黑名单中的 App。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "替換規則不適用於黑名單中的 App。"
+          }
         }
       }
     },
@@ -3972,6 +4298,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "检查指定路径中可能被 App 识别为越狱特征的文件。请确认用途后再移除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "檢查指定路徑中可能被 App 用來辨識越獄的檔案。請確認用途後再移除。"
           }
         }
       }
@@ -4026,6 +4358,12 @@
             "state": "translated",
             "value": "SSH 服务"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SSH 服務"
+          }
         }
       }
     },
@@ -4078,6 +4416,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已检测到 SSH 服务，可通过 Sileo 卸载，或修改默认端口。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已偵測到 SSH 服務，可透過 Sileo 移除，或修改預設埠。"
           }
         }
       }
@@ -4132,6 +4476,12 @@
             "state": "translated",
             "value": "保存"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲存"
+          }
         }
       }
     },
@@ -4184,6 +4534,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "保存后会重启已启用的服务。重新连接时请使用新端口。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲存後會重新啟動已啟用的服務。重新連線時請使用新的埠號。"
           }
         }
       }
@@ -4238,6 +4594,12 @@
             "state": "translated",
             "value": "正在保存…"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在儲存…"
+          }
         }
       }
     },
@@ -4290,6 +4652,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在扫描…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在掃描…"
           }
         }
       }
@@ -4344,6 +4712,12 @@
             "state": "translated",
             "value": "全选"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全選"
+          }
         }
       }
     },
@@ -4396,6 +4770,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已手动选择"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已手動選取"
           }
         }
       }
@@ -4450,6 +4830,12 @@
             "state": "translated",
             "value": "已选：%ld"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已選取：%ld"
+          }
         }
       }
     },
@@ -4502,6 +4888,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "未安装此服务。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未安裝此服務。"
           }
         }
       }
@@ -4556,6 +4948,12 @@
             "state": "translated",
             "value": "服务"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "服務"
+          }
         }
       }
     },
@@ -4608,6 +5006,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定"
           }
         }
       }
@@ -4662,6 +5066,12 @@
             "state": "translated",
             "value": "显示详情"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示詳細資訊"
+          }
         }
       }
     },
@@ -4714,6 +5124,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "当前已启用 VPN 或代理，部分应用可能因此拒绝运行。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前已啟用 VPN 或代理伺服器，部分 App 可能因此拒絕執行。"
           }
         }
       }
@@ -4768,6 +5184,12 @@
             "state": "translated",
             "value": "原 Scheme"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "來源 Scheme"
+          }
         }
       }
     },
@@ -4820,6 +5242,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "启动失败"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "啟動失敗"
           }
         }
       }
@@ -4874,6 +5302,12 @@
             "state": "translated",
             "value": "状态"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "狀態"
+          }
         }
       }
     },
@@ -4926,6 +5360,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "目标 Scheme"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目標 Scheme"
           }
         }
       }
@@ -5064,6 +5504,12 @@
             "state": "translated",
             "value": "将永久删除所选的 %ld 个项目。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將永久刪除所選的 %ld 個項目。"
+          }
         }
       }
     },
@@ -5116,6 +5562,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "找不到随应用提供的清理规则。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找不到 App 內建的清理規則。"
           }
         }
       }
@@ -5170,6 +5622,12 @@
             "state": "translated",
             "value": "随应用提供的清理规则未通过校验。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App 內建的清理規則未通過驗證。"
+          }
         }
       }
     },
@@ -5222,6 +5680,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "清理规则的字典格式无效。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清理規則的字典格式無效。"
           }
         }
       }
@@ -5276,6 +5740,12 @@
             "state": "translated",
             "value": "清理规则文件无效。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清理規則檔案無效。"
+          }
         }
       }
     },
@@ -5328,6 +5798,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法删除此文件。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法移除此檔案。"
           }
         }
       }
@@ -5382,6 +5858,12 @@
             "state": "translated",
             "value": "无法读取此文件夹。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法讀取此資料夾。"
+          }
         }
       }
     },
@@ -5434,6 +5916,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已保存的配置字典格式无效。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已儲存的設定字典格式無效。"
           }
         }
       }
@@ -5488,6 +5976,12 @@
             "state": "translated",
             "value": "所选应用已不可用。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所選 App 已無法使用。"
+          }
         }
       }
     },
@@ -5540,6 +6034,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "原 Scheme 和目标 Scheme 不能相同。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "來源與目標 Scheme 不能相同。"
           }
         }
       }
@@ -5594,6 +6094,12 @@
             "state": "translated",
             "value": "Bootstrap 已为此应用启用插件注入。请先在 Bootstrap 的 AppList 中将其关闭。"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bootstrap 已為此 App 啟用 Tweak 注入。請先在 Bootstrap 的 AppList 中將其關閉。"
+          }
         }
       }
     },
@@ -5646,6 +6152,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "这将永久删除此应用的数据，且无法撤销。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這會永久移除此 App 的資料，且無法復原。"
           }
         }
       }
@@ -5700,6 +6212,12 @@
             "state": "translated",
             "value": "重试"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重試"
+          }
         }
       }
     },
@@ -5753,6 +6271,12 @@
             "state": "translated",
             "value": "URL Scheme 替换"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme 替換"
+          }
         }
       }
     },
@@ -5802,6 +6326,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "URL Scheme"
@@ -5859,6 +6389,12 @@
             "state": "translated",
             "value": "无法扫描"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法掃描"
+          }
         }
       }
     },
@@ -5911,6 +6447,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "未知 Bindfs 挂载"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未知的 Bindfs 掛載"
           }
         }
       }
@@ -5965,6 +6507,12 @@
             "state": "translated",
             "value": "无法识别 Preboot 系统"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法辨識 Preboot 系統"
+          }
         }
       }
     },
@@ -6017,6 +6565,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "当前服务配置不支持修改端口。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前服務設定不支援修改埠。"
           }
         }
       }
@@ -6071,6 +6625,12 @@
             "state": "translated",
             "value": "VPN 或代理"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VPN 或代理伺服器"
+          }
         }
       }
     },
@@ -6120,6 +6680,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本 %@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "版本 %@"
@@ -6177,58 +6743,11 @@
             "state": "translated",
             "value": "警告"
           }
-        }
-      }
-    },
-    "Whitelist Mode": {
-      "extractionState": "manual",
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "وضع القائمة البيضاء"
-          }
         },
-        "de": {
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Whitelist-Modus"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Whitelist Mode"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mode liste blanche"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Modalità lista bianca"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ホワイトリストモード"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chế độ danh sách trắng"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "白名单模式"
+            "value": "警告"
           }
         }
       }
@@ -6283,6 +6802,12 @@
             "state": "translated",
             "value": "搜索名称或标识符…"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜尋名稱或識別碼…"
+          }
         }
       }
     },
@@ -6332,6 +6857,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "var 清理"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "var 清理"
@@ -6388,6 +6919,12 @@
             "state": "translated",
             "value": "更新"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新整理"
+          }
         }
       }
     },
@@ -6439,6 +6976,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "有効にする"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "啟用"
           }
         }
       }
@@ -6492,6 +7035,12 @@
             "state": "translated",
             "value": "無効にする"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停用"
+          }
         }
       }
     },
@@ -6543,6 +7092,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "無効"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已停用"
           }
         }
       }
@@ -6596,6 +7151,12 @@
             "state": "translated",
             "value": "選択"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選取"
+          }
         }
       }
     },
@@ -6647,6 +7208,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "選択解除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消選取"
           }
         }
       }

@@ -19,7 +19,6 @@ typedef mach_port_t io_registry_entry_t;
 #include <sys/mount.h>
 #include <sys/socket.h>
 #include <sys/sysctl.h>
-#include <sys/wait.h>
 #include <unistd.h>
 #include <zlib.h>
 
@@ -32,6 +31,7 @@ BOOL isUUIDPathOf(NSString *path, NSString *parent);
 void killAllForBundle(const char *bundlePath);
 NSString *clearAppData(AppInfo *app);
 NSString *RootUserClearAppData(AppInfo *app);
+BOOL RootUserRemountPreboot(void);
 
 static BOOL RHFail(NSError **error, NSString *message) {
     if (error) {
@@ -319,13 +319,8 @@ static BOOL RHPortIsOpen(uint16_t port) {
                                          @"/private/preboot/, otherwise it will cause bootloop",
                                          nil)]
             }];
-            pid_t pid = 0;
-            char *arguments[] = {"/sbin/mount", "-u", "-w", "/private/preboot", NULL};
-            posix_spawn(&pid, arguments[0], NULL, NULL, arguments, NULL);
-            if (pid > 0) {
-                int status = 0;
-                waitpid(pid, &status, 0);
-            }
+            // Remounting preboot is privileged; the app itself runs as mobile.
+            RootUserRemountPreboot();
         }
     } else {
         [warnings addObject:@{

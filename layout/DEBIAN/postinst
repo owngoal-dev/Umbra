@@ -5,5 +5,13 @@ case "$(dpkg --print-architecture)" in
 	appletvos-*) uicache -a ;;
 	*) uicache -p /Applications/Umbra.app ;;
 esac
+
+# The app runs as mobile and performs privileged work through its own helper.
+# Stop the running copy and clear the setuid bit left behind by older builds.
+killall -9 Umbra 2>/dev/null || true
 chown 0:0 /Applications/Umbra.app/Umbra
-chmod +s /Applications/Umbra.app/Umbra
+chmod 0755 /Applications/Umbra.app/Umbra
+
+# Files written while the app ran as root stay root-owned; hand them back to mobile.
+chmod -R 0755 /var/mobile/Library/RootHide 2>/dev/null || true
+chown -R 501:501 /var/mobile/Library/RootHide 2>/dev/null || true

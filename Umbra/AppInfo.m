@@ -23,34 +23,10 @@
 @implementation AppInfo {
     PrivateApi_LSApplicationProxy *_applicationProxy;
     UIImage *_icon;
-    NSString *_name;
 }
 
 - (NSString *)name {
-    if (_name) {
-        return _name;
-    }
-    NSString *languageCode = [[NSLocale preferredLanguages] firstObject];
-    NSRange range = [languageCode rangeOfString:@"-" options:NSBackwardsSearch];
-    if (range.location != NSNotFound) {
-        languageCode = [languageCode substringToIndex:range.location];
-    }
-
-    NSString *infoPlistPath = [_applicationProxy.bundleURL.path
-        stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.lproj/InfoPlist.strings",
-                                                                  languageCode]];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ([fileManager fileExistsAtPath:infoPlistPath]) {
-        NSDictionary *plistDict = [[NSDictionary alloc] initWithContentsOfFile:infoPlistPath];
-        NSString *displayName = [plistDict objectForKey:@"CFBundleDisplayName"];
-        if (displayName) {
-            _name = displayName;
-            return _name;
-        }
-    }
-
-    _name = _applicationProxy.localizedName ?: _applicationProxy.localizedShortName;
-    return _name;
+    return _applicationProxy.localizedName ?: _applicationProxy.localizedShortName;
 }
 
 - (NSString *)bundleIdentifier {

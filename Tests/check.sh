@@ -6,6 +6,10 @@ trap 'rm -rf "$check_dir"' EXIT
 xcrun clang -fobjc-arc -DROOTHIDE_USE_STUB -I Umbra -framework Foundation \
     Umbra/RHCleaner.m Tests/CleanerRulesCheck.m -o "$check_dir/cleaner-rules"
 "$check_dir/cleaner-rules"
+if grep -qE 'chmod[[:space:]]+([ug]?[+]s|4[0-7][0-7][0-7])' layout/DEBIAN/postinst; then
+    echo "postinst must not install the app as setuid root" >&2
+    exit 1
+fi
 python3 - <<'PY'
 from pathlib import Path
 import re

@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-LANGUAGES = {"en", "de", "ar", "fr", "zh-Hans", "it", "vi", "ja"}
+LANGUAGES = {"en", "de", "ar", "fr", "zh-Hans", "zh-Hant", "it", "vi", "ja"}
 STRING = r'@?"(?:\\.|[^"\\])*"'
 CALL = re.compile(rf'\b(?:L|localized|Localized|NSLocalizedString)\s*\(\s*((?:{STRING}|[^",)])+)')
 FORMAT = re.compile(r"%(?:\d+\$)?[-+#0 ']*(?:\d+|\*)?(?:\.(?:\d+|\*))?(?:hh|ll|[hlLztj])?[@diuoxXfFeEgGaAcCsSp]")
@@ -52,7 +52,7 @@ catalog = json.loads(
 assert catalog["sourceLanguage"] == "en"
 assert catalog["version"] == "1.0"
 strings = catalog["strings"]
-assert {"General", "Whitelist Mode", "Automatically blacklist newly installed apps."} <= strings.keys()
+assert {"Blacklist", "Settings", "Advanced"} <= strings.keys()
 
 for key, entry in strings.items():
     assert set(entry["localizations"]) == LANGUAGES, f"Missing or unexpected language: {key!r}"

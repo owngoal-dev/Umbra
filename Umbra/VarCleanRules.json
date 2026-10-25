@@ -37,6 +37,8 @@
             "staged_system_apps",
             "internal",
             "iomfb_bics_daemon",
+            "boot",
+            "OOPJit",
 		],
 		"blacklist":[
 			"jb",
@@ -136,7 +138,8 @@
 			"Preferences",
 			"USBRestricted",
 			"com.apple.wifianalyticsd",
-            "Catacomb" //FaceID
+            "Catacomb", //FaceID
+            "AKSAnalytics",
 		],
 	},
 	"/var/root/Library/Application Support" : {
@@ -186,7 +189,10 @@
 
 	"/var/mobile" : {
 		"whitelist":[
+            ".ssh",
+            ".forward",
             ".fseventsd",
+            ".bootstrapped",
             ".DocumentRevisions-V100",
 			"Applications",
 			"Containers",
@@ -196,6 +202,7 @@
 			"Media",
 			"MobileSoftwareUpdate",
             "tmp",
+            "dirs_cleaner",
 		],
         "blacklist":[
             "log.txt",
@@ -205,6 +212,15 @@
             "zp.unject.plist",
         ]
 	},
+    "/var/mobile/.ssh" : {
+        "whitelist":[
+        ],
+        "blacklist":[
+            "known_hosts",
+            "known_hosts.old",
+            "authorized_keys",
+        ],
+    },
     "/var/mobile/Media" : {
         "default" : "whitelist",
         "whitelist":[
@@ -439,6 +455,24 @@
             "Phone",
             "Seymour",
             "UnifiedAssetFramework",
+            "MediaML",
+            "TextUnderstanding",
+            "AppleIntelligencePlatform",
+            "ContactlessReader",
+            "ExtensibleSSO",
+            "FinanceBackup",
+            "homeenergyd",
+            "LockdownMode",
+            "ManagedAssets",
+            "ManagedAssets2",
+            "MediaAnalysis",
+            "Metadata",
+            "NetworkDiagnosticsFramework",
+            "PhotosFace",
+            "PrivateCloudCompute",
+            "Stickers",
+            "SOS",
+            ".localized",
 		],
 		"blacklist":[
 			"Sileo",
@@ -494,6 +528,9 @@
             "ptpcamerad.plist",
             "com.google.gmp.measurement.monitor.plist",
             "com.google.gmp.measurement.plist",
+            "ReportSystemMemory.plist",
+            "TokenBucketRateLimiter.plist",
+            "PerfPowerServices.plist",
         ],
         "blacklist":[
             "wiki.qaq.umbra.plist",
@@ -525,6 +562,8 @@
             "networkserviceproxy",
             "Multitouch",
             "AskPermission",
+            "livefsd",
+            "locationaccessstored",
             
 		],
 		"blacklist":[
@@ -584,6 +623,10 @@
 			"sharedCaches",
             "Backup",
             "ssu",
+            "JetPackCache",
+            "tvapp_bag",
+            "askpermissiond",
+            "EnergyKit",
 		],
 		"blacklist":[
 			"ImageTables", //Filza
@@ -641,6 +684,8 @@
         "default" : "blacklist",
 		"whitelist":[
 			{"match":"regexp", "name":"^com\\.apple\\."},
+            "askpermissiond",
+            "AKSAnalytics",
 		],
 		"blacklist":[
 			"com.opa334.Dopamine",
@@ -680,6 +725,7 @@
             "SoftwareUpdateCore",
             "CalNotificationsAvailable",
             "biokit_hw_issue_notification",
+            "servicesintelligenced.log",
         ],
         "blacklist":[
         ]
@@ -688,10 +734,18 @@
     "/var/db/com.apple.xpc.roleaccountd.staging" : {
         "default" : "whitelist",
         "whitelist":[
+            "tmp",
+            "exec",
         ],
         "blacklist":[
             {"match":"regexp", "name":"^exec-"},
-            "exec",
+        ]
+    },
+    "/var/db/com.apple.xpc.roleaccountd.staging/exec" : {
+        "whitelist":[
+            {"match":"regexp", "name":"\\d+\\.\\d+\\.xpc"},
+        ],
+        "blacklist":[
         ]
     },
 }

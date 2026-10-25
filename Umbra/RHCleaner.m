@@ -102,7 +102,41 @@ NSArray<NSDictionary *> *GetDirectoryContents(NSString *path) {
     return result;
 }
 
-static NSDictionary *ReadRules(NSString *path, NSError **error) {
+static BOOL ValidateRuleEntry(NSDictionary *rule) {
+    if (![rule isKindOfClass:NSDictionary.class])
+        return NO;
+    NSString *defaultMode = rule[@"default"];
+    if (defaultMode && ![defaultMode isKindOfClass:NSString.class])
+        return NO;
+    if (defaultMode && ![defaultMode isEqual:@"whitelist"] && ![defaultMode isEqual:@"blacklist"])
+        return NO;
+    for (NSString *key in @[ @"whitelist", @"blacklist" ]) {
+        NSArray *list = rule[key];
+        if (!list)
+            continue;
+        if (![list isKindOfClass:NSArray.class])
+            return NO;
+        for (id entry in list) {
+            if ([entry isKindOfClass:NSString.class])
+                continue;
+            if (![entry isKindOfClass:NSDictionary.class])
+                return NO;
+            NSString *name = entry[@"name"];
+            NSString *match = entry[@"match"];
+            if (![name isKindOfClass:NSString.class] || ![match isKindOfClass:NSString.class])
+                return NO;
+            if ([match isEqual:@"include"])
+                continue;
+            if (![match isEqual:@"regexp"])
+                return NO;
+            if (![NSRegularExpression regularExpressionWithPattern:name options:0 error:nil])
+                return NO;
+        }
+    }
+    return YES;
+}
+
+static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **error) {
     NSData *data = [NSData dataWithContentsOfFile:path options:0 error:error];
     if (!data)
         return nil;
@@ -118,6 +152,7 @@ static NSDictionary *ReadRules(NSString *path, NSError **error) {
             NSDictionary *rule = rules[directory];
             if (![directory isKindOfClass:NSString.class] || !directory.isAbsolutePath ||
                 ![rule isKindOfClass:NSDictionary.class] ||
+                (validateEntries && !ValidateRuleEntry(rule)) ||
                 (rule[@"whitelist"] && ![rule[@"whitelist"] isKindOfClass:NSArray.class]) ||
                 (rule[@"blacklist"] && ![rule[@"blacklist"] isKindOfClass:NSArray.class])) {
                 valid = NO;
@@ -145,13 +180,17 @@ static NSDictionary *ReadRules(NSString *path, NSError **error) {
 + (NSArray<RHCleanGroup *> *)scanKeepingSelection:(NSDictionary<NSString *, NSNumber *> *)selection
                                             error:(NSError **)error {
     NSDictionary *rules =
-        ReadRules(jbroot(@"/var/mobile/Library/RootHide/varCleanRules.plist"), error);
+        ReadRules(jbroot(@"/var/mobile/Library/RootHide/varCleanRules.plist"), NO, error);
     if (!rules)
         return nil;
-    NSDictionary *customRules =
-        ReadRules(jbroot(@"/var/mobile/Library/RootHide/varCleanRules-custom.plist"), error);
-    if (!customRules)
-        return nil;
+    NSString *customPath = jbroot(@"/var/mobile/Library/RootHide/varCleanRules-custom.plist");
+    NSError *customError = nil;
+    NSDictionary *customRules = ReadRules(customPath, YES, &customError);
+    if (!customRules) {
+        // A hand-edited custom file must not make the whole cleaner unusable.
+        NSLog(@"Ignoring invalid custom cleaning rules: %@", customError);
+        customRules = @{};
+    }
 
     NSMutableSet<NSString *> *paths = [NSMutableSet setWithArray:rules.allKeys];
     [paths addObjectsFromArray:customRules.allKeys];

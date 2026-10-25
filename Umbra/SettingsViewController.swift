@@ -4,7 +4,8 @@ final class SettingsViewController: UITableViewController {
     private let check: EnvironmentCheck
     private var services: [ManagedService] = []
     private var showsURLSchemeReplacements = false
-    private var rulesSection: Int { services.isEmpty ? 1 : 2 }
+    private var servicesSection: Int { 0 }
+    private var rulesSection: Int { services.isEmpty ? 0 : 1 }
 
     init(check: EnvironmentCheck) {
         self.check = check
@@ -55,39 +56,18 @@ final class SettingsViewController: UITableViewController {
     override func numberOfSections(in tableView: UITableView) -> Int { rulesSection + 1 }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 { return 1 }
-        return section == rulesSection ? (showsURLSchemeReplacements ? 2 : 1) : services.count
+        section == rulesSection ? (showsURLSchemeReplacements ? 2 : 1) : services.count
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int)
         -> String?
     {
-        if section == 0 { return localized("General") }
-        return localized(section == rulesSection ? "Advanced" : "Services")
+        localized(section == rulesSection ? "Advanced" : "Services")
     }
 
     override func tableView(
         _ tableView: UITableView, cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
-        if indexPath.section == 0 {
-            let cell = detailCell(in: tableView, reuseIdentifier: "General")
-            var content = cell.defaultContentConfiguration()
-            content.text = localized("Whitelist Mode")
-            content.secondaryText = localized("Automatically blacklist newly installed apps.")
-            content.textProperties.numberOfLines = 0
-            content.secondaryTextProperties.numberOfLines = 0
-            content.secondaryTextProperties.color = .secondaryLabel
-            content.textToSecondaryTextVerticalPadding = 6
-            content.directionalLayoutMargins = NSDirectionalEdgeInsets(
-                top: 16, leading: 20, bottom: 16, trailing: 20)
-            cell.contentConfiguration = content
-            let toggle = AppSwitch()
-            toggle.isEnabled = false
-            toggle.accessibilityLabel = localized("Whitelist Mode")
-            cell.accessoryView = toggle
-            cell.selectionStyle = .none
-            return cell
-        }
         let isRule = indexPath.section == rulesSection
         let isReplacement = isRule && showsURLSchemeReplacements && indexPath.row == 0
         let cell = detailCell(in: tableView, reuseIdentifier: isRule ? "Rules" : "Service")
@@ -178,7 +158,7 @@ final class SettingsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         #if os(tvOS)
-            if indexPath.section == 1, !services.isEmpty {
+            if indexPath.section == servicesSection, !services.isEmpty {
                 self.tableView(tableView, accessoryButtonTappedForRowWith: indexPath)
                 return
             }
@@ -196,7 +176,7 @@ final class SettingsViewController: UITableViewController {
     override func tableView(
         _ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath
     ) {
-        guard indexPath.section == 1, !services.isEmpty else { return }
+        guard indexPath.section == servicesSection, !services.isEmpty else { return }
         presentServicePorts(services[indexPath.row], from: self) { [weak self] in
             self?.check.refresh()
             self?.refreshServices()
