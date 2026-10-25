@@ -1,7 +1,7 @@
 import UIKit
 
-@objc(AppDelegate)
-final class AppDelegate: UIResponder, UIApplicationDelegate {
+@objc(UMBAppDelegate)
+final class UMBAppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     private var cleanupTimer: Timer?
     private var environmentCheck: EnvironmentCheck?
@@ -20,7 +20,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func prepareApplication() {
         do {
-            try RHBackend.prepare()
+            try UMBBackend.prepare()
             let check = EnvironmentCheck()
             environmentCheck = check
             let applications = ApplicationsViewController(check: check)
@@ -54,7 +54,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         cleanupTimer?.invalidate()
         var count = 0
         cleanupTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-            RHBackend.cleanOwnApplicationFiles()
+            UMBBackend.cleanOwnApplicationFiles()
             count += 1
             if count > 40 { timer.invalidate() }
         }

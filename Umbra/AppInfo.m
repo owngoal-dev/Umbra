@@ -20,7 +20,7 @@
 @property (nonatomic, readonly) NSURL *containerURL;
 @end
 
-@implementation AppInfo {
+@implementation UMBInstalledAppInfo {
     PrivateApi_LSApplicationProxy *_applicationProxy;
     UIImage *_icon;
 }

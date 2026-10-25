@@ -29,8 +29,8 @@ typedef mach_port_t io_registry_entry_t;
 
 BOOL isUUIDPathOf(NSString *path, NSString *parent);
 void killAllForBundle(const char *bundlePath);
-NSString *clearAppData(AppInfo *app);
-NSString *RootUserClearAppData(AppInfo *app);
+NSString *clearAppData(UMBInstalledAppInfo *app);
+NSString *RootUserClearAppData(UMBInstalledAppInfo *app);
 BOOL RootUserRemountPreboot(void);
 
 static BOOL RHFail(NSError **error, NSString *message) {
@@ -64,7 +64,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
     return connected;
 }
 
-@implementation RHBackend
+@implementation UMBBackend
 
 + (BOOL)prepareWithError:(NSError **)error {
     NSFileManager *manager = NSFileManager.defaultManager;
@@ -144,10 +144,10 @@ static BOOL RHPortIsOpen(uint16_t port) {
     }
 }
 
-+ (NSArray<AppInfo *> *)installedApps {
-    NSMutableArray<AppInfo *> *applications = [NSMutableArray new];
++ (NSArray<UMBInstalledAppInfo *> *)installedApps {
+    NSMutableArray<UMBInstalledAppInfo *> *applications = [NSMutableArray new];
     for (id proxy in LSApplicationWorkspace.defaultWorkspace.allInstalledApplications) {
-        AppInfo *app = [AppInfo appWithPrivateProxy:proxy];
+        UMBInstalledAppInfo *app = [UMBInstalledAppInfo appWithPrivateProxy:proxy];
         if (!app.isHiddenApp && ![app.bundleIdentifier hasPrefix:@"com.apple."] &&
             isUUIDPathOf(app.bundleURL.path, @"/private/var/containers/Bundle/Application/")) {
             [applications addObject:app];
@@ -165,7 +165,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
     if (!identifier.length) {
         return nil;
     }
-    NSURL *bundleURL = [AppInfo appWithBundleIdentifier:identifier].bundleURL;
+    NSURL *bundleURL = [UMBInstalledAppInfo appWithBundleIdentifier:identifier].bundleURL;
     if (!bundleURL) {
         return nil;
     }
@@ -193,7 +193,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
     return NSLocalizedString(@"Blacklist is not supported in current environment.", nil);
 }
 
-+ (NSString *)blacklistRejectionForApp:(AppInfo *)app {
++ (NSString *)blacklistRejectionForApp:(UMBInstalledAppInfo *)app {
     NSFileManager *manager = NSFileManager.defaultManager;
     if ([manager fileExistsAtPath:jbroot(@"/.thebootstrapped")] &&
         ([manager
@@ -220,7 +220,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
            (subtype & ~CPU_SUBTYPE_MASK) == CPU_SUBTYPE_ARM64E;
 }
 
-+ (BOOL)setBlacklisted:(BOOL)blacklisted forApp:(AppInfo *)app error:(NSError **)error {
++ (BOOL)setBlacklisted:(BOOL)blacklisted forApp:(UMBInstalledAppInfo *)app error:(NSError **)error {
     if (!app.bundleIdentifier.length || !app.bundleURL.path.length) {
         return RHFail(error, NSLocalizedString(@"The selected app is no longer available.", nil));
     }
@@ -244,7 +244,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
     return YES;
 }
 
-+ (NSString *)clearDataForApp:(AppInfo *)app {
++ (NSString *)clearDataForApp:(UMBInstalledAppInfo *)app {
     if (!app.bundleIdentifier.length || !app.bundleURL.path.length) {
         return NSLocalizedString(@"The selected app is no longer available.", nil);
     }
@@ -348,7 +348,7 @@ static BOOL RHPortIsOpen(uint16_t port) {
             @"message" : [unknownMounts componentsJoinedByString:@"\n"]
         }];
     }
-    NSArray *installedServices = RHServicePorts.installedServices;
+    NSArray *installedServices = UMBServicePorts.installedServices;
     NSArray *serviceIDs = @[ @"openssh", @"dropbear", @"frida" ];
     NSArray *titles = @[
         NSLocalizedString(@"SSH Server", nil), NSLocalizedString(@"Dropbear", nil),

@@ -245,7 +245,7 @@ void killAllForBundle(const char *bundlePath) {
     free(info);
 }
 
-NSString *RootUserClearAppData(AppInfo *app) {
+NSString *RootUserClearAppData(UMBInstalledAppInfo *app) {
     NSString *error = nil;
     NSString *result = nil;
     int ret = spawnRoot(NSBundle.mainBundle.executablePath,
@@ -305,7 +305,7 @@ int main(int argc, char *argv[]) {
         @autoreleasepool {
             NSError *error = nil;
             if (argc == 3 && strcmp(argv[1], "servicePorts") == 0) {
-                NSArray *ports = [RHServicePorts portsForService:@(argv[2]) error:&error];
+                NSArray *ports = [UMBServicePorts portsForService:@(argv[2]) error:&error];
                 if (ports) {
                     NSData *data = [NSJSONSerialization dataWithJSONObject:ports
                                                                    options:0
@@ -321,7 +321,7 @@ int main(int argc, char *argv[]) {
                     return 1;
                 }
                 NSArray *ports = [@(argv[3]) componentsSeparatedByString:@","];
-                if ([RHServicePorts setPorts:ports forService:@(argv[2]) error:&error]) {
+                if ([UMBServicePorts setPorts:ports forService:@(argv[2]) error:&error]) {
                     return 0;
                 }
             }
@@ -363,8 +363,8 @@ int main(int argc, char *argv[]) {
             if (RHRequireRoot(argv[1]) != 0) {
                 return 1;
             }
-            AppInfo *app = [AppInfo appWithBundleIdentifier:@(argv[2])];
-            NSString *clearAppData(AppInfo * app);
+            UMBInstalledAppInfo *app = [UMBInstalledAppInfo appWithBundleIdentifier:@(argv[2])];
+            NSString *clearAppData(UMBInstalledAppInfo * app);
             NSString *error = clearAppData(app);
             if (error) {
                 fprintf(stderr, "%s", error.UTF8String);
@@ -393,7 +393,7 @@ int main(int argc, char *argv[]) {
 
     NSString *appDelegateClassName;
     @autoreleasepool {
-        appDelegateClassName = @"AppDelegate";
+        appDelegateClassName = @"UMBAppDelegate";
     }
     return UIApplicationMain(argc, argv, nil, appDelegateClassName);
 }

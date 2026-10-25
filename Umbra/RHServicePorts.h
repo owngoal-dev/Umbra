@@ -2,7 +2,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RHServicePorts : NSObject
+@interface UMBServicePorts : NSObject
 + (NSArray<NSString *> *)installedServices;
 + (NSNumber *)opensshBackupPort;
 + (nullable NSArray<NSNumber *> *)portsForService:(NSString *)service

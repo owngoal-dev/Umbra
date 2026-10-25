@@ -1,9 +1,9 @@
 #import "RHCleaner.h"
 #include <assert.h>
 
-extern NSArray<RHCleanItem *> *RHCleanerItemsForDirectory(NSString *, NSArray<NSDictionary *> *,
-                                                          NSDictionary *, NSDictionary *,
-                                                          NSDictionary<NSString *, NSNumber *> *);
+extern NSArray<UMBCleanItem *> *RHCleanerItemsForDirectory(NSString *, NSArray<NSDictionary *> *,
+                                                           NSDictionary *, NSDictionary *,
+                                                           NSDictionary<NSString *, NSNumber *> *);
 
 BOOL RootUserGetDirectoryContents(NSString *path, NSString *cacheFile) {
     abort();
@@ -13,7 +13,7 @@ BOOL RootUserRemoveItemAtPath(NSString *path) {
     abort();
 }
 
-static RHCleanItem *Item(NSDictionary *rule, NSDictionary *custom, NSNumber *previous) {
+static UMBCleanItem *Item(NSDictionary *rule, NSDictionary *custom, NSNumber *previous) {
     return RHCleanerItemsForDirectory(@"/test", @[ @{
                                           @"name" : @"sample",
                                           @"isDirectory" : @NO
@@ -64,7 +64,7 @@ int main(void) {
         assert(!Item(black, white, @YES).checked);
         assert(Item(black, nil, nil).checked);
 
-        NSArray<RHCleanItem *> *items = RHCleanerItemsForDirectory(@"/test", @[
+        NSArray<UMBCleanItem *> *items = RHCleanerItemsForDirectory(@"/test", @[
             @{@"name" : @"a-file",
               @"isDirectory" : @NO},
             @{@"name" : @"z-folder",
@@ -76,7 +76,7 @@ int main(void) {
             @{@"name" : @"outside/file",
               @"isDirectory" : @NO}
         ],
-                                                                   @{}, nil, @{});
+                                                                    @{}, nil, @{});
         assert(items.count == 3);
         assert([items[0].name isEqualToString:@"b-folder"]);
         assert([items[1].name isEqualToString:@"z-folder"]);

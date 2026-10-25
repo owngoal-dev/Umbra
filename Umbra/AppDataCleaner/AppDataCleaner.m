@@ -4,7 +4,7 @@
 
 BOOL isUUIDPathOf(NSString *path, NSString *parent);
 
-NSString *clearAppData(AppInfo *app) {
+NSString *clearAppData(UMBInstalledAppInfo *app) {
     NSError *error = nil;
 
     if (app.containerURL &&

@@ -57,7 +57,7 @@ final class EnvironmentCheck {
     private(set) var isChecking = false
     private(set) var findings: [[String: String]] = []
 
-    init() { findings = RHBackend.startupWarnings() }
+    init() { findings = UMBBackend.startupWarnings() }
 
     var summary: String {
         let titles = findings.compactMap { $0["title"] }
@@ -103,7 +103,7 @@ final class EnvironmentCheck {
         isChecking = true
         NotificationCenter.default.post(name: Self.didChange, object: self)
         DispatchQueue.global(qos: .utility).async {
-            let findings = RHBackend.startupWarnings()
+            let findings = UMBBackend.startupWarnings()
             DispatchQueue.main.async {
                 self.findings = findings
                 self.isChecking = false

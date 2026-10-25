@@ -3,23 +3,23 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RHBackend : NSObject
+@interface UMBBackend : NSObject
 
 + (BOOL)prepareWithError:(NSError **)error NS_SWIFT_NAME(prepare());
 + (nullable id)configurationForKey:(NSString *)key NS_SWIFT_NAME(configuration(forKey:));
 + (BOOL)setConfiguration:(id)value
                   forKey:(NSString *)key
                    error:(NSError **)error NS_SWIFT_NAME(setConfiguration(_:forKey:));
-+ (NSArray<AppInfo *> *)installedApps NS_SWIFT_NAME(installedApps());
++ (NSArray<UMBInstalledAppInfo *> *)installedApps NS_SWIFT_NAME(installedApps());
 + (nullable NSString *)relaxinMarketingVersion NS_SWIFT_NAME(relaxinMarketingVersion());
 + (nullable NSString *)blacklistUnavailableReason NS_SWIFT_NAME(blacklistUnavailableReason());
-+ (nullable NSString *)blacklistRejectionForApp:(AppInfo *)app
++ (nullable NSString *)blacklistRejectionForApp:(UMBInstalledAppInfo *)app
     NS_SWIFT_NAME(blacklistRejection(for:));
 + (BOOL)requiresCompatibilityWarning NS_SWIFT_NAME(requiresCompatibilityWarning());
 + (BOOL)setBlacklisted:(BOOL)blacklisted
-                forApp:(AppInfo *)app
+                forApp:(UMBInstalledAppInfo *)app
                  error:(NSError **)error NS_SWIFT_NAME(setBlacklisted(_:for:));
-+ (nullable NSString *)clearDataForApp:(AppInfo *)app NS_SWIFT_NAME(clearData(for:));
++ (nullable NSString *)clearDataForApp:(UMBInstalledAppInfo *)app NS_SWIFT_NAME(clearData(for:));
 + (NSArray<NSDictionary<NSString *, NSString *> *> *)
     startupWarnings NS_SWIFT_NAME(startupWarnings());
 + (NSString *)customRulesPath NS_SWIFT_NAME(customRulesPath());

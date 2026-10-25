@@ -168,7 +168,7 @@ final class SettingsViewController: UITableViewController {
                 navigationController?.pushViewController(
                     URLSchemeRulesViewController(), animated: true)
             } else {
-                openInFileManager(path: RHBackend.customRulesPath(), from: self)
+                openInFileManager(path: UMBBackend.customRulesPath(), from: self)
             }
         }
     }

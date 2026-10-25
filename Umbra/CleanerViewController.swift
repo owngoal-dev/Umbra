@@ -116,8 +116,8 @@ private final class CleanerCheckbox: UIView {
 
 final class CleanerViewController: UITableViewController {
     private let worker = DispatchQueue(label: "wiki.qaq.umbra.cleanup", qos: .userInitiated)
-    private var groups: [RHCleanGroup] = []
-    private var files: [CleanFileID: RHCleanItem] = [:]
+    private var groups: [UMBCleanGroup] = []
+    private var files: [CleanFileID: UMBCleanItem] = [:]
     private var failures: [String: String] = [:]
     private var dataSource: CleanerDataSource!
     private var operation: String?
@@ -174,8 +174,8 @@ final class CleanerViewController: UITableViewController {
         apply([], animated: false) { self.refresh(keepingSelection: false) }
     }
 
-    private var items: [RHCleanItem] { groups.flatMap(\.items) }
-    private var selectedItems: [RHCleanItem] { items.filter(\.checked) }
+    private var items: [UMBCleanItem] { groups.flatMap(\.items) }
+    private var selectedItems: [UMBCleanItem] { items.filter(\.checked) }
     private var allEligibleSelected: Bool { !items.contains { !$0.ignored && !$0.checked } }
 
     @objc private func manualRefresh() { refresh(keepingSelection: false) }
@@ -198,7 +198,7 @@ final class CleanerViewController: UITableViewController {
         operation = localized("Scanning…")
         updateInterface()
         worker.async { [weak self] in
-            let result = Result { try RHCleaner.scan(selection: selection) }
+            let result = Result { try UMBCleaner.scan(selection: selection) }
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.operation = nil
@@ -232,7 +232,7 @@ final class CleanerViewController: UITableViewController {
     }
 
     private func apply(
-        _ newGroups: [RHCleanGroup], animated: Bool, completion: @escaping () -> Void
+        _ newGroups: [UMBCleanGroup], animated: Bool, completion: @escaping () -> Void
     ) {
         let previous = Set(dataSource.snapshot().itemIdentifiers)
         groups = newGroups.filter { !$0.items.isEmpty || $0.errorMessage != nil }
@@ -318,7 +318,7 @@ final class CleanerViewController: UITableViewController {
         operation = localized("Removing…")
         updateInterface()
         worker.async { [weak self] in
-            let failures = RHCleaner.remove(paths: paths)
+            let failures = UMBCleaner.remove(paths: paths)
             let removed = Set(paths).subtracting(failures.keys)
             DispatchQueue.main.async {
                 guard let self else { return }
@@ -399,7 +399,7 @@ final class CleanerViewController: UITableViewController {
         cell.contentConfiguration = content
     }
 
-    private func configure(_ cell: UITableViewCell, item: RHCleanItem, animated: Bool) {
+    private func configure(_ cell: UITableViewCell, item: UMBCleanItem, animated: Bool) {
         cell.selectionStyle = .none
         var content = cell.defaultContentConfiguration()
         content.text = item.name
@@ -459,7 +459,7 @@ final class CleanerViewController: UITableViewController {
     }
 
     #if os(tvOS)
-        private func presentActions(for item: RHCleanItem, at indexPath: IndexPath) {
+        private func presentActions(for item: UMBCleanItem, at indexPath: IndexPath) {
             let alert = UIAlertController(
                 title: item.name, message: item.path, preferredStyle: .alert)
             alert.addAction(

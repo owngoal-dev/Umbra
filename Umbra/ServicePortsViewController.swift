@@ -28,11 +28,11 @@ enum ManagedService: String, CaseIterable {
     }
 
     static var installed: [ManagedService] {
-        RHServicePorts.installedServices().compactMap(ManagedService.init(rawValue:))
+        UMBServicePorts.installedServices().compactMap(ManagedService.init(rawValue:))
     }
 
     var portSummary: String {
-        guard let ports = try? RHServicePorts.ports(for: rawValue) else {
+        guard let ports = try? UMBServicePorts.ports(for: rawValue) else {
             return localized("Port settings unavailable")
         }
         let separator =
@@ -69,7 +69,7 @@ final class ServicePortsViewController: UITableViewController {
         super.init(style: AppPlatform.tableStyle)
         title = service.title
         do {
-            originalPorts = try RHServicePorts.ports(for: service.rawValue).map(\.intValue)
+            originalPorts = try UMBServicePorts.ports(for: service.rawValue).map(\.intValue)
         } catch {
             loadError = error.localizedDescription
         }
@@ -91,7 +91,7 @@ final class ServicePortsViewController: UITableViewController {
             navigationItem.rightBarButtonItem = saveButton
             var ports = originalPorts
             if service == .openssh && ports.count == 1 {
-                ports.append(RHServicePorts.opensshBackupPort().intValue)
+                ports.append(UMBServicePorts.opensshBackupPort().intValue)
             }
             fields = ports.enumerated().map { index, port in
                 let field = UITextField()
@@ -237,7 +237,7 @@ final class ServicePortsViewController: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: spinner)
         DispatchQueue.global(qos: .userInitiated).async {
             let result = Result {
-                try RHServicePorts.setPorts(
+                try UMBServicePorts.setPorts(
                     ports.map { NSNumber(value: $0) }, for: self.service.rawValue)
             }
             DispatchQueue.main.async {

@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@interface AppInfo : NSObject
+@interface UMBInstalledAppInfo : NSObject
 @property (nonatomic, readonly) NSString *bundleIdentifier;
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) UIImage *icon;

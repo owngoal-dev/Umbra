@@ -2,8 +2,8 @@ import UIKit
 
 #if os(tvOS)
     private final class ApplicationSearchResultsViewController: UITableViewController {
-        var onSelect: ((AppInfo) -> Void)?
-        private var apps: [AppInfo] = []
+        var onSelect: ((UMBInstalledAppInfo) -> Void)?
+        private var apps: [UMBInstalledAppInfo] = []
         private var configuration: [String: Bool] = [:]
         private var isLoading = false
 
@@ -16,7 +16,7 @@ import UIKit
             tableView.estimatedRowHeight = 76
         }
 
-        func update(apps: [AppInfo], configuration: [String: Bool], isLoading: Bool) {
+        func update(apps: [UMBInstalledAppInfo], configuration: [String: Bool], isLoading: Bool) {
             self.apps = apps
             self.configuration = configuration
             self.isLoading = isLoading
@@ -85,8 +85,8 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
     #endif
     private let workQueue = DispatchQueue(
         label: "wiki.qaq.umbra.applications", qos: .userInitiated)
-    private var apps: [AppInfo] = []
-    private var filtered: [AppInfo] = []
+    private var apps: [UMBInstalledAppInfo] = []
+    private var filtered: [UMBInstalledAppInfo] = []
     private var configuration: [String: Bool] = [:]
     private var unavailableReason: String?
     private var isLoading = false
@@ -181,10 +181,10 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
             (cell.accessoryView as? AppSwitch)?.isEnabled = false
         }
         let load = {
-            let apps = RHBackend.installedApps()
+            let apps = UMBBackend.installedApps()
             let configuration =
-                RHBackend.configuration(forKey: "appconfig") as? [String: Bool] ?? [:]
-            let reason = RHBackend.blacklistUnavailableReason()
+                UMBBackend.configuration(forKey: "appconfig") as? [String: Bool] ?? [:]
+            let reason = UMBBackend.blacklistUnavailableReason()
             let update = {
                 self.configuration = configuration
                 self.unavailableReason = reason
@@ -421,7 +421,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
     }
 
     #if os(tvOS)
-        private func presentActions(for app: AppInfo) {
+        private func presentActions(for app: UMBInstalledAppInfo) {
             let enabled = configuration[app.bundleIdentifier ?? ""] ?? false
             let alert = UIAlertController(
                 title: app.name, message: app.bundleIdentifier, preferredStyle: .alert)
@@ -450,7 +450,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
             }
         }
 
-        private func finishSearch(selecting app: AppInfo) {
+        private func finishSearch(selecting app: UMBInstalledAppInfo) {
             search.isActive = false
             search.searchBar.text = nil
             filtered = apps
@@ -467,18 +467,18 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         }
     #endif
 
-    private func toggle(_ app: AppInfo, enabled: Bool) {
+    private func toggle(_ app: UMBInstalledAppInfo, enabled: Bool) {
         let identifier = app.bundleIdentifier ?? ""
         guard !isLoading, !isWorking, !pendingChanges.contains(identifier) else {
             updateApp(identifier)
             return
         }
-        if let reason = unavailableReason ?? RHBackend.blacklistRejection(for: app) {
+        if let reason = unavailableReason ?? UMBBackend.blacklistRejection(for: app) {
             updateApp(identifier)
             showMessage(reason, title: localized("Blacklist is unavailable"), from: self)
             return
         }
-        if enabled && !didShowCompatibilityWarning && RHBackend.requiresCompatibilityWarning() {
+        if enabled && !didShowCompatibilityWarning && UMBBackend.requiresCompatibilityWarning() {
             updateApp(identifier)
             let alert = UIAlertController(
                 title: localized("Warning"),
@@ -498,7 +498,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         }
     }
 
-    private func save(_ app: AppInfo, enabled: Bool) {
+    private func save(_ app: UMBInstalledAppInfo, enabled: Bool) {
         let identifier = app.bundleIdentifier ?? ""
         guard !isLoading, !isWorking, pendingChanges.insert(identifier).inserted else { return }
         let previous = configuration[identifier]
@@ -507,7 +507,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
         updateApp(identifier)
         workQueue.async {
             do {
-                try RHBackend.setBlacklisted(enabled, for: app)
+                try UMBBackend.setBlacklisted(enabled, for: app)
                 DispatchQueue.main.async {
                     self.pendingChanges.remove(identifier)
                     self.updateApp(identifier)
@@ -592,7 +592,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
 
     #endif
 
-    private func confirmClear(_ app: AppInfo) {
+    private func confirmClear(_ app: UMBInstalledAppInfo) {
         guard !isWorking, !isLoading, pendingChanges.isEmpty else { return }
         let name = app.name ?? app.bundleIdentifier ?? ""
         let alert = UIAlertController(
@@ -604,7 +604,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
             UIAlertAction(title: localized("Clear Data"), style: .destructive) { _ in
                 self.isWorking = true
                 let work = DispatchWorkItem {
-                    let error = RHBackend.clearData(for: app)
+                    let error = UMBBackend.clearData(for: app)
                     DispatchQueue.main.async {
                         self.isWorking = false
                         self.operationStatus =

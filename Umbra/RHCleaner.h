@@ -2,7 +2,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RHCleanItem : NSObject
+@interface UMBCleanItem : NSObject
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *path;
 @property (nonatomic) BOOL folder;
@@ -10,16 +10,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL ignored;
 @end
 
-@interface RHCleanGroup : NSObject
+@interface UMBCleanGroup : NSObject
 @property (nonatomic, copy) NSString *path;
-@property (nonatomic, copy) NSArray<RHCleanItem *> *items;
+@property (nonatomic, copy) NSArray<UMBCleanItem *> *items;
 @property (nonatomic, copy, nullable) NSString *errorMessage;
 @end
 
-@interface RHCleaner : NSObject
-+ (nullable NSArray<RHCleanGroup *> *)scanKeepingSelection:
-                                          (NSDictionary<NSString *, NSNumber *> *)selection
-                                                     error:(NSError **)error
+@interface UMBCleaner : NSObject
++ (nullable NSArray<UMBCleanGroup *> *)scanKeepingSelection:
+                                           (NSDictionary<NSString *, NSNumber *> *)selection
+                                                      error:(NSError **)error
     NS_SWIFT_NAME(scan(selection:));
 + (NSDictionary<NSString *, NSString *> *)removePaths:(NSArray<NSString *> *)paths
     NS_SWIFT_NAME(remove(paths:));

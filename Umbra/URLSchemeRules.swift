@@ -12,7 +12,7 @@ enum URLSchemeRules {
     static let key = "urlSchemeReplacements"
 
     static var isSupported: Bool {
-        guard let version = RHBackend.relaxinMarketingVersion(),
+        guard let version = UMBBackend.relaxinMarketingVersion(),
             version.split(separator: ".", omittingEmptySubsequences: false).allSatisfy({
                 UInt($0) != nil
             })
@@ -38,7 +38,7 @@ enum URLSchemeRules {
     }
 
     private static func configuration() throws -> [String: Any] {
-        guard let value = RHBackend.configuration(forKey: key) else { return [:] }
+        guard let value = UMBBackend.configuration(forKey: key) else { return [:] }
         guard let rules = value as? [String: Any] else {
             throw failure(localized("The saved configuration is not a valid dictionary."))
         }
@@ -70,13 +70,13 @@ enum URLSchemeRules {
         }
         if let original { rules.removeValue(forKey: original) }
         rules[rule.source] = ["target": rule.target, "enabled": rule.enabled]
-        try RHBackend.setConfiguration(rules, forKey: key)
+        try UMBBackend.setConfiguration(rules, forKey: key)
     }
 
     static func remove(_ source: String) throws {
         var rules = try configuration()
         rules.removeValue(forKey: source)
-        try RHBackend.setConfiguration(rules, forKey: key)
+        try UMBBackend.setConfiguration(rules, forKey: key)
     }
 
     static func failure(_ message: String) -> NSError {

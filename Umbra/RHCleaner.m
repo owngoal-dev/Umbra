@@ -5,10 +5,10 @@
 extern BOOL RootUserGetDirectoryContents(NSString *path, NSString *cacheFile);
 extern BOOL RootUserRemoveItemAtPath(NSString *path);
 
-@implementation RHCleanItem
+@implementation UMBCleanItem
 @end
 
-@implementation RHCleanGroup
+@implementation UMBCleanGroup
 @end
 
 static BOOL Matches(NSString *name, NSArray *list) {
@@ -34,10 +34,10 @@ static BOOL Matches(NSString *name, NSArray *list) {
     return NO;
 }
 
-NSArray<RHCleanItem *> *
+NSArray<UMBCleanItem *> *
 RHCleanerItemsForDirectory(NSString *path, NSArray<NSDictionary *> *contents, NSDictionary *rule,
                            NSDictionary *custom, NSDictionary<NSString *, NSNumber *> *selection) {
-    NSMutableArray<RHCleanItem *> *items = [NSMutableArray new];
+    NSMutableArray<UMBCleanItem *> *items = [NSMutableArray new];
     for (id entry in contents) {
         if (![entry isKindOfClass:NSDictionary.class])
             continue;
@@ -71,7 +71,7 @@ RHCleanerItemsForDirectory(NSString *path, NSArray<NSDictionary *> *contents, NS
             checked = !ignored && [custom[@"default"] isEqual:@"blacklist"];
         }
 
-        RHCleanItem *item = [RHCleanItem new];
+        UMBCleanItem *item = [UMBCleanItem new];
         item.name = name;
         item.path = [path stringByAppendingPathComponent:name];
         item.folder = [entry[@"isDirectory"] boolValue];
@@ -79,7 +79,7 @@ RHCleanerItemsForDirectory(NSString *path, NSArray<NSDictionary *> *contents, NS
         item.ignored = ignored;
         [items addObject:item];
     }
-    [items sortUsingComparator:^NSComparisonResult(RHCleanItem *a, RHCleanItem *b) {
+    [items sortUsingComparator:^NSComparisonResult(UMBCleanItem *a, UMBCleanItem *b) {
         if (a.folder != b.folder)
             return a.folder ? NSOrderedAscending : NSOrderedDescending;
         return [a.name localizedCaseInsensitiveCompare:b.name];
@@ -175,10 +175,10 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
     return rules;
 }
 
-@implementation RHCleaner
+@implementation UMBCleaner
 
-+ (NSArray<RHCleanGroup *> *)scanKeepingSelection:(NSDictionary<NSString *, NSNumber *> *)selection
-                                            error:(NSError **)error {
++ (NSArray<UMBCleanGroup *> *)scanKeepingSelection:(NSDictionary<NSString *, NSNumber *> *)selection
+                                             error:(NSError **)error {
     NSDictionary *rules =
         ReadRules(jbroot(@"/var/mobile/Library/RootHide/varCleanRules.plist"), NO, error);
     if (!rules)
@@ -194,7 +194,7 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
 
     NSMutableSet<NSString *> *paths = [NSMutableSet setWithArray:rules.allKeys];
     [paths addObjectsFromArray:customRules.allKeys];
-    NSMutableArray<RHCleanGroup *> *groups = [NSMutableArray new];
+    NSMutableArray<UMBCleanGroup *> *groups = [NSMutableArray new];
     NSFileManager *manager = NSFileManager.defaultManager;
     for (NSString *path in paths) {
         NSArray *contents = GetDirectoryContents(path);
@@ -206,7 +206,7 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
             }
         }
 
-        RHCleanGroup *group = [RHCleanGroup new];
+        UMBCleanGroup *group = [UMBCleanGroup new];
         group.path = path;
         group.items = RHCleanerItemsForDirectory(path, contents, rules[path] ?: customRules[path],
                                                  rules[path] ? customRules[path] : nil, selection);
@@ -215,7 +215,7 @@ static NSDictionary *ReadRules(NSString *path, BOOL validateEntries, NSError **e
         }
         [groups addObject:group];
     }
-    [groups sortUsingComparator:^NSComparisonResult(RHCleanGroup *a, RHCleanGroup *b) {
+    [groups sortUsingComparator:^NSComparisonResult(UMBCleanGroup *a, UMBCleanGroup *b) {
         if ((a.items.count > 0) != (b.items.count > 0))
             return a.items.count > 0 ? NSOrderedAscending : NSOrderedDescending;
         return [a.path compare:b.path];

@@ -182,7 +182,7 @@ static NSArray<NSNumber *> *ConfigPorts(NSMutableDictionary *config, NSString *s
 
 static NSMutableDictionary *ReadConfig(NSString *service, NSData **original, NSError **error) {
     NSString *path = ServicePath(service);
-    if (!path || ![[RHServicePorts installedServices] containsObject:service]) {
+    if (!path || ![[UMBServicePorts installedServices] containsObject:service]) {
         PortError(error, NSLocalizedString(@"Service is not installed.", nil));
         return nil;
     }
@@ -278,7 +278,7 @@ static BOOL PortsAreListening(NSArray<NSNumber *> *ports) {
     return YES;
 }
 
-@implementation RHServicePorts
+@implementation UMBServicePorts
 
 + (NSArray<NSString *> *)installedServices {
     NSString *status = [NSString stringWithContentsOfFile:jbroot(@"/var/lib/dpkg/status")
