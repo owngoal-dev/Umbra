@@ -4,6 +4,11 @@
 <dict>
 	<key>UILaunchScreen</key>
 	<dict/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>irisin</string>
+		<string>sileo</string>
+	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

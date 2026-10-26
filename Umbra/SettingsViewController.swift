@@ -12,6 +12,14 @@ final class SettingsViewController: UITableViewController {
         services.isEmpty ? 0 : 1
     }
 
+    private var appsSection: Int? {
+        #if os(iOS)
+            rulesSection + 1
+        #else
+            nil
+        #endif
+    }
+
     init(check: EnvironmentCheck) {
         self.check = check
         super.init(style: AppPlatform.tableStyle)
@@ -63,22 +71,35 @@ final class SettingsViewController: UITableViewController {
     }
 
     override func numberOfSections(in _: UITableView) -> Int {
-        rulesSection + 1
+        #if os(iOS)
+            rulesSection + 2
+        #else
+            rulesSection + 1
+        #endif
     }
 
     override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
-        section == rulesSection ? (showsURLSchemeReplacements ? 2 : 1) : services.count
+        if section == appsSection {
+            return OwnGoalApps.all.count
+        }
+        return section == rulesSection ? (showsURLSchemeReplacements ? 2 : 1) : services.count
     }
 
     override func tableView(_: UITableView, titleForHeaderInSection section: Int)
         -> String?
     {
-        localized(section == rulesSection ? "Advanced" : "Services")
+        if section == appsSection {
+            return localized("OwnGoal Picks")
+        }
+        return localized(section == rulesSection ? "Advanced" : "Services")
     }
 
     override func tableView(
         _ tableView: UITableView, cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
+        if indexPath.section == appsSection {
+            return appCell(in: tableView, app: OwnGoalApps.all[indexPath.row])
+        }
         let isRule = indexPath.section == rulesSection
         let isReplacement = isRule && showsURLSchemeReplacements && indexPath.row == 0
         let cell = detailCell(in: tableView, reuseIdentifier: isRule ? "Rules" : "Service")
@@ -118,6 +139,41 @@ final class SettingsViewController: UITableViewController {
         #else
             cell.selectionStyle = .default
         #endif
+        return cell
+    }
+
+    private func appCell(in tableView: UITableView, app: OwnGoalApp) -> UITableViewCell {
+        let cell = detailCell(in: tableView, reuseIdentifier: "OwnGoalApp")
+        var content = cell.defaultContentConfiguration()
+        content.image = UIImage(named: app.iconName)
+        content.imageProperties.maximumSize = AppPlatform.applicationIconSize
+        content.imageProperties.reservedLayoutSize = AppPlatform.applicationIconSize
+        content.imageProperties.cornerRadius = AppPlatform.applicationIconCornerRadius
+        content.imageToTextPadding = 16
+        content.text = app.name
+        content.textProperties.font = .preferredFont(forTextStyle: .headline)
+        content.textProperties.adjustsFontForContentSizeCategory = true
+        content.secondaryText = localized(app.taglineKey)
+        content.secondaryTextProperties.font = .preferredFont(forTextStyle: .subheadline)
+        content.secondaryTextProperties.color = .secondaryLabel
+        content.secondaryTextProperties.numberOfLines = 2
+        content.secondaryTextProperties.adjustsFontForContentSizeCategory = true
+        content.textToSecondaryTextVerticalPadding = 2
+        content.directionalLayoutMargins = NSDirectionalEdgeInsets(
+            top: 12, leading: 20, bottom: 12, trailing: 20
+        )
+        cell.contentConfiguration = content
+
+        let arrow = UIImageView(image: UIImage(systemName: "arrow.up.right"))
+        arrow.tintColor = .tertiaryLabel
+        arrow.preferredSymbolConfiguration = UIImage.SymbolConfiguration(
+            pointSize: 13, weight: .semibold
+        )
+        cell.accessoryView = arrow
+        cell.selectionStyle = .default
+        cell.isAccessibilityElement = true
+        cell.accessibilityLabel = "\(app.name), \(localized(app.taglineKey))"
+        cell.accessibilityTraits = .button
         return cell
     }
 
@@ -175,6 +231,12 @@ final class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        #if os(iOS)
+            if indexPath.section == appsSection {
+                open(OwnGoalApps.all[indexPath.row])
+                return
+            }
+        #endif
         #if os(tvOS)
             if indexPath.section == servicesSection, !services.isEmpty {
                 self.tableView(tableView, accessoryButtonTappedForRowWith: indexPath)
@@ -191,6 +253,25 @@ final class SettingsViewController: UITableViewController {
             }
         }
     }
+
+    #if os(iOS)
+        private func open(_ app: OwnGoalApp) {
+            open([app.irisinURL, app.sileoURL, app.repositoryURL], at: 0)
+        }
+
+        private func open(_ urls: [URL], at index: Int) {
+            guard index < urls.count else { return }
+            let url = urls[index]
+            guard UIApplication.shared.canOpenURL(url) else {
+                open(urls, at: index + 1)
+                return
+            }
+            UIApplication.shared.open(url, options: [:]) { [weak self] opened in
+                guard !opened else { return }
+                self?.open(urls, at: index + 1)
+            }
+        }
+    #endif
 
     override func tableView(
         _: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath

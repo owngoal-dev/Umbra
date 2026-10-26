@@ -33,7 +33,7 @@ The tvOS build requires a compatible tvOS RootHide runtime, `libroothide.dylib`,
 ### Artifacts and validation
 
 The unsigned archive contains `Products/Applications/Umbra.app`. The deb is written to
-`packages/wiki.qaq.umbra_2.1_appletvos-arm64e.deb` with the version from `control`.
+`packages/wiki.qaq.umbra_2.2.1_appletvos-arm64e.deb` with the version from `control`.
 Both contain an arm64 Mach-O executable with the tvOS platform, minimum OS 15.0 and device
 family 3. The deb retains the existing RootHide signing and installation hooks.
 
@@ -71,7 +71,7 @@ tvOS 版本仍需兼容的 tvOS RootHide 环境、`libroothide.dylib`、特权 h
 ### 产物与验证
 
 未签名归档内含 `Products/Applications/Umbra.app`。deb 输出到
-`packages/wiki.qaq.umbra_2.1_appletvos-arm64e.deb`，版本来自 `control`。
+`packages/wiki.qaq.umbra_2.2.1_appletvos-arm64e.deb`，版本来自 `control`。
 两者的程序实际为 arm64 Mach-O，平台为 tvOS，最低系统版本 15.0、设备族 3。
 deb 沿用现有 RootHide 签名与安装脚本。
 
