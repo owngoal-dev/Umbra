@@ -45,6 +45,13 @@ enum OwnGoalApps {
             repositoryURL: URL(string: "https://github.com/owngoal-dev/Inspector")!
         ),
         OwnGoalApp(
+            name: "iGhostVT",
+            taglineKey: "A Ghostty-Powered Terminal",
+            iconName: "OwnGoalIGhostVT",
+            packageIdentifier: "wiki.qaq.ighostvt",
+            repositoryURL: URL(string: "https://github.com/owngoal-dev/iGhostVT")!
+        ),
+        OwnGoalApp(
             name: "Xrash",
             taglineKey: "Understand Every Crash",
             iconName: "OwnGoalXrash",
@@ -52,11 +59,11 @@ enum OwnGoalApps {
             repositoryURL: URL(string: "https://github.com/owngoal-dev/Xrash")!
         ),
         OwnGoalApp(
-            name: "iGhostVT",
-            taglineKey: "A Ghostty-Powered Terminal",
-            iconName: "OwnGoalIGhostVT",
-            packageIdentifier: "wiki.qaq.ighostvt",
-            repositoryURL: URL(string: "https://github.com/owngoal-dev/iGhostVT")!
+            name: "Apelin",
+            taglineKey: "Write. Build. Install. On the device.",
+            iconName: "OwnGoalApelin",
+            packageIdentifier: "wiki.qaq.apelin",
+            repositoryURL: URL(string: "https://github.com/owngoal-dev/Apelin")!
         ),
     ]
 }
