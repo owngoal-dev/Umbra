@@ -31,6 +31,25 @@
 		87A875551EF338E170387F1F /* ServicePortsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBE446981E8180EE6C00850 /* ServicePortsViewController.swift */; };
 		9CE313C1225F23ECFF381842 /* URLSchemeRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3867B2F887651DAF4ED47F /* URLSchemeRules.swift */; };
 		853872BBF6F4A946C7A49E52 /* URLSchemeRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C651B7E5F16BFE7972ED4FED /* URLSchemeRulesViewController.swift */; };
+		782ABFDA0EF08C5307899C51 /* UMBInstalledAppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA3034A2A47EBA800DC242C /* UMBInstalledAppInfo.m */; };
+		8E5F843B21FCD6CC44EA6186 /* NSJSONSerialization+UMBComments.m in Sources */ = {isa = PBXBuildFile; fileRef = 8477B5E02A7526AB000632D0 /* NSJSONSerialization+UMBComments.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		2870DFF6E303CE3D29CFC3F5 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1D0D1BEDF1A3D6E5DD573FEF /* Localizable.xcstrings */; };
+		7BD657658CF14DCFC2DAE5E4 /* UMBAppDataCleaner.m in Sources */ = {isa = PBXBuildFile; fileRef = 848148282D131A2800CB9FA9 /* UMBAppDataCleaner.m */; };
+		2E38AEE21F02262C4BBAAB01 /* TVRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C2BC17CAEF4E07F56CEC68 /* TVRootView.swift */; };
+		3321FEF82C6D463376D92D7D /* UMBServicePorts.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FC90C131A8DAF0249A56E4D /* UMBServicePorts.m */; };
+		53EB395247F5D33D31793899 /* TVAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23369595B8513B1F9C702FCB /* TVAppDelegate.swift */; };
+		3FB8CC3605FD5F1DC8D75D57 /* UMBBackend.m in Sources */ = {isa = PBXBuildFile; fileRef = 570EE24F94889E07F90B9E5D /* UMBBackend.m */; };
+		63438B83DE0EE8F239FACC0F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EF76878C8C271E38DFBA267 /* Foundation.framework */; };
+		122EB4195FCB8382695AEFDD /* TVModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6CC4F8A535A0402B73D6CB /* TVModel.swift */; };
+		2ABA90D8CA328FB30ECCC569 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A672ABBE27F748E100878787 /* Assets.xcassets */; };
+		BD59F2D7BE10CF801FD4475D /* TVCleanerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A773B33559E5397096B0C7 /* TVCleanerView.swift */; };
+		F9BCDF39DD2249E67D187BB3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A672ABC427F748E100878787 /* main.m */; };
+		52BB26AFC28ED6BCC9D44236 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847EBF802D9B01DB0052E18F /* MobileCoreServices.framework */; };
+		B9F0ABDF727DF5FADFE6518F /* VarCleanRules.json in Resources */ = {isa = PBXBuildFile; fileRef = 84BBFAC72A741C800054A68E /* VarCleanRules.json */; };
+		34003D6ACA0586C51B927239 /* UMBCleaner.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA5EF4DF8534306039B07C /* UMBCleaner.m */; };
+		3219C17C00784C9182B1A603 /* TVComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F94E81D6984405A0A2CABE /* TVComponents.swift */; };
+		9F012C8706314AEBA5C74626 /* TVApplicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D32BD0E37445689CF50FE4 /* TVApplicationsView.swift */; };
+		F2A72055120542B0A32ACB1A /* TVEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB73B18D049146F18EEED671 /* TVEnvironmentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +95,15 @@
 		1FBE446981E8180EE6C00850 /* ServicePortsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ServicePortsViewController.swift"; sourceTree = "<group>"; };
 		5A3867B2F887651DAF4ED47F /* URLSchemeRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSchemeRules.swift; sourceTree = "<group>"; };
 		C651B7E5F16BFE7972ED4FED /* URLSchemeRulesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSchemeRulesViewController.swift; sourceTree = "<group>"; };
+		0EF76878C8C271E38DFBA267 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		5E6CC4F8A535A0402B73D6CB /* TVModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TVModel.swift; sourceTree = "<group>"; };
+		22C2BC17CAEF4E07F56CEC68 /* TVRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TVRootView.swift; sourceTree = "<group>"; };
+		59A773B33559E5397096B0C7 /* TVCleanerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TVCleanerView.swift; sourceTree = "<group>"; };
+		23369595B8513B1F9C702FCB /* TVAppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TVAppDelegate.swift; sourceTree = "<group>"; };
+		F69C1736E1AF45D665B39C10 /* Umbra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Umbra.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0F94E81D6984405A0A2CABE /* TVComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVComponents.swift; sourceTree = "<group>"; };
+		97D32BD0E37445689CF50FE4 /* TVApplicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVApplicationsView.swift; sourceTree = "<group>"; };
+		CB73B18D049146F18EEED671 /* TVEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVEnvironmentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +114,15 @@
 				848D86672DBC606D003C680F /* IOKit.framework in Frameworks */,
 				847EBF812D9B01DB0052E18F /* MobileCoreServices.framework in Frameworks */,
 				840A948D2C6C9F3C00180FFA /* libroothide.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4CC8CF0732BF11984CC69442 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63438B83DE0EE8F239FACC0F /* Foundation.framework in Frameworks */,
+				52BB26AFC28ED6BCC9D44236 /* MobileCoreServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -122,6 +159,7 @@
 				A672ABB127F748DE00878787 /* Umbra */,
 				A672ABB027F748DE00878787 /* Products */,
 				BFE9353B27F753D30022D46C /* Frameworks */,
+				A5D5B9370506491A7B3282B0 /* UmbraTV */,
 			);
 			sourceTree = "<group>";
 		};
@@ -129,6 +167,7 @@
 			isa = PBXGroup;
 			children = (
 				A672ABAF27F748DE00878787 /* Umbra.app */,
+				F69C1736E1AF45D665B39C10 /* Umbra.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -176,8 +215,32 @@
 			children = (
 				848D86662DBC606D003C680F /* IOKit.framework */,
 				847EBF802D9B01DB0052E18F /* MobileCoreServices.framework */,
+				8939E7620452939AEA73A43D /* tvOS */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A5D5B9370506491A7B3282B0 /* UmbraTV */ = {
+			isa = PBXGroup;
+			children = (
+				23369595B8513B1F9C702FCB /* TVAppDelegate.swift */,
+				59A773B33559E5397096B0C7 /* TVCleanerView.swift */,
+				5E6CC4F8A535A0402B73D6CB /* TVModel.swift */,
+				C0F94E81D6984405A0A2CABE /* TVComponents.swift */,
+				97D32BD0E37445689CF50FE4 /* TVApplicationsView.swift */,
+				CB73B18D049146F18EEED671 /* TVEnvironmentView.swift */,
+				22C2BC17CAEF4E07F56CEC68 /* TVRootView.swift */,
+			);
+			name = UmbraTV;
+			path = UmbraTV;
+			sourceTree = "<group>";
+		};
+		8939E7620452939AEA73A43D /* tvOS */ = {
+			isa = PBXGroup;
+			children = (
+				0EF76878C8C271E38DFBA267 /* Foundation.framework */,
+			);
+			name = tvOS;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -198,6 +261,23 @@
 			name = Umbra;
 			productName = Umbra;
 			productReference = A672ABAF27F748DE00878787 /* Umbra.app */;
+			productType = "com.apple.product-type.application";
+		};
+		EAA8D77BFAEFBA2D63BC66D2 /* UmbraTV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C2D3FB86369CB984FB3EA831 /* Build configuration list for PBXNativeTarget "UmbraTV" */;
+			buildPhases = (
+				89ABF28DDD5709B784E24DDF /* Sources */,
+				4CC8CF0732BF11984CC69442 /* Frameworks */,
+				5DA0E3A3D315DABE3F9BBDC8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UmbraTV;
+			productName = UmbraTV;
+			productReference = F69C1736E1AF45D665B39C10 /* Umbra.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -236,6 +316,7 @@
 			projectRoot = "";
 			targets = (
 				A672ABAE27F748DE00878787 /* Umbra */,
+				EAA8D77BFAEFBA2D63BC66D2 /* UmbraTV */,
 			);
 		};
 /* End PBXProject section */
@@ -248,6 +329,16 @@
 				1ABB0BD182343F4D3D34C97F /* Localizable.xcstrings in Resources */,
 				A672ABBF27F748E100878787 /* Assets.xcassets in Resources */,
 				84BBFAC92A7420100054A68E /* VarCleanRules.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5DA0E3A3D315DABE3F9BBDC8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2870DFF6E303CE3D29CFC3F5 /* Localizable.xcstrings in Resources */,
+				2ABA90D8CA328FB30ECCC569 /* Assets.xcassets in Resources */,
+				B9F0ABDF727DF5FADFE6518F /* VarCleanRules.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +367,27 @@
 				A672ABC527F748E100878787 /* main.m in Sources */,
 				8477B5E22A7526AB000632D0 /* NSJSONSerialization+UMBComments.m in Sources */,
 				848148292D131A2800CB9FA9 /* UMBAppDataCleaner.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		89ABF28DDD5709B784E24DDF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53EB395247F5D33D31793899 /* TVAppDelegate.swift in Sources */,
+				BD59F2D7BE10CF801FD4475D /* TVCleanerView.swift in Sources */,
+				122EB4195FCB8382695AEFDD /* TVModel.swift in Sources */,
+				3219C17C00784C9182B1A603 /* TVComponents.swift in Sources */,
+				9F012C8706314AEBA5C74626 /* TVApplicationsView.swift in Sources */,
+				F2A72055120542B0A32ACB1A /* TVEnvironmentView.swift in Sources */,
+				2E38AEE21F02262C4BBAAB01 /* TVRootView.swift in Sources */,
+				782ABFDA0EF08C5307899C51 /* UMBInstalledAppInfo.m in Sources */,
+				3321FEF82C6D463376D92D7D /* UMBServicePorts.m in Sources */,
+				3FB8CC3605FD5F1DC8D75D57 /* UMBBackend.m in Sources */,
+				34003D6ACA0586C51B927239 /* UMBCleaner.m in Sources */,
+				F9BCDF39DD2249E67D187BB3 /* main.m in Sources */,
+				8E5F843B21FCD6CC44EA6186 /* NSJSONSerialization+UMBComments.m in Sources */,
+				7BD657658CF14DCFC2DAE5E4 /* UMBAppDataCleaner.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -425,21 +537,20 @@
 					"$(PROJECT_DIR)/Umbra/Platform",
 					"$(PROJECT_DIR)/Umbra/roothide",
 				);
-				MARKETING_VERSION = 2.2.1;
+				MARKETING_VERSION = 2.2.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lz",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = wiki.qaq.umbra;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
 				SWIFT_OBJC_BRIDGING_HEADER = "Umbra/Umbra-Bridging-Header.h";
-				OTHER_LDFLAGS = ("$(inherited)", "-lz");
-				"OTHER_LDFLAGS[sdk=appletv*]" = ("$(inherited)", "-lroothide-tvos");
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"TARGETED_DEVICE_FAMILY[sdk=appletv*]" = 3;
-				SUPPORTED_PLATFORMS = "iphoneos appletvos";
-				TVOS_DEPLOYMENT_TARGET = 15.0;
-				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletv*]" = AppIconTV;
 				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)";
 			};
 			name = Debug;
@@ -474,21 +585,116 @@
 					"$(PROJECT_DIR)/Umbra/Platform",
 					"$(PROJECT_DIR)/Umbra/roothide",
 				);
-				MARKETING_VERSION = 2.2.1;
+				MARKETING_VERSION = 2.2.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lz",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = wiki.qaq.umbra;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
 				SWIFT_OBJC_BRIDGING_HEADER = "Umbra/Umbra-Bridging-Header.h";
-				OTHER_LDFLAGS = ("$(inherited)", "-lz");
-				"OTHER_LDFLAGS[sdk=appletv*]" = ("$(inherited)", "-lroothide-tvos");
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"TARGETED_DEVICE_FAMILY[sdk=appletv*]" = 3;
-				SUPPORTED_PLATFORMS = "iphoneos appletvos";
+				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)";
+			};
+			name = Release;
+		};
+		62AB26B6DBE05AFEC16CADBF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconTV;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Umbra/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Umbra;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Umbra",
+					"$(PROJECT_DIR)/Umbra/Platform",
+					"$(PROJECT_DIR)/Umbra/roothide",
+				);
+				MARKETING_VERSION = 2.2.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lz",
+					"-lroothide-tvos",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = wiki.qaq.umbra;
+				PRODUCT_NAME = Umbra;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = appletvos;
+				SUPPORTED_PLATFORMS = appletvos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Umbra/Umbra-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 15.0;
-				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletv*]" = AppIconTV;
+				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)";
+			};
+			name = Debug;
+		};
+		7B288BA986AEDE2F1EFB4AE0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconTV;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Umbra/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Umbra;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Umbra",
+					"$(PROJECT_DIR)/Umbra/Platform",
+					"$(PROJECT_DIR)/Umbra/roothide",
+				);
+				MARKETING_VERSION = 2.2.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lz",
+					"-lroothide-tvos",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = wiki.qaq.umbra;
+				PRODUCT_NAME = Umbra;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = appletvos;
+				SUPPORTED_PLATFORMS = appletvos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Umbra/Umbra-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)";
 			};
 			name = Release;
@@ -510,6 +716,15 @@
 			buildConfigurations = (
 				A672ABC927F748E100878787 /* Debug */,
 				A672ABCA27F748E100878787 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C2D3FB86369CB984FB3EA831 /* Build configuration list for PBXNativeTarget "UmbraTV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B288BA986AEDE2F1EFB4AE0 /* Release */,
+				62AB26B6DBE05AFEC16CADBF /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

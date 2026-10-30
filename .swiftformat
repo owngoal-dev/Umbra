@@ -1,3 +1,6 @@
 --swiftversion 6.0
+--indent 4
+--linebreaks lf
+--trimwhitespace always
 --disable redundantSendable
 --exclude .build,.theos,build,DerivedData,packages,Umbra/roothide

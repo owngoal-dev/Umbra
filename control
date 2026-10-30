@@ -1,6 +1,6 @@
 Package: wiki.qaq.umbra
 Name: Umbra (RootHide Manager)
-Version: 2.2.1
+Version: 2.2.2
 Architecture: iphoneos-arm64e
 Depends: firmware (>= 15.0)
 Description: Hide custom firmware from apps in RootHide environments.

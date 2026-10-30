@@ -70,7 +70,7 @@ printf '#define VARCLEANRULESHASH %s\n' \
 
 ### tvOS
 
-Apple TV is an optional platform. See the separate [tvOS build and runtime notes](Docs/tvOS.md).
+Apple TV uses the separate `UmbraTV` target and scheme (tvOS 15+), with a native SwiftUI interface for remote navigation and the same shared core. Build with `make UMBRA_PLATFORM=tvos ipa`. See the [tvOS build and runtime notes](Docs/tvOS.md).
 
 ### License
 
@@ -144,7 +144,7 @@ printf '#define VARCLEANRULESHASH %s\n' \
 
 ### tvOS
 
-Apple TV 为可选平台，详见独立的 [tvOS 构建与运行说明](Docs/tvOS.md)。
+Apple TV 使用独立的 `UmbraTV` target 与 Scheme（tvOS 15+），以原生 SwiftUI 界面适配遥控器导航，核心层与 iOS 共用。使用 `make UMBRA_PLATFORM=tvos ipa` 构建，详见 [tvOS 构建与运行说明](Docs/tvOS.md)。
 
 ### 许可
 
