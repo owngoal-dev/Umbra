@@ -72,8 +72,9 @@ private struct TVApplicationRow: View {
             } label: {
                 HStack(spacing: 24) {
                     if let icon = app.icon {
+                        // tvOS app icons use a 5:3 landscape canvas.
                         Image(uiImage: icon).resizable().scaledToFit()
-                            .frame(width: 96, height: 72)
+                            .frame(width: 120, height: 72)
                             .accessibilityHidden(true)
                     }
                     TVRow(
