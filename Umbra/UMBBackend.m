@@ -18,6 +18,9 @@ typedef mach_port_t io_registry_entry_t;
 #endif
 
 #include <arpa/inet.h>
+#if TARGET_OS_IOS
+#include <limits.h>
+#endif
 #include <mach/machine.h>
 #include <sys/mount.h>
 #include <sys/socket.h>
@@ -266,9 +269,31 @@ static BOOL RHPortIsOpen(uint16_t port) {
     if (!app.bundleIdentifier.length || !app.bundleURL.path.length) {
         return NSLocalizedString(@"The selected app is no longer available.", nil);
     }
+#if TARGET_OS_IOS
+    if ([self hasTrollStoreMarkerForApp:app]) {
+        return NSLocalizedString(@"Data clearing is unavailable for TrollStore apps.", nil);
+    }
+#endif
     UMBKillAllForBundle(app.bundleURL.path.UTF8String);
     return geteuid() == 0 && getegid() == 0 ? UMBClearAppData(app) : UMBRootUserClearAppData(app);
 }
+
+#if TARGET_OS_IOS
++ (BOOL)hasTrollStoreMarkerForApp:(UMBInstalledAppInfo *)app {
+    NSString *bundlePath = app.bundleURL.path;
+    if (!UMBIsUUIDPathOf(bundlePath, @"/private/var/containers/Bundle/Application/")) {
+        return NO;
+    }
+    char resolvedPath[PATH_MAX];
+    if (!realpath(bundlePath.fileSystemRepresentation, resolvedPath)) {
+        return NO;
+    }
+    NSString *containerPath = [[NSString stringWithUTF8String:resolvedPath] stringByDeletingLastPathComponent];
+    NSFileManager *manager = NSFileManager.defaultManager;
+    return [manager fileExistsAtPath:[containerPath stringByAppendingPathComponent:@"_TrollStore"]] ||
+        [manager fileExistsAtPath:[containerPath stringByAppendingPathComponent:@"_TrollStoreLite"]];
+}
+#endif
 
 + (NSArray<NSDictionary<NSString *, NSString *> *> *)startupWarnings {
     NSMutableArray<NSDictionary<NSString *, NSString *> *> *warnings = [NSMutableArray new];

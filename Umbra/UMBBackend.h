@@ -1,6 +1,7 @@
 #import "UMBInstalledAppInfo.h"
 
 #import <Foundation/Foundation.h>
+#import <TargetConditionals.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,6 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
                 forApp:(UMBInstalledAppInfo *)app
                  error:(NSError **)error NS_SWIFT_NAME(setBlacklisted(_:for:));
 + (nullable NSString *)clearDataForApp:(UMBInstalledAppInfo *)app NS_SWIFT_NAME(clearData(for:));
+#if TARGET_OS_IOS
++ (BOOL)hasTrollStoreMarkerForApp:(UMBInstalledAppInfo *)app NS_SWIFT_NAME(hasTrollStoreMarker(for:));
+#endif
 + (NSArray<NSDictionary<NSString *, NSString *> *> *)startupWarnings NS_SWIFT_NAME(startupWarnings());
 + (NSString *)customRulesPath NS_SWIFT_NAME(customRulesPath());
 + (void)cleanOwnApplicationFiles NS_SWIFT_NAME(cleanOwnApplicationFiles());

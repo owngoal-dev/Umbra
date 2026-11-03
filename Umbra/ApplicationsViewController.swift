@@ -606,6 +606,9 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
               !isLoading, pendingChanges.isEmpty
         else { return nil }
         let app = filtered[indexPath.row]
+        #if os(iOS)
+            guard !UMBBackend.hasTrollStoreMarker(for: app) else { return nil }
+        #endif
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
             UIMenu(
                 children: [
@@ -629,6 +632,7 @@ final class ApplicationsViewController: UITableViewController, UISearchResultsUp
                   pendingChanges.isEmpty
             else { return nil }
             let app = filtered[indexPath.row]
+            guard !UMBBackend.hasTrollStoreMarker(for: app) else { return nil }
             let action = UIContextualAction(style: .destructive, title: localized("Clear App Data")) {
                 [weak self] _, _, done in
                 done(false)

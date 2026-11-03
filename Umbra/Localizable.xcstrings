@@ -6128,6 +6128,20 @@
         }
       }
     },
+    "Data clearing is unavailable for TrollStore apps.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ar": { "stringUnit": { "state": "translated", "value": "لا يمكن مسح بيانات تطبيقات TrollStore." } },
+        "de": { "stringUnit": { "state": "translated", "value": "Daten von TrollStore-Apps können nicht gelöscht werden." } },
+        "en": { "stringUnit": { "state": "translated", "value": "Data clearing is unavailable for TrollStore apps." } },
+        "fr": { "stringUnit": { "state": "translated", "value": "L’effacement des données n’est pas disponible pour les apps TrollStore." } },
+        "it": { "stringUnit": { "state": "translated", "value": "La cancellazione dei dati non è disponibile per le app TrollStore." } },
+        "ja": { "stringUnit": { "state": "translated", "value": "TrollStoreアプリのデータは消去できません。" } },
+        "vi": { "stringUnit": { "state": "translated", "value": "Không thể xóa dữ liệu của ứng dụng TrollStore." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法清除 TrollStore 应用的数据。" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "無法清除 TrollStore App 的資料。" } }
+      }
+    },
     "The selected app is no longer available.": {
       "extractionState": "manual",
       "localizations": {
